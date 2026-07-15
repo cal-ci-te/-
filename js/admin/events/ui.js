@@ -1,4 +1,4 @@
-// ========== UI 控制事件（已废弃，由 AdminPanel 直接绑定） ==========
+// UI 控制事件（已废弃，由 AdminPanel 直接绑定）
 export const AdminUiEvents = {
   bind: function () {
     // 事件绑定已由 AdminPanel 处理，此处留空

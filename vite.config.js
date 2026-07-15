@@ -1,8 +1,12 @@
 ﻿import { defineConfig, loadEnv } from "vite";
+import errpulse from '@errpulse/vite';  // ← 新增
 
 export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, process.cwd(), "");
     return {
+        plugins: [
+            errpulse(),  // ← 新增
+        ],
         root: "./",
         server: {
             port: 3000,
@@ -28,11 +32,9 @@ export default defineConfig(({ mode }) => {
                     timeout: 60000,
                 },
             },
-            // HMR 正常开启
             hmr: {
                 overlay: true,
             },
-            // 开发时强制禁用缓存（可选）
             watch: {
                 usePolling: true,
             },
@@ -44,7 +46,6 @@ export default defineConfig(({ mode }) => {
                     main: "index.html",
                 },
                 output: {
-                    // 添加 hash 以确保缓存更新
                     entryFileNames: 'js/[name].[hash].js',
                     chunkFileNames: 'js/[name].[hash].js',
                     assetFileNames: 'assets/[name].[hash].[ext]',

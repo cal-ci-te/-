@@ -19,13 +19,10 @@ function handleDecoUpload(req, res) {
             const id = 'deco_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
             const savedName = name || '未命名贴纸';
 
-            console.log('[Upload] 准备插入贴纸:', id, savedName, '图片大小:', imageBuffer.length);
-
             dbModule.run(
                 'INSERT INTO decos (id, name, style, image_data) VALUES (?, ?, ?, ?)',
                 [id, savedName, 'fixed', imageBuffer]
             );
-            console.log('[Upload] 插入成功');
 
             broadcast({
                 type: 'deco_created',
@@ -33,11 +30,7 @@ function handleDecoUpload(req, res) {
             });
 
             res.writeHead(200, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({
-                id: id,
-                dataUrl: base64,
-                name: savedName,
-            }));
+            res.end(JSON.stringify({ id, dataUrl: base64, name: savedName }));
         } catch (err) {
             console.error('[Upload] 处理失败:', err);
             res.writeHead(400);

@@ -1,4 +1,4 @@
-// ========== 自定义右键菜单（修复切换样式，移除对 AdminAssetEvents 的直接依赖） ==========
+//自定义右键菜单（修复切换样式，移除对 AdminAssetEvents 的直接依赖） ==========
 import { DecoShelf } from '../../services/deco.js';
 import { Utils } from '../../utils.js';
 import { EventBus } from '../../core/event-bus.js';

@@ -159,3 +159,35 @@ module.exports = {
     queryAll,
     exec
 };
+
+function closeDb() {
+    if (db) {
+        try {
+            db.close();
+            console.log('✅ 数据库连接已关闭');
+        } catch (err) {
+            console.warn('⚠️ 关闭数据库时出错:', err.message);
+        }
+    }
+}
+
+// 注册进程退出钩子
+process.on('exit', () => {
+    closeDb();
+});
+
+process.on('SIGINT', () => {
+    closeDb();
+    process.exit(0);
+});
+
+module.exports = {
+    initDb,
+    getDb: () => db,
+    saveDb,
+    run,
+    query,
+    queryAll,
+    exec,
+    closeDb,  // 导出关闭方法
+};
