@@ -1,0 +1,94 @@
+/* ========== 目录树组件 ========== */
+.directory-tree {
+    padding: 4px 0;
+}
+.tree-node {
+    list-style: none;
+    user-select: none;
+}
+.tree-node-content {
+    display: flex;
+    align-items: center;
+    padding: 4px 10px;
+    cursor: pointer;
+    transition: background 0.15s;
+    margin: 1px 4px;
+    border-left: 2px solid transparent;
+    border-radius: 4px;
+}
+.tree-node-content:hover {
+    background: rgba(90, 62, 43, 0.4);
+}
+.tree-node-content.active {
+    background: rgba(196, 122, 68, 0.25);
+    border-left-color: #c47a44;
+}
+.tree-node-content .node-icon {
+    width: 22px;
+    font-size: 14px;
+    text-align: center;
+    margin-right: 6px;
+    flex-shrink: 0;
+}
+.tree-node-content .node-title {
+    flex: 1;
+    font-size: 13px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.tree-node-content .toggle-icon {
+    width: 16px;
+    font-size: 11px;
+    text-align: center;
+    margin-right: 4px;
+    color: #8a6a4a;
+    flex-shrink: 0;
+}
+.children {
+    margin-left: 20px;
+    padding-left: 6px;
+    border-left: 1px dashed #5a3e2b;
+}
+.folder > .tree-node-content .node-title {
+    color: #e8c88a;
+    font-weight: 600;
+}
+.article > .tree-node-content .node-title {
+    color: #c4b5a0;
+}
+.visibility-toggle {
+    background: none;
+    border: none;
+    color: #3a5a2b;
+    cursor: pointer;
+    font-size: 14px;
+    margin-left: 8px;
+}
+.dropzone-background {
+    margin: 12px 8px 8px 8px;
+    padding: 16px;
+    border: 2px dashed #5a3e2b;
+    border-radius: 6px;
+    color: #7a6a58;
+    text-align: center;
+    font-size: 11px;
+    transition: background 0.2s;
+    background: rgba(26, 22, 18, 0.3);
+}
+.dropzone-background.drag-over {
+    border-color: #c47a44;
+    background: rgba(196, 122, 68, 0.15);
+}
+
+/* 右键菜单（与主站一致） */
+#custom-context-menu .ctx-item {
+    padding: 6px 16px;
+    cursor: pointer;
+    color: #e8d5b5;
+    font-size: 12px;
+    font-family: 'Courier New', monospace;
+}
+#custom-context-menu .ctx-item:hover {
+    background: #3a2a1a;
+}

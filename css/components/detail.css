@@ -1,0 +1,454 @@
+/* ========== 文章详情子页面（标签页模式） ========== */
+.detail-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(26, 22, 18, 0.92);
+  backdrop-filter: blur(12px);
+  z-index: 3000;
+  display: none;
+  flex-direction: column;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.detail-overlay.active {
+  display: flex;
+}
+
+.detail-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  background: #2a231c;
+  border: 1px solid #5a3e2b;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.4);
+}
+
+/* 标签页栏 */
+.detail-tabs {
+  display: flex;
+  background: #1e1a15;
+  border-bottom: 1px solid #5a3e2b;
+  padding: 0 8px;
+  overflow-x: auto;
+  flex-shrink: 0;
+  min-height: 40px;
+  gap: 4px;
+  align-items: center;
+}
+
+.detail-tab {
+  display: flex;
+  align-items: center;
+  padding: 8px 16px;
+  background: transparent;
+  color: #c4b5a0;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  cursor: pointer;
+  border: none;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+  white-space: nowrap;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.detail-tab:hover {
+  background: rgba(90, 62, 43, 0.3);
+  color: #e8d5b5;
+}
+
+.detail-tab.active {
+  color: #e8c88a;
+  border-bottom-color: #c47a44;
+  background: rgba(196, 122, 68, 0.1);
+}
+
+.detail-tab .tab-close {
+  background: none;
+  border: none;
+  color: #7a6a58;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0 4px;
+  line-height: 1;
+}
+
+.detail-tab .tab-close:hover {
+  color: #c44a44;
+}
+
+.detail-tab .tab-title {
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 内容面板区域 */
+.detail-panes {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+.detail-pane {
+  display: none;
+  padding: 30px 40px;
+  overflow-y: auto;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.detail-pane.active {
+  display: block;
+}
+
+/* ----- 文章正文样式（增强） ----- */
+.detail-body {
+  color: #d4c9b8;
+  line-height: 1.8;
+  font-size: 1rem;
+  font-family: 'IM Fell English', 'Georgia', serif;
+}
+
+.detail-body h1 {
+  font-size: 2rem;
+  color: #e8c88a;
+  border-bottom: 1px solid #5a3e2b;
+  padding-bottom: 10px;
+  margin: 24px 0 16px;
+}
+
+.detail-body h2 {
+  font-size: 1.6rem;
+  color: #e8c88a;
+  margin: 24px 0 12px;
+  border-left: 4px solid #c47a44;
+  padding-left: 12px;
+}
+
+.detail-body h3 {
+  font-size: 1.3rem;
+  color: #d4b88a;
+  margin: 20px 0 10px;
+  padding-left: 8px;
+}
+
+.detail-body p {
+  margin-bottom: 1.2em;
+}
+
+.detail-body strong {
+  color: #e8c88a;
+}
+
+.detail-body em {
+  color: #c4b5a0;
+  font-style: italic;
+}
+
+.detail-body ul {
+  margin: 8px 0 12px 24px;
+  list-style: disc;
+}
+
+.detail-body ul li {
+  margin-bottom: 4px;
+}
+
+.detail-body blockquote {
+  border-left: 3px solid #c47a44;
+  padding-left: 16px;
+  margin: 12px 0;
+  color: #b8a992;
+  font-style: italic;
+  background: rgba(196, 122, 68, 0.05);
+  padding: 8px 16px;
+  border-radius: 4px;
+}
+
+.detail-body code {
+  background: #1e1a15;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9rem;
+  color: #e8c88a;
+}
+
+.detail-body pre {
+  background: #1e1a15;
+  padding: 16px;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 12px 0;
+  border: 1px solid #5a3e2b;
+}
+
+.detail-body pre code {
+  background: none;
+  padding: 0;
+  font-size: 0.9rem;
+}
+
+/* 移动端 */
+@media (max-width: 768px) {
+  .detail-overlay {
+    padding: 10px;
+  }
+  .detail-pane {
+    padding: 20px;
+  }
+  .detail-tab .tab-title {
+    max-width: 100px;
+  }
+  .detail-body h1 {
+    font-size: 1.6rem;
+  }
+  .detail-body h2 {
+    font-size: 1.3rem;
+  }
+  .detail-body h3 {
+    font-size: 1.1rem;
+  }
+}
+
+/* ========== 面板控制栏（浏览器风格） ========== */
+.pane-controls {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #5a3e2b;
+  padding-bottom: 10px;
+}
+
+.pane-controls button {
+  background: none;
+  border: none;
+  color: #c4b5a0;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 2px 8px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.pane-controls button:hover {
+  background: rgba(90, 62, 43, 0.3);
+  color: #e8d5b5;
+}
+
+.pane-controls .pane-close:hover {
+  color: #c44a44;
+  background: rgba(196, 68, 68, 0.2);
+}
+
+/* ========== 悬浮窗样式 ========== */
+.floating-window {
+  position: fixed;
+  z-index: 3100;
+  background: #2a231c;
+  border: 1px solid #5a3e2b;
+  border-radius: 8px;
+  box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.35);
+  min-width: 200px;
+  max-width: 320px;
+  cursor: default;
+  padding: 6px 10px;
+  user-select: none;
+  backdrop-filter: blur(4px);
+  transition: opacity 0.2s;
+}
+
+.floating-window .floating-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.floating-window .floating-title {
+  font-family: 'Courier New', monospace;
+  color: #e8c88a;
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
+
+.floating-window .floating-header button {
+  background: none;
+  border: none;
+  color: #c4b5a0;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.floating-window .floating-header button:hover {
+  background: rgba(90, 62, 43, 0.3);
+  color: #e8d5b5;
+}
+
+.floating-window .floating-header .floating-close:hover {
+  color: #c44a44;
+  background: rgba(196, 68, 68, 0.2);
+}
+
+/* 移动端调整 */
+@media (max-width: 768px) {
+  .floating-window {
+    min-width: 160px;
+    max-width: 260px;
+    padding: 4px 8px;
+  }
+  .floating-window .floating-title {
+    font-size: 12px;
+  }
+}
+
+/* ========== 面板控制栏 ========== */
+.pane-controls {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #5a3e2b;
+  padding-bottom: 10px;
+}
+
+.pane-controls button {
+  background: none;
+  border: none;
+  color: #c4b5a0;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 2px 8px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.pane-controls button:hover {
+  background: rgba(90, 62, 43, 0.3);
+  color: #e8d5b5;
+}
+
+.pane-controls .pane-close:hover {
+  color: #c44a44;
+  background: rgba(196, 68, 68, 0.2);
+}
+
+/* ========== 左下角最小化栏（类似浏览器标签栏） ========== */
+.minimized-bar {
+  position: fixed;
+  left: 20px;
+  top: 10px;
+  max-width: calc(100vw - 40px);
+  height: 40px;
+  background: #1e1a15;
+  border: 1px solid #5a3e2b;
+  border-radius: 8px;
+  display: none; /* 默认隐藏，有内容时显示 */
+  align-items: center;
+  padding: 0 8px;
+  gap: 4px;
+  overflow-x: auto; /* 超出滚动 */
+  overflow-y: hidden;
+  white-space: nowrap;
+  z-index: 3100;
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.35);
+  scrollbar-width: thin;
+  scrollbar-color: #5a3e2b #1e1a15;
+}
+
+.minimized-bar::-webkit-scrollbar {
+  height: 4px;
+}
+
+.minimized-bar::-webkit-scrollbar-track {
+  background: #1e1a15;
+}
+
+.minimized-bar::-webkit-scrollbar-thumb {
+  background: #5a3e2b;
+  border-radius: 4px;
+}
+
+.minimized-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #2a231c;
+  border: 1px solid #5a3e2b;
+  border-radius: 4px;
+  padding: 2px 8px;
+  flex-shrink: 0;
+  height: 30px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.minimized-item:hover {
+  background: #3a2a1a;
+}
+
+.minimized-item .minimized-title {
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  color: #e8d5b5;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.minimized-item .minimized-restore,
+.minimized-item .minimized-close {
+  background: none;
+  border: none;
+  color: #c4b5a0;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 0 2px;
+  line-height: 1;
+}
+
+.minimized-item .minimized-restore:hover {
+  color: #e8c88a;
+}
+
+.minimized-item .minimized-close:hover {
+  color: #c44a44;
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+  .minimized-bar {
+    left: 10px;
+    bottom: 10px;
+    max-width: calc(100vw - 20px);
+    height: 36px;
+    padding: 0 6px;
+  }
+  .minimized-item {
+    height: 26px;
+    padding: 0 6px;
+  }
+  .minimized-item .minimized-title {
+    max-width: 80px;
+    font-size: 11px;
+  }
+}

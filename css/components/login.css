@@ -1,0 +1,54 @@
+/* ========== 登录UI ========== */
+.login-widget {
+  position: fixed;
+  top: 70px; /* 从20px改为70px，向下移动50px */
+  right: 20px;
+  z-index: 1002;
+  cursor: pointer;
+}
+
+.login-trigger {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(42, 35, 28, 0.85);
+  backdrop-filter: blur(8px);
+  padding: 6px 14px 6px 10px;
+  border-radius: 50px;
+  border: 1px solid #5a3e2b;
+  transition: all 0.2s ease;
+}
+
+.login-trigger:hover {
+  background: rgba(42, 35, 28, 0.95);
+  border-color: #c47a44;
+}
+
+.login-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 1px solid #5a3e2b;
+  background: #1e1a15;
+}
+
+.login-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.login-label {
+  font-size: 11px;
+  color: #e8c88a;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 1px;
+}
+
+.welcome-text {
+  font-size: 9px;
+  color: #c4b5a0;
+  font-family: 'Courier New', monospace;
+  opacity: 0.8;
+}

@@ -1,0 +1,71 @@
+/* ========== 动画 ========== */
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+@keyframes toastFadeInOut {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+  15% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  85% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.9);
+    visibility: hidden;
+  }
+}
+
+.toast-message {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--color-bg-overlay);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-2xl) var(--spacing-9xl);
+  color: var(--color-text-accent);
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-md);
+  z-index: var(--z-toast);
+  text-align: center;
+  animation: toastFadeInOut 2s ease-in-out forwards;
+}
+
+.toast-message.error {
+  border-color: var(--color-error);
+  color: var(--color-text-warning);
+}
+
+.toast-message.success {
+  border-color: var(--color-success);
+  color: var(--color-text-success);
+}

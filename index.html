@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>REVACHOL - 原创角色档案馆</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Special+Elite&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- 平铺式背景水印层 -->
+<div class="tiled-watermark" id="tiledWatermark"></div>
+<div class="custom-texture" id="customTexture"></div>
+<div class="visible-watermark" id="visibleWatermark"></div>
+
+<!-- ========== 全屏视频背景 ========== -->
+<div class="fullscreen-bg" id="fullscreenBg">
+    <video id="heroVideo" autoplay muted loop playsinline preload="auto">
+        <source src="videos/hero-bg-desktop.webm" type="video/webm" media="(min-width: 768px)">
+        <source src="videos/hero-bg-mobile.webm" type="video/webm" media="(max-width: 767px)">
+        <source src="videos/hero-bg-desktop.mp4" type="video/mp4" media="(min-width: 768px)">
+        <source src="videos/hero-bg-mobile.mp4" type="video/mp4" media="(max-width: 767px)">
+    </video>
+</div>
+
+<!-- 自定义贴图层 -->
+<div class="deco-logo" id="decoLogo"></div>
+<div class="deco-stamp" id="decoStamp"></div>
+<div class="deco-raven" id="decoRaven"></div>
+
+<!-- ========== 右上角登录UI ========== -->
+<div class="login-widget" id="loginWidget">
+    <div class="login-trigger" id="loginTrigger">
+        <img class="login-avatar" id="loginAvatar" src="images/default-avatar.png" alt="头像">
+        <div class="login-info">
+            <span class="login-label" id="loginLabel"></span>
+            <span class="welcome-text" id="welcomeText"></span>
+        </div>
+    </div>
+</div>
+
+<!-- ========== 登录弹窗 ========== -->
+<div class="modal-overlay" id="loginModalOverlay">
+    <div class="login-modal" id="loginModal">
+        <div class="modal-header">
+            <h3 id="loginModalTitle"></h3>
+            <button class="modal-close" id="modalCloseBtn">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="input-group">
+                <label id="loginUsernameLabel"></label>
+                <input type="text" id="loginUsername" placeholder="">
+            </div>
+            <div class="input-group">
+                <label id="loginPasswordLabel"></label>
+                <input type="password" id="loginPassword" placeholder="">
+            </div>
+            <button class="login-submit-btn" id="modalLoginBtn"></button>
+            <div class="login-hint" id="loginHint"></div>
+        </div>
+    </div>
+</div>
+
+<!-- ========== 头像裁剪弹窗 ========== -->
+<div class="modal-overlay" id="avatarCropModalOverlay">
+    <div class="crop-modal" id="avatarCropModal">
+        <div class="modal-header">
+            <h3 id="cropModalTitle"></h3>
+            <button class="modal-close" id="cropModalCloseBtn">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="crop-container">
+                <canvas id="cropCanvas"></canvas>
+            </div>
+            <div class="crop-preview">
+                <p id="cropPreviewLabel"></p>
+                <canvas id="previewCanvas" width="80" height="80"></canvas>
+            </div>
+            <div class="crop-actions">
+                <button class="crop-cancel-btn" id="cropCancelBtn"></button>
+                <button class="crop-confirm-btn" id="cropConfirmBtn"></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ========== 文章详情子页面 ========== -->
+<div class="detail-overlay" id="detailOverlay">
+    <div class="detail-container">
+        <div class="detail-tabs" id="detailTabs"></div>
+        <div class="detail-panes" id="detailPanes"></div>
+    </div>
+</div>
+
+<!-- ========== 管理员控制台 ========== -->
+<div class="admin-panel open collapsed" id="adminPanel" style="right:20px;bottom:20px;">
+    <div class="panel-header" id="panelHeader">
+        <h4 id="adminPanelTitle"></h4>
+        <span class="toggle-icon" id="panelToggleIcon">▶</span>
+    </div>
+    <div class="panel-content" id="panelContent"></div>
+</div>
+
+<!-- ========== 应用布局 ========== -->
+<div class="app-layout">
+    <!-- 悬浮侧边栏 -->
+    <div class="sidebar open collapsed" id="sidebar">
+        <div class="sidebar-header">
+            <h3 id="sidebarTitle"></h3>
+            <div class="sidebar-header-actions">
+                <button class="sidebar-collapse-btn" id="sidebarCollapseBtn" title="展开/收起">◀</button>
+            </div>
+        </div>
+        <div class="sidebar-body">
+            <div class="sidebar-search">
+                <input type="text" id="sidebarSearchInput" class="sidebar-search-box" placeholder="" autocomplete="off">
+            </div>
+            <div id="positionModeControls" style="display:none; padding: 8px 12px; border-bottom:1px solid #3a2a1a;">
+                <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+                    <button id="enterPositionModeBtn" style="width:auto;background:#5a3e2b;padding:4px 12px;font-size:11px;border:none;color:#e8d5b5;border-radius:4px;cursor:pointer;"></button>
+                    <button id="savePositionChangesBtn" style="width:auto;background:#3a5a2b;padding:4px 12px;font-size:11px;border:none;color:#e8d5b5;border-radius:4px;cursor:pointer;display:none;"></button>
+                    <button id="cancelPositionChangesBtn" style="width:auto;background:#3a2a1a;padding:4px 12px;font-size:11px;border:none;color:#e8d5b5;border-radius:4px;cursor:pointer;display:none;"></button>
+                </div>
+                <div style="font-size:9px;color:#7a6a58;margin-top:4px;" id="positionModeHint"></div>
+            </div>
+            <div class="directory-tree" id="directoryTree">
+                <div style="padding: 20px; text-align: center; color: #7a6a58;" id="directoryLoading"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 遮罩层 -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- 右侧主要内容 -->
+    <div class="main-content">
+        <div class="copyright-bar" id="copyrightBar"></div>
+
+        <div class="toolbar">
+            <div class="header-decoration">
+                <div class="avatar" id="siteAvatar">🎭</div>
+                <h1 id="siteTitle"></h1>
+                <p class="subtitle" id="siteSubtitle"></p>
+            </div>
+            <div style="width: 44px;"></div>
+        </div>
+
+        <!-- 首屏说明区域 -->
+        <div class="hero-section">
+            <div class="hero-content">
+                <h2 id="heroTitle"></h2>
+                <div class="hero-description" id="heroDescription"></div>
+            </div>
+        </div>
+
+        <div id="articlesContainer" class="articles-grid">
+            <div class="loading" id="articlesLoading"></div>
+        </div>
+    </div>
+</div>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>

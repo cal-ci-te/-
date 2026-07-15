@@ -1,0 +1,136 @@
+/* ========== CSS 模块化主入口 ========== */
+
+/* 1. 基础样式 */
+@import url('base/variables.css');
+@import url('base/reset.css');
+@import url('base/layout.css');
+
+/* 2. 组件样式 */
+@import url('components/sidebar.css');
+@import url('components/directory.css');
+@import url('components/articles.css');
+@import url('components/detail.css');
+@import url('components/admin.css');
+@import url('components/login.css');
+@import url('components/modal.css');
+@import url('components/watermark.css');
+
+/* 3. 工具样式 */
+@import url('utilities/animations.css');
+@import url('utilities/scrollbar.css');
+@import url('utilities/responsive.css');
+
+/* ========== 贴图编辑模式高亮 ========== */
+.deco-editing {
+  outline: 3px solid #c47a44 !important;
+  outline-offset: 4px !important;
+  cursor: grab !important;
+  pointer-events: auto !important;
+  box-shadow: 0 0 20px rgba(196, 122, 68, 0.5) !important;
+  transition: none !important;
+  z-index: 100 !important;
+}
+
+.deco-editing:active {
+  cursor: grabbing !important;
+}
+
+/* ========== 头像裁剪弹窗 ========== */
+.crop-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  background: #1e1a15;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.crop-container canvas {
+  max-width: 100%;
+  cursor: crosshair;
+  border: 1px solid #5a3e2b;
+  border-radius: 4px;
+  image-rendering: pixelated;
+}
+
+.crop-preview {
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.crop-preview p {
+  color: #c4b5a0;
+  font-size: 10px;
+  margin-bottom: 6px;
+  font-family: 'Courier New', monospace;
+}
+
+.crop-preview canvas {
+  background: #1e1a15;
+  border: 1px solid #5a3e2b;
+  border-radius: 8px;
+  width: 80px;
+  height: 80px;
+}
+
+/* ========== Toast 提示 ========== */
+.toast-message {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(30, 26, 21, 0.95);
+  backdrop-filter: blur(8px);
+  border: 1px solid #c47a44;
+  border-radius: 8px;
+  padding: 14px 28px;
+  color: #e8d5b5;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  z-index: 2100;
+  text-align: center;
+  animation: toastFadeInOut 2s ease-in-out forwards;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+  max-width: 90%;
+}
+
+.toast-message.error {
+  border-color: #c44a44;
+  color: #e8a0a0;
+}
+
+.toast-message.success {
+  border-color: #4a7a3a;
+  color: #a0e8a0;
+}
+
+@keyframes toastFadeInOut {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+  15% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  85% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.9);
+    visibility: hidden;
+  }
+}
+
+/* ========== 模式激活按钮 ========== */
+.mode-active {
+  background: #3a5a2b !important;
+  color: #e8d5b5 !important;
+}
+
+.mode-active:hover {
+  background: #4a7a3a !important;
+}

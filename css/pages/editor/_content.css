@@ -1,0 +1,88 @@
+/* ========== 右侧编辑区 ========== */
+.editor-content {
+    flex: 1;
+    padding: 30px 40px;
+    overflow-y: auto;
+    background: #1a1612;
+    transition: padding 0.25s;
+}
+.editor-content .empty-state {
+    color: #7a6a58;
+    text-align: center;
+    margin-top: 60px;
+    font-size: 14px;
+    line-height: 1.8;
+}
+.editor-content .empty-state .icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+}
+.editor-form {
+    max-width: 900px;
+    margin: 0 auto;
+    display: none;
+}
+.editor-form.active {
+    display: block;
+}
+.editor-form .form-group {
+    margin-bottom: 20px;
+}
+.editor-form label {
+    display: block;
+    font-size: 12px;
+    color: #c4b5a0;
+    margin-bottom: 6px;
+    letter-spacing: 1px;
+}
+.editor-form input[type="text"],
+.editor-form textarea {
+    width: 100%;
+    background: #2a231c;
+    border: 1px solid #5a3e2b;
+    border-radius: 6px;
+    color: #e8d5b5;
+    font-family: 'Special Elite', 'Courier New', monospace;
+    font-size: 14px;
+    padding: 10px 14px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+.editor-form input[type="text"]:focus,
+.editor-form textarea:focus {
+    border-color: #c47a44;
+    box-shadow: 0 0 12px rgba(196, 122, 68, 0.15);
+}
+.editor-form textarea {
+    min-height: 400px;
+    resize: vertical;
+    line-height: 1.8;
+}
+.editor-form .form-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 10px;
+}
+.editor-form .form-actions button {
+    padding: 6px 24px;
+    border: none;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.editor-form .form-actions .save-btn {
+    background: #3a5a2b;
+    color: #e8d5b5;
+}
+.editor-form .form-actions .save-btn:hover {
+    background: #4a7a3a;
+}
+.editor-form .form-actions .cancel-btn {
+    background: #3a2a1a;
+    color: #c4b5a0;
+}
+.editor-form .form-actions .cancel-btn:hover {
+    background: #5a3e2b;
+}

@@ -1,0 +1,243 @@
+/* ========== 文章网格容器 ========== */
+.articles-grid {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 60px; /* 增大卡片组之间的间距 */
+  padding: 10px 0 40px;
+}
+
+/* ========== 分组标题（占整行） ========== */
+.group-header {
+  width: 100%;
+  padding: 8px 4px 4px 4px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid rgba(196, 122, 68, 0.2);
+}
+
+.group-header .folder-title {
+  font-family: 'Special Elite', monospace;
+  color: #e8c88a;
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.3);
+}
+
+.group-header .folder-title .folder-icon {
+  margin-right: 8px;
+}
+
+.group-header .folder-title.level-1 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #e8c88a;
+  letter-spacing: 3px;
+}
+
+.group-header .folder-title.level-2 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #d4b88a;
+  letter-spacing: 2px;
+  padding-left: 16px;
+}
+
+.group-header .folder-title.level-3 {
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: #c4a87a;
+  letter-spacing: 1px;
+  padding-left: 32px;
+}
+
+.group-header .folder-title.level-4,
+.group-header .folder-title.level-5,
+.group-header .folder-title.level-6 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #b8a080;
+  padding-left: 48px;
+}
+
+/* ========== 卡片容器（每个卡片单独一行） ========== */
+.card {
+  width: 50%;
+  background: #2a231c;
+  background-image: linear-gradient(135deg, #332b22 0%, #231e18 100%);
+  border: 1px solid #5a3e2b;
+  padding: 22px;
+  transition: all 0.25s;
+  position: relative;
+  box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+  cursor: pointer;
+  border-radius: 8px;
+  scroll-margin-top: 30px;
+  margin-bottom: 40px; /* 卡片之间的大间距 */
+}
+
+/* 奇数卡片靠左，偶数卡片靠右 */
+.card:nth-child(odd) {
+  align-self: flex-start;
+  margin-right: auto;
+  transform: rotate(-0.3deg);
+}
+
+.card:nth-child(even) {
+  align-self: flex-end;
+  margin-left: auto;
+  transform: rotate(0.4deg);
+}
+
+.card:hover {
+  transform: rotate(0deg) translateY(-4px);
+  border-color: #c47a44;
+  box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.4);
+}
+
+.card.selected {
+  outline: 3px solid #c47a44;
+  outline-offset: 2px;
+  transform: scale(1.01);
+  box-shadow: 0 0 30px rgba(196, 122, 68, 0.2);
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  right: 6px;
+  bottom: 6px;
+  border: 1px dashed rgba(196, 122, 68, 0.15);
+  pointer-events: none;
+  border-radius: 4px;
+}
+
+.card::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 30px;
+  height: 30px;
+  background: linear-gradient(135deg, transparent 50%, rgba(0, 0, 0, 0.2) 50%);
+  pointer-events: none;
+}
+
+.card h3 {
+  font-family: 'IM Fell English', 'Georgia', serif;
+  color: #e8c88a;
+  margin-bottom: 12px;
+  font-size: 1.25rem;
+  font-weight: 700;
+  border-left: 3px solid #c47a44;
+  padding-left: 10px;
+}
+
+.card h3::before {
+  content: '✦';
+  margin-right: 8px;
+  color: #c47a44;
+  font-size: 0.85rem;
+}
+
+.card-content {
+  color: #b8a992;
+  line-height: 1.65;
+  font-size: 0.9rem;
+  font-family: 'IM Fell English', 'Georgia', serif;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
+  -webkit-box-orient: vertical;
+}
+
+.card-meta {
+  margin-top: 14px;
+  font-size: 10px;
+  color: #7a6a58;
+  border-top: 1px solid #4a3a28;
+  padding-top: 10px;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 0.5px;
+}
+
+.card .card-click-hint {
+  position: absolute;
+  bottom: 8px;
+  right: 12px;
+  font-size: 9px;
+  color: #5a4a38;
+  font-family: 'Courier New', monospace;
+  opacity: 0.5;
+}
+
+/* ========== 骨架屏（适配左右交替） ========== */
+.skeleton-card {
+  width: 50%;
+  background: #2a231c;
+  border: 1px solid #5a3e2b;
+  padding: 22px;
+  position: relative;
+  box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+  min-height: 200px;
+  border-radius: 8px;
+  margin-bottom: 40px;
+}
+
+.skeleton-card:nth-child(odd) {
+  align-self: flex-start;
+  margin-right: auto;
+}
+
+.skeleton-card:nth-child(even) {
+  align-self: flex-end;
+  margin-left: auto;
+}
+
+.skeleton-card .skeleton-line {
+  height: 16px;
+  background: #3a2a1a;
+  margin-bottom: 12px;
+  border-radius: 4px;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.skeleton-card .skeleton-line.title {
+  width: 70%;
+  height: 24px;
+}
+
+.skeleton-card .skeleton-line.short {
+  width: 40%;
+}
+
+.skeleton-card .skeleton-line.long {
+  width: 90%;
+}
+
+/* ========== 加载更多提示 ========== */
+.loading-more {
+  text-align: center;
+  padding: 30px;
+  color: #c4b5a0;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  width: 100%;
+  animation: pulse 1s ease-in-out infinite;
+}
+
+.end-message {
+  text-align: center;
+  padding: 30px;
+  color: #7a6a58;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  width: 100%;
+  animation: fadeOut 2s ease-in-out forwards;
+}

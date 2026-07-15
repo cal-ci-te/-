@@ -1,0 +1,168 @@
+/* ========== 基础布局 ========== */
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
+  padding: 20px;
+  padding-top: 80px;
+}
+
+.main-content {
+  flex: 1;
+  padding: 0 20px;
+  min-width: 0;
+  margin-left: 0;
+  padding-top: 0;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  border-bottom: 1px solid #5a3e2b;
+  padding-bottom: 20px;
+}
+
+/* 移除右侧空 div 的宽度，或将其隐藏 */
+.toolbar > div:last-child {
+  display: none; /* 或 width: 0; */
+}
+
+.header-decoration {
+  flex: 1;
+  text-align: center;
+}
+
+.avatar {
+  width: 60px;
+  height: 60px;
+  background: #2a231c;
+  border: 2px solid #c47a44;
+  margin: 0 auto 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  transform: rotate(1deg);
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+}
+
+h1 {
+  font-family: 'Special Elite', monospace;
+  color: #e8d5b5;
+  font-size: 1.6rem;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  text-shadow: 3px 3px 0 #3a2a1a;
+  font-weight: 400;
+}
+
+.subtitle {
+  color: #c4b5a0;
+  font-size: 0.8rem;
+  font-style: italic;
+  letter-spacing: 2px;
+}
+
+.copyright-bar {
+  text-align: center;
+  font-size: 10px;
+  color: #7a6a58;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 1px;
+  padding: 6px 0;
+  border-bottom: 1px solid #5a3e2b;
+  margin-bottom: 10px;
+}
+
+/* ========== 首屏说明区域 ========== */
+.hero-section {
+  min-height: calc(100vh - 120px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+  border-bottom: 1px solid #5a3e2b;
+  margin-bottom: 40px;
+  position: relative;
+  z-index: 1; /* 确保内容在视频背景之上 */
+}
+
+.hero-content {
+  max-width: 800px;
+  margin: 0 auto;
+  margin-top: -300px;
+}
+
+.hero-content h2 {
+  font-family: 'Special Elite', monospace;
+  color: #e8d5b5;
+  font-size: 1rem;
+  letter-spacing: 4px;
+  text-shadow: 3px 3px 0 #3a2a1a;
+  margin-bottom: 10px;
+}
+
+.hero-description {
+  text-align: left;
+  font-size: 0.5rem;
+  line-height: 1.2;
+  color: #c4b5a0;
+  /*background: rgba(30, 26, 21, 0.6);*/
+  padding: 24px 32px;
+  border-radius: 12px;
+  /*border-left: 4px solid #c47a44;*/
+}
+
+.hero-description p {
+  margin-bottom: 8px;
+}
+
+.hero-description p:last-child {
+  margin-bottom: 0;
+}
+
+.hero-description strong {
+  color: #e8c88a;
+}
+
+/* ========== 全屏视频背景 ========== */
+.fullscreen-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0; /* 低于水印 (z-index:2) 和贴纸 (z-index:99) */
+  pointer-events: none; /* 不干扰交互 */
+  background: #1a1612; /* 视频加载前的底色 */
+  transition: opacity 0.15s ease;
+}
+
+.fullscreen-bg video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* 铺满且不变形 */
+  display: block;
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+  .hero-section {
+    min-height: calc(100vh - 100px);
+    padding: 20px 16px;
+  }
+  .hero-content h2 {
+    font-size: 1.8rem;
+  }
+  .hero-description {
+    font-size: 0.9rem;
+    padding: 16px 20px;
+  }
+}

@@ -1,0 +1,230 @@
+/* ========== 移动端适配 ========== */
+@media (max-width: 1025px) {
+
+  .toolbar {
+    justify-content: center;       /* 整体居中 */
+    gap: 0;                        /* 取消间距 */
+  }
+
+  .toolbar .header-decoration {
+    flex: 0 0 auto;
+    width: 100%;
+    text-align: center;
+  }
+
+  /* 隐藏右侧占位空 div，避免偏移 */
+  .toolbar > div:last-child {
+    display: none;
+  }
+
+  /* 可选：调整图标和标题的大小 */
+  .avatar {
+    width: 40px;
+    height: 40px;
+    font-size: 24px;
+  }
+
+  h1 {
+    font-size: 1.4rem;
+    letter-spacing: 2px;
+  }
+
+  .subtitle {
+    font-size: 0.7rem;
+  }
+
+  .app-layout {
+    padding: var(--spacing-lg);
+    padding-top: 70px;
+  }
+
+  .sidebar {
+    left: var(--spacing-lg) !important;
+    top: 60px !important;
+    width: 260px !important;
+    max-height: 60vh !important;
+  }
+
+  .sidebar.open {
+    width: 200px !important;
+    max-height: 60vh !important;
+  }
+
+  .sidebar.collapsed {
+    width: 44px !important;
+    min-width: 44px !important;
+    max-width: 44px !important;
+  }
+
+  .main-content {
+    padding: 0 var(--spacing-md);
+  }
+
+  .articles-grid {
+    gap: var(--spacing-10xl);
+  }
+
+  .article-group {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-4xl);
+  }
+
+  .card {
+    transform: rotate(0deg) !important;
+    padding: var(--spacing-4xl);
+  }
+
+  .card h3 {
+    font-size: var(--font-size-xl);
+  }
+
+  .card-content {
+    font-size: var(--font-size-md);
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+  }
+
+  .group-header .folder-title.level-1 {
+    font-size: var(--font-size-2xl);
+  }
+
+  .group-header .folder-title.level-2 {
+    font-size: var(--font-size-xl);
+    padding-left: var(--spacing-md);
+  }
+
+  .group-header .folder-title.level-3 {
+    font-size: var(--font-size-md);
+    padding-left: var(--spacing-3xl);
+  }
+
+  .admin-panel {
+    width: 250px !important;
+    max-height: calc(100vh - 120px);
+    bottom: var(--spacing-lg) !important;
+    right: var(--spacing-lg) !important;
+  }
+
+  .admin-panel.collapsed {
+    width: 44px !important;
+    min-width: 44px !important;
+    max-width: 44px !important;
+  }
+
+  .login-widget {
+    top: var(--spacing-lg);
+    right: var(--spacing-lg);
+  }
+
+  .login-trigger {
+    padding: var(--spacing-xs) var(--spacing-lg) var(--spacing-xs) var(--spacing-sm);
+  }
+
+  .login-avatar {
+    width: 20px;
+    height: 20px;
+  }
+
+  .login-label {
+    font-size: var(--font-size-xs);
+  }
+
+  .welcome-text {
+    font-size: var(--font-size-xs);
+  }
+
+  .login-modal {
+    width: 280px;
+  }
+
+  .crop-modal {
+    width: 320px;
+  }
+
+  .detail-content {
+    padding: var(--spacing-4xl);
+    margin: var(--spacing-lg);
+  }
+
+  .detail-content .detail-title {
+    font-size: var(--font-size-4xl);
+  }
+
+  .detail-overlay {
+    padding: var(--spacing-4xl);
+  }
+
+  .toolbar {
+    gap: var(--spacing-lg);
+    padding-bottom: var(--spacing-2xl);
+  }
+
+  .avatar {
+    width: 45px;
+    height: 45px;
+    font-size: var(--font-size-5xl);
+  }
+
+  h1 {
+    font-size: var(--font-size-2xl);
+    letter-spacing: 2px;
+  }
+
+  .deco-logo,
+  .deco-raven {
+    opacity: 0.2;
+  }
+
+  /* ========== 移动端：网站说明区域 ========== */
+  .hero-section {
+    min-height: auto;           /* 取消固定高度 */
+    padding: 20px 16px;
+    margin-bottom: 20px;
+  }
+
+  .hero-content {
+    margin-top: 0;              /* 取消负边距，让说明正常显示 */
+    padding-top: 10px;
+  }
+
+  .hero-content h2 {
+    font-size: 1.2rem;          /* 调整标题大小 */
+  }
+
+  .hero-description {
+    font-size: 0.6rem;         /* 调整说明文字大小 */
+    padding: 16px 18px;
+    line-height: 1.5;
+  }
+
+  .hero-description p {
+    margin-bottom: 6px;
+  }
+
+  /* ========== 文章编辑器 ========== */
+.editor-sidebar {
+    width: 180px !important;        /* 从 280px 缩小到 200px */
+  }
+
+  .editor-sidebar.collapsed {
+    width: 0 !important;
+    margin-left: 0 !important;
+  }
+
+  /* 可选：相应调整编辑区内边距，让内容更舒展 */
+  .editor-content {
+    padding: 20px 16px;
+  }
+
+  /* 可选：缩小目录内字体和间距，避免拥挤 */
+  .editor-sidebar-header h3 {
+    font-size: 13px;
+  }
+  .tree-node-content {
+    padding: 3px 6px;
+    font-size: 12px;
+  }
+}
+
+
+

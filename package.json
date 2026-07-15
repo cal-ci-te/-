@@ -1,0 +1,48 @@
+{
+  "name": "revachol",
+  "version": "1.0.0",
+  "description": "原创角色档案馆",
+  "main": "index.html",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint js/**/*.js --fix",
+    "format": "prettier --write js/**/*.js css/**/*.css",
+    "type-check": "tsc --noEmit",
+    "test": "vitest --config vitest.config.js",
+    "test:coverage": "vitest run --coverage --config vitest.config.js",
+    "test:watch": "vitest --config vitest.config.js --watch"
+  },
+  "keywords": [
+    "revachol",
+    "角色",
+    "档案馆"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@errpulse/vite": "^0.7.0",
+    "@eslint/eslintrc": "^3.3.6",
+    "@eslint/js": "^10.0.1",
+    "@vitest/coverage-v8": "^4.1.10",
+    "concurrently": "^10.0.3",
+    "eslint": "^10.7.0",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^17.7.0",
+    "jsdom": "^29.1.1",
+    "nodemon": "^3.1.14",
+    "prettier": "^3.9.5",
+    "typescript": "^6.0.3",
+    "vite": "^7.3.6",
+    "vitest": "^4.1.10"
+  },
+  "dependencies": {
+    "@errpulse/node": "^0.7.0",
+    "busboy": "^1.6.0",
+    "dotenv": "^17.4.2",
+    "sql.js": "^1.14.1",
+    "ws": "^8.21.1"
+  }
+}

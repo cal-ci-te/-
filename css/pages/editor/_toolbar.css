@@ -1,0 +1,63 @@
+/* ========== 顶部工具栏 ========== */
+.editor-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 20px;
+    background: #1e1a15;
+    border-bottom: 1px solid #5a3e2b;
+    flex-shrink: 0;
+    min-height: 48px;
+    z-index: 10;
+    height: 48px;
+}
+.editor-toolbar .left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.editor-toolbar .brand {
+    font-size: 16px;
+    color: #e8c88a;
+    letter-spacing: 2px;
+}
+.editor-toolbar .actions {
+    display: flex;
+    gap: 8px;
+}
+.editor-toolbar button {
+    background: #5a3e2b;
+    border: none;
+    color: #e8d5b5;
+    padding: 4px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 12px;
+    transition: background 0.2s;
+}
+.editor-toolbar button:hover {
+    background: #c47a44;
+    color: #1a1612;
+}
+.editor-toolbar .close-btn {
+    background: transparent;
+    color: #7a6a58;
+}
+.editor-toolbar .close-btn:hover {
+    background: #3a2a1a;
+    color: #e8d5b5;
+}
+.toggle-btn {
+    background: none;
+    border: 1px solid #5a3e2b;
+    border-radius: 4px;
+    color: #e8c88a;
+    font-size: 16px;
+    padding: 2px 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.toggle-btn:hover {
+    background: #5a3e2b;
+}

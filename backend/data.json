@@ -1,0 +1,9 @@
+{
+  "articles": [
+    { "id": 1, "title": "🔥 魔法师 1", "content": "这是魔法师 1 号角色", "category": "🔥 魔法师", "updateTime": "2026-06-22T12:54:26.592Z", "visible": 1 },
+    { "id": 2, "title": "⚔️ 骑士 1", "content": "这是骑士 1 号角色", "category": "⚔️ 骑士", "updateTime": "2026-06-22T12:54:26.593Z", "visible": 1 },
+    { "id": 3, "title": "🗡️ 刺客 1", "content": "这是刺客 1 号角色", "category": "🗡️ 刺客", "updateTime": "2026-06-22T12:54:26.593Z", "visible": 1 }
+  ],
+  "settings": {},
+  "decos": []
+}
