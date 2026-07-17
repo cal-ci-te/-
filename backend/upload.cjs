@@ -1,10 +1,15 @@
-const dbModule = require('./db.cjs');  // 注意 './' 表示当前目录
+// ========== 贴图上传（使用 StorageService） ==========
+const { storage } = require('./storage/index.cjs');
 const { broadcast } = require('./websocket.cjs');
+const dbModule = require('./db.cjs');
 
 function handleDecoUpload(req, res) {
+    console.log('[Upload] 收到上传请求');
+
     let body = '';
     req.on('data', (chunk) => (body += chunk));
-    req.on('end', () => {
+    req.on('end', async () => {
+        console.log('[Upload] 请求体接收完毕，长度:', body.length);
         try {
             const data = JSON.parse(body);
             const { name, base64 } = data;
@@ -29,45 +34,50 @@ function handleDecoUpload(req, res) {
                 return;
             }
 
-            const id = 'deco_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
             const savedName = name || '未命名贴纸';
+            const filename = savedName + '.webp';
 
-            console.log('[Upload] 准备插入贴纸:', id, savedName, '图片大小:', imageBuffer.length);
+            console.log('[Upload] 准备调用 storage.upload，文件名:', filename);
 
-            // 使用 dbModule.run 插入
-            const result = dbModule.run(
-                'INSERT INTO decos (id, name, style, image_data) VALUES (?, ?, ?, ?)',
-                [id, savedName, 'fixed', imageBuffer]
+            // 上传到存储服务
+            const result = await storage.upload(imageBuffer, filename, 'image/webp');
+            console.log('[Upload] storage.upload 返回结果:', result);
+
+            // 保存到数据库
+            dbModule.run(
+                'INSERT INTO decos (id, name, style, image_path) VALUES (?, ?, ?, ?)',
+                [result.id, savedName, 'fixed', result.key]
             );
-            console.log('[Upload] dbModule.run 结果:', result);
-
-            // 验证插入
-            const verifyRow = dbModule.query('SELECT id, length(image_data) as img_len FROM decos WHERE id = ?', [id]);
-            console.log('[Upload] ✅ 验证成功，image_data 大小:', verifyRow ? verifyRow.img_len : '无');
-
-            if (!verifyRow || verifyRow.img_len === 0) {
-                console.error('[Upload] ❌ 验证失败：image_data 未保存');
-                res.writeHead(500);
-                res.end('Image data not saved');
-                return;
-            }
 
             broadcast({
                 type: 'deco_created',
-                payload: { id, name: savedName, position: null, style: 'fixed' },
+                payload: {
+                    id: result.id,
+                    name: savedName,
+                    position: null,
+                    style: 'fixed',
+                    dataUrl: `/api/decos/${result.id}/image`,
+                },
             });
 
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({
-                id: id,
-                dataUrl: base64,
+                id: result.id,
+                dataUrl: `/api/decos/${result.id}/image`,
                 name: savedName,
             }));
         } catch (err) {
             console.error('[Upload] 处理失败:', err);
-            res.writeHead(400);
-            res.end('Invalid JSON');
+            console.error('[Upload] 错误堆栈:', err.stack);
+            res.writeHead(500);
+            res.end('Internal Server Error');
         }
+    });
+
+    req.on('error', (err) => {
+        console.error('[Upload] 请求错误:', err);
+        res.writeHead(500);
+        res.end('Internal Server Error');
     });
 }
 
