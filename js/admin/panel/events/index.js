@@ -13,6 +13,7 @@ import * as gradientHandlers from '../handlers/gradient.js';
 import * as textureHandlers from '../handlers/texture.js';
 import * as videoHandlers from '../handlers/video.js';
 import * as watermarkHandlers from '../handlers/watermark.js';
+import * as themeHandlers from '../handlers/theme.js';
 
 // 构建 action → handler 映射表
 const handlerMap = {
@@ -34,7 +35,7 @@ const handlerMap = {
   'video-opacity': videoHandlers.videoOpacity,
   'apply-watermark': watermarkHandlers.applyWatermark,
   'watermark-opacity': watermarkHandlers.watermarkOpacity,
-
+  'theme-switch': themeHandlers.themeSwitchHandler,
 };
 
 // 注册到 AdminPanel
@@ -76,4 +77,4 @@ export const AdminEvents = {
   },
 };
 
-console.log('✅ AdminPanel 事件入口（委托器版本）已加载（上传逻辑独立）');
+console.log('✅ AdminPanel 事件入口（委托器版本）已加载（含主题切换）');

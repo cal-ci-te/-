@@ -1,0 +1,32 @@
+/* ===== 全局防止横向溢出 ===== */
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* 防止长单词/URL 撑开布局 */
+body,
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+div,
+span,
+a,
+button,
+input,
+textarea {
+  word-wrap: break-word;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}

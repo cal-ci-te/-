@@ -19,6 +19,7 @@ export const Sidebar = {
 
   currentThreshold: 5,
 
+  // ----- 初始化 -----
   init: function (sidebarEl, overlayEl, treeContainer) {
     console.log('[Sidebar] 初始化...');
     this.sidebar = sidebarEl;
@@ -35,6 +36,7 @@ export const Sidebar = {
     console.log('[Sidebar] 初始化完成');
   },
 
+  // ----- 状态管理 -----
   loadState: function () {
     const saved = Utils.storage.get('sidebar_state');
     if (saved) {
@@ -135,12 +137,16 @@ export const Sidebar = {
     this.saveState();
   },
 
+  // ----- 事件绑定 -----
   bindEvents: function () {
     if (!this.sidebar) return;
 
+    // 鼠标事件
     this.sidebar.addEventListener('mousedown', this.startDrag.bind(this));
+    // 触摸事件（移动端）
     this.sidebar.addEventListener('touchstart', this.startDragTouch.bind(this), { passive: false });
 
+    // 防止拖拽时选中文本
     this.sidebar.addEventListener(
       'selectstart',
       function (e) {
@@ -148,6 +154,7 @@ export const Sidebar = {
       }.bind(this)
     );
 
+    // 全局事件
     document.addEventListener('mousemove', this.onDrag.bind(this));
     document.addEventListener('mouseup', this.stopDrag.bind(this));
     document.addEventListener('touchmove', this.onDragTouch.bind(this), { passive: false });
@@ -156,6 +163,7 @@ export const Sidebar = {
     console.log('[Sidebar] 拖拽事件已绑定');
   },
 
+  // ----- 鼠标拖拽 -----
   startDrag: function (e) {
     if (e.button !== 0) return;
 
@@ -183,6 +191,7 @@ export const Sidebar = {
     e.preventDefault();
   },
 
+  // ----- 触摸拖拽（移动端） -----
   startDragTouch: function (e) {
     const touch = e.touches[0];
     if (!touch) return;
@@ -192,6 +201,7 @@ export const Sidebar = {
     if (e.target.closest('button') || e.target.closest('input')) return;
     if (e.target.closest('.toggle-icon') || e.target.closest('.tree-node-content')) return;
 
+    // 移动端阈值稍大，便于区分点击和拖拽
     this.currentThreshold = 10;
     this._dragOccurred = false;
     this.isDraggingSidebar = true;
@@ -208,9 +218,11 @@ export const Sidebar = {
     document.body.style.userSelect = 'none';
     document.body.style.webkitUserSelect = 'none';
 
+    // 阻止页面滚动
     e.preventDefault();
   },
 
+  // ----- 鼠标拖拽移动 -----
   onDrag: function (e) {
     if (!this.isDraggingSidebar) return;
 
@@ -238,6 +250,7 @@ export const Sidebar = {
     this.sidebar.style.transform = 'none';
   },
 
+  // ----- 触摸拖拽移动 -----
   onDragTouch: function (e) {
     if (!this.isDraggingSidebar) return;
     const touch = e.touches[0];
@@ -265,9 +278,11 @@ export const Sidebar = {
     this.sidebar.style.right = 'auto';
     this.sidebar.style.bottom = 'auto';
     this.sidebar.style.transform = 'none';
+
     e.preventDefault();
   },
 
+  // ----- 拖拽结束 -----
   stopDrag: function () {
     if (this.isDraggingSidebar) {
       this.isDraggingSidebar = false;
@@ -290,6 +305,7 @@ export const Sidebar = {
     }
   },
 
+  // ----- 辅助方法 -----
   wasDragAction: function () {
     return this.isDragging || this._dragOccurred;
   },

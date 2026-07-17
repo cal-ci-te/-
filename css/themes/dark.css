@@ -1,0 +1,322 @@
+/* ========== 暗色主题 ========== */
+:root {
+  --color-bg-primary: #1a1612;
+  --color-bg-secondary: #1e1a15;
+  --color-bg-tertiary: #2a231c;
+  --color-bg-card: #2a231c;
+  --color-bg-card-start: #332b22;
+  --color-bg-card-end: #231e18;
+  --color-bg-skeleton: #3a2a1a;
+  --color-bg-overlay: rgba(30, 26, 21, 0.95);
+
+  --color-border: #5a3e2b;
+  --color-border-light: rgba(90, 62, 43, 0.3);
+  --color-border-dashed: rgba(196, 122, 68, 0.2);
+  --color-border-highlight: #c47a44;
+
+  --color-text-primary: #d4c9b8;
+  --color-text-secondary: #c4b5a0;
+  --color-text-muted: #7a6a58;
+  --color-text-heading: #e8c88a;
+  --color-text-light: #b8a992;
+  --color-text-accent: #e8d5b5;
+
+  --color-accent: #c47a44;
+  --color-accent-dark: #5a3e2b;
+  --color-accent-light: #e8c88a;
+  --color-accent-gold: #ffd966;
+
+  --color-folder-1: #e8c88a;
+  --color-folder-2: #d4b88a;
+  --color-folder-3: #c4a87a;
+  --color-folder-4: #b8a080;
+
+  --color-hover: rgba(90, 62, 43, 0.4);
+  --color-active: rgba(196, 122, 68, 0.25);
+  --color-success: #3a5a2b;
+  --color-success-hover: #4a7a3a;
+  --color-danger: #3a2a1a;
+  --color-danger-hover: #5a3e2b;
+  --color-error: #c44a44;
+
+  --shadow-sm: 4px 4px 0 rgba(0, 0, 0, 0.35);
+  --shadow-md: 6px 6px 0 rgba(0, 0, 0, 0.35);
+  --shadow-lg: 8px 8px 0 rgba(0, 0, 0, 0.4);
+  --shadow-xl: 4px 4px 20px rgba(0, 0, 0, 0.6);
+  --shadow-focus: 0 0 12px rgba(196, 122, 68, 0.15);
+  --shadow-glow: 0 0 30px rgba(196, 122, 68, 0.2);
+
+  --font-family-serif: 'IM Fell English', 'Georgia', 'Times New Roman', serif;
+  --font-family-display: 'Special Elite', 'Courier New', monospace;
+  --font-family-mono: 'Courier New', monospace;
+  --font-family-base: var(--font-family-sans), var(--font-family-display), var(--font-family-serif), monospace;
+}
+
+/* 从 body { ... } 改为 html body { ... } */
+html body {
+    background-color: #1a1612 !important;
+    background-image: none !important;
+}
+
+/* ===== 卡片 ===== */
+.card {
+  background: var(--color-bg-card) !important;
+  border: 1px solid var(--color-border) !important;
+  box-shadow: var(--shadow-md) !important;
+  padding: 22px !important;
+  transition: all 0.25s !important;
+  cursor: pointer !important;
+}
+.card:hover {
+  transform: rotate(0deg) translateY(-4px) !important;
+  border-color: var(--color-border-highlight) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+.card h3 {
+  color: var(--color-text-heading) !important;
+}
+.card-content {
+  color: var(--color-text-secondary) !important;
+}
+.card-meta {
+  color: var(--color-text-muted) !important;
+}
+
+/* ===== 侧边栏 ===== */
+.sidebar {
+  background: var(--color-bg-secondary) !important;
+  border: 1px solid var(--color-border) !important;
+  box-shadow: var(--shadow-md) !important;
+}
+.sidebar-header {
+  background: var(--color-bg-tertiary) !important;
+  border-bottom: 1px solid var(--color-border) !important;
+}
+.sidebar-header h3 {
+  color: var(--color-text-heading) !important;
+}
+
+/* ===== 目录树 ===== */
+.tree-node-content {
+  border-left: 2px solid transparent !important;
+}
+.tree-node-content:hover {
+  background: var(--color-hover) !important;
+  border-left-color: var(--color-border-highlight) !important;
+}
+.tree-node-content.active {
+  background: var(--color-active) !important;
+  border-left-color: var(--color-border-highlight) !important;
+}
+.node-title {
+  color: var(--color-text-secondary) !important;
+}
+.folder > .tree-node-content .node-title {
+  color: var(--color-text-heading) !important;
+}
+
+/* ===== 按钮 ===== */
+button, .btn, .theme-btn, .avatar-upload-btn, .login-submit-btn {
+  background: var(--color-bg-tertiary) !important;
+  color: var(--color-text-primary) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: 4px !important;
+  padding: 6px 12px !important;
+  cursor: pointer !important;
+  font-family: var(--font-family-base) !important;
+  transition: all 0.2s !important;
+}
+button:hover, .btn:hover, .theme-btn:hover {
+  background: var(--color-accent-dark) !important;
+  color: #e8d5b5 !important;
+}
+
+/* ===== 管理员面板 ===== */
+.admin-panel {
+  background: var(--color-bg-secondary) !important;
+  border: 1px solid var(--color-border) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+.panel-header {
+  background: var(--color-bg-tertiary) !important;
+  border-bottom: 1px solid var(--color-border) !important;
+}
+.panel-header h4 {
+  color: var(--color-text-heading) !important;
+}
+.panel-content {
+  background: var(--color-bg-primary) !important;
+}
+.panel-content label {
+  color: var(--color-text-muted) !important;
+}
+
+/* ===== 登录弹窗 ===== */
+.login-modal {
+  background: var(--color-bg-card) !important;
+  border: 1px solid var(--color-border) !important;
+  box-shadow: var(--shadow-xl) !important;
+}
+.login-modal .modal-header {
+  background: var(--color-bg-tertiary) !important;
+  border-bottom: 1px solid var(--color-border) !important;
+}
+.login-modal .modal-header h3 {
+  color: var(--color-text-heading) !important;
+}
+.login-modal .input-group label {
+  color: var(--color-text-muted) !important;
+}
+.login-modal .input-group input {
+  background: var(--color-bg-card) !important;
+  border: 1px solid var(--color-border) !important;
+  color: var(--color-text-primary) !important;
+}
+
+/* ===== 输入框 ===== */
+input[type="text"], input[type="password"], textarea {
+  background: var(--color-bg-card) !important;
+  border: 1px solid var(--color-border) !important;
+  color: var(--color-text-primary) !important;
+  border-radius: 4px !important;
+  padding: 6px 10px !important;
+  font-family: var(--font-family-base) !important;
+}
+
+/* ===== 详情页 ===== */
+.detail-overlay {
+  background: var(--color-bg-overlay) !important;
+}
+.detail-container {
+  background: var(--color-bg-card) !important;
+  border: 1px solid var(--color-border) !important;
+}
+.detail-tabs {
+  background: var(--color-bg-secondary) !important;
+  border-bottom: 1px solid var(--color-border) !important;
+}
+.detail-tab {
+  color: var(--color-text-muted) !important;
+}
+.detail-tab:hover {
+  color: var(--color-text-primary) !important;
+}
+.detail-tab.active {
+  color: var(--color-text-heading) !important;
+  border-bottom-color: var(--color-border-highlight) !important;
+}
+.detail-body {
+  color: var(--color-text-primary) !important;
+}
+.detail-body h1, .detail-body h2, .detail-body h3 {
+  color: var(--color-text-heading) !important;
+}
+.detail-body blockquote {
+  border-left-color: var(--color-border-highlight) !important;
+  color: var(--color-text-secondary) !important;
+}
+
+/* ===== 最小化栏 ===== */
+.minimized-bar {
+  background: var(--color-bg-secondary) !important;
+  border: 1px solid var(--color-border) !important;
+}
+.minimized-item {
+  background: var(--color-bg-tertiary) !important;
+  border: 1px solid var(--color-border) !important;
+}
+.minimized-item .minimized-title {
+  color: var(--color-text-primary) !important;
+}
+
+/* ===== 水印 ===== */
+.visible-watermark {
+  color: var(--color-text-muted) !important;
+}
+
+/* ===== Toast ===== */
+.toast-message {
+  background: var(--color-bg-overlay) !important;
+  border: 1px solid var(--color-border-highlight) !important;
+  color: var(--color-text-primary) !important;
+}
+.toast-message.error {
+  border-color: var(--color-error) !important;
+  color: var(--color-error) !important;
+}
+.toast-message.success {
+  border-color: var(--color-success) !important;
+  color: var(--color-success) !important;
+}
+
+/* ===== 滚动条 ===== */
+::-webkit-scrollbar-track {
+  background: var(--color-bg-secondary) !important;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border) !important;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-accent) !important;
+}
+
+/* ===== 文章编辑器 ===== */
+.editor-toolbar {
+  background: var(--color-bg-secondary) !important;
+  border-bottom: 1px solid var(--color-border) !important;
+}
+.editor-toolbar .brand {
+  color: var(--color-text-heading) !important;
+}
+.editor-sidebar {
+  background: var(--color-bg-secondary) !important;
+  border-right: 1px solid var(--color-border) !important;
+}
+.editor-sidebar-header {
+  background: var(--color-bg-tertiary) !important;
+  border-bottom: 1px solid var(--color-border) !important;
+}
+.editor-sidebar-header h3 {
+  color: var(--color-text-heading) !important;
+}
+.editor-content {
+  background: var(--color-bg-primary) !important;
+}
+.editor-form input[type="text"], .editor-form textarea {
+  background: var(--color-bg-card) !important;
+  border: 1px solid var(--color-border) !important;
+  color: var(--color-text-primary) !important;
+}
+.editor-form label {
+  color: var(--color-text-muted) !important;
+}
+
+/* ===== 首屏说明 ===== */
+.hero-content h2 {
+  color: var(--color-text-heading) !important;
+}
+.hero-description {
+  color: var(--color-text-secondary) !important;
+}
+.hero-description strong {
+  color: var(--color-text-heading) !important;
+}
+
+/* ===== 工具栏 ===== */
+.toolbar {
+  border-bottom: 1px solid var(--color-border) !important;
+}
+h1 {
+  color: var(--color-text-heading) !important;
+}
+.subtitle {
+  color: var(--color-text-muted) !important;
+}
+.copyright-bar {
+  color: var(--color-text-muted) !important;
+  border-bottom: 1px solid var(--color-border) !important;
+}
+.avatar {
+  background: var(--color-bg-tertiary) !important;
+  border-color: var(--color-border-highlight) !important;
+}

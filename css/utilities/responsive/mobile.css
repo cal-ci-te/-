@@ -1,0 +1,437 @@
+/* ===== 手机端（768px） ===== */
+@media (max-width: 768px) {
+
+  /* ===== 全局 ===== */
+  .app-layout {
+    padding: 12px;
+    padding-top: 60px;
+  }
+
+  .main-content {
+    padding: 0 8px;
+  }
+
+  /* ===== 首屏说明区域 ===== */
+  .hero-section {
+    min-height: auto;
+    padding: 16px 12px 24px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid #5a3e2b;
+  }
+
+  .hero-content {
+    margin-top: 0;
+    padding-top: 8px;
+  }
+
+  .hero-content h2 {
+    font-size: 1rem;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+  }
+
+  .hero-description {
+    font-size: 0.55rem;
+    padding: 12px 14px;
+    line-height: 1.6;
+    text-align: left;
+  }
+
+  .hero-description p {
+    margin-bottom: 4px;
+  }
+
+  /* ===== 全屏视频背景 - 完全隐藏 ===== */
+  .fullscreen-bg {
+    opacity: 0 !important;
+    display: none !important;
+  }
+
+  .fullscreen-bg video {
+    display: none !important;
+  }
+
+  /* ===== 卡片 ===== */
+  .card {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 16px !important;
+    margin-bottom: 24px !important;
+  }
+
+  .card:nth-child(odd),
+  .card:nth-child(even) {
+    align-self: center !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    transform: rotate(0deg) !important;
+  }
+
+  .card h3 {
+    font-size: 1rem !important;
+  }
+
+  .card-content {
+    font-size: 0.8rem !important;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+  }
+
+  #positionModeControls {
+        display: block !important;
+        padding: 8px 12px !important;
+        border-bottom: 1px solid #3a2a1a !important;
+    }
+
+  /* ===== 侧边栏 ===== */
+  .sidebar {
+    position: fixed !important;
+    left: 8px !important;
+    top: 56px !important;
+    width: 220px !important;
+    max-width: calc(100vw - 16px) !important;
+    max-height: 55vh !important;
+    border-radius: 6px;
+    z-index: 1000;
+    overflow: hidden;
+  }
+
+  .sidebar.open {
+    width: 180px !important;
+  }
+
+  .sidebar.collapsed {
+    width: 40px !important;
+    min-width: 40px !important;
+    max-width: 40px !important;
+  }
+
+  .sidebar-header h3 {
+    font-size: 0.8rem;
+  }
+
+  .sidebar-search-box {
+    font-size: 11px;
+    padding: 6px 10px;
+  }
+
+  /* ===== 管理员面板 ===== */
+  .admin-panel {
+    position: fixed !important;
+    width: 200px !important;
+    max-width: calc(100vw - 16px) !important;
+    max-height: calc(100vh - 100px);
+    bottom: 10px !important;
+    right: 10px !important;
+    border-radius: 6px;
+    z-index: 1001;
+  }
+
+  .admin-panel.collapsed {
+    width: 40px !important;
+    min-width: 40px !important;
+    max-width: 40px !important;
+  }
+
+  .admin-panel .panel-header h4 {
+    font-size: 10px;
+  }
+
+  .admin-panel .panel-content {
+    padding: 8px 12px;
+    font-size: 10px;
+  }
+
+  .admin-panel button {
+    font-size: 10px;
+    padding: 4px 10px;
+  }
+
+  /* ===== 登录组件 ===== */
+  .login-widget {
+    position: fixed !important;
+    top: 8px !important;
+    right: 8px !important;
+    z-index: 1002;
+    max-width: calc(100vw - 16px) !important;
+  }
+
+  .login-trigger {
+    padding: 4px 10px 4px 6px;
+    border-radius: 30px;
+    max-width: 100%;
+  }
+
+  .login-avatar {
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+  }
+
+  .login-info {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .login-label {
+    font-size: 8px;
+  }
+
+  .welcome-text {
+    font-size: 7px;
+  }
+
+  /* ===== 登录弹窗 ===== */
+  .login-modal {
+    width: 90%;
+    max-width: 320px;
+    margin: 20px;
+  }
+
+  .login-modal .modal-body {
+    padding: 16px;
+  }
+
+  /* ===== 裁剪弹窗 ===== */
+  .crop-modal {
+    width: 95%;
+    max-width: 360px;
+    margin: 20px;
+  }
+
+  .crop-container canvas {
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* ===== 详情页 ===== */
+  .detail-overlay {
+    padding: 8px;
+  }
+
+  .detail-container {
+    border-radius: 8px;
+  }
+
+  .detail-pane {
+    padding: 16px;
+  }
+
+  .detail-tabs {
+    padding: 0 4px;
+    min-height: 32px;
+    overflow-x: auto;
+  }
+
+  .detail-tab {
+    padding: 4px 10px;
+    font-size: 11px;
+    flex-shrink: 0;
+  }
+
+  .detail-tab .tab-title {
+    max-width: 80px;
+  }
+
+  .detail-body {
+    font-size: 0.85rem;
+    line-height: 1.6;
+  }
+
+  .detail-body h1 {
+    font-size: 1.3rem;
+  }
+
+  .detail-body h2 {
+    font-size: 1.1rem;
+  }
+
+  .detail-body h3 {
+    font-size: 1rem;
+  }
+
+  /* ===== 最小化栏 ===== */
+  .minimized-bar {
+    position: fixed !important;
+    left: 8px !important;
+    bottom: 8px !important;
+    max-width: calc(100vw - 16px) !important;
+    height: 32px !important;
+    padding: 0 4px !important;
+    border-radius: 6px !important;
+    z-index: 3100 !important;
+  }
+
+  .minimized-item {
+    height: 24px !important;
+    padding: 0 6px !important;
+  }
+
+  .minimized-item .minimized-title {
+    max-width: 60px !important;
+    font-size: 10px !important;
+  }
+
+  /* ===== Toast ===== */
+  .toast-message {
+    font-size: 11px;
+    padding: 10px 20px;
+    max-width: 90%;
+  }
+
+  /* ===== 水印 ===== */
+  .visible-watermark {
+    font-size: 7px;
+    padding: 2px 6px;
+    bottom: 8px;
+    right: 8px;
+  }
+
+  .deco-logo,
+  .deco-raven,
+  .deco-stamp {
+    opacity: 0.15 !important;
+    transform: scale(0.7);
+  }
+
+  /* ===== 加载提示 ===== */
+  .loading-more {
+    padding: 20px;
+    font-size: 11px;
+  }
+
+  .end-message {
+    padding: 20px;
+    font-size: 11px;
+  }
+
+  /* ===== 文章编辑器 ===== */
+  .editor-sidebar {
+    width: 180px !important;
+    max-width: calc(100vw - 16px) !important;
+  }
+
+  .editor-sidebar.collapsed {
+    width: 0 !important;
+    margin-left: 0 !important;
+  }
+
+  .editor-content {
+    padding: 20px 16px;
+  }
+
+  .editor-sidebar-header h3 {
+    font-size: 13px;
+  }
+
+  .tree-node-content {
+    padding: 3px 6px;
+    font-size: 12px;
+  }
+
+  /* ===== 目录树 ===== */
+  .tree-node-content .node-title {
+    font-size: 12px;
+  }
+
+  .children {
+    margin-left: 12px;
+    padding-left: 4px;
+  }
+
+  .toggle-icon {
+    width: 14px;
+    font-size: 10px;
+  }
+
+  #positionModeControls {
+        display: block !important;
+        padding: 10px 12px !important;
+        border-bottom: 1px solid #3a2a1a !important;
+        background: #1a1612;
+        margin-bottom: 4px;
+        border-radius: 0 0 6px 6px;
+    }
+
+    #positionModeControls .pos-controls-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        align-items: center;
+    }
+
+    #positionModeControls button {
+        font-size: 11px !important;
+        padding: 6px 12px !important;
+        margin: 0 !important;
+        width: auto !important;
+        border-radius: 4px !important;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    #positionModeControls button:active {
+        transform: scale(0.96);
+    }
+
+    #positionModeControls #enterPositionModeBtn {
+        background: #5a3e2b !important;
+        color: #e8d5b5 !important;
+    }
+
+    #positionModeControls #savePositionChangesBtn {
+        background: #3a5a2b !important;
+        color: #e8d5b5 !important;
+    }
+
+    #positionModeControls #cancelPositionChangesBtn {
+        background: #3a2a1a !important;
+        color: #c4b5a0 !important;
+    }
+
+    #positionModeControls .pos-hint {
+        font-size: 10px !important;
+        color: #7a6a58 !important;
+        margin-top: 4px !important;
+        width: 100%;
+        text-align: center;
+    }
+
+    /* 当按钮隐藏时，用 display:none 替代 visibility */
+    #positionModeControls #savePositionChangesBtn[style*="display: none"],
+    #positionModeControls #cancelPositionChangesBtn[style*="display: none"] {
+        display: none !important;
+    }
+
+      /* ===== 移动端：隐藏所有贴纸 ===== */
+  /* 隐藏静态贴纸（logo、stamp、raven） */
+  .deco-logo,
+  .deco-stamp,
+  .deco-raven {
+    display: none !important;
+  }
+
+  /* 隐藏动态生成的贴纸（ID 以 deco- 开头） */
+  [id^="deco-"] {
+    display: none !important;
+  }
+
+  /* 隐藏贴纸编辑相关按钮（如“编辑位置”） */
+  .asset-edit-pos-btn,
+  .deco-edit-pos,
+  .asset-edit-pos {
+    display: none !important;
+  }
+
+  /* 隐藏贴纸位置管理的确认/取消按钮（如果有） */
+  #confirmEditPosBtn,
+  #cancelEditPosBtn {
+    display: none !important;
+  }
+}
+
+    
+
+
+  

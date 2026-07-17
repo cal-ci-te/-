@@ -1,0 +1,396 @@
+/* ========== 低保真 / 梦核 / 阈限空间 主题 ========== */
+
+/* 字体已在 index.html 中全局加载，此处不再重复 @import */
+
+:root {
+  /* 变量定义 */
+  --color-bg-primary: #f0ebe0;
+  --color-bg-secondary: #e8dfd0;
+  --color-bg-tertiary: #dacfc0;
+  --color-bg-card: #fff9f0;
+  --color-bg-card-start: #fffaf2;
+  --color-bg-card-end: #f5ede0;
+  --color-bg-overlay: rgba(240, 235, 224, 0.92);
+
+  --color-border: #c0b0a0;
+  --color-border-light: rgba(160, 140, 120, 0.2);
+  --color-border-dashed: rgba(180, 120, 80, 0.15);
+  --color-border-highlight: #b08050;
+
+  --color-text-primary: #8a7a6a;
+  --color-text-secondary: #9a8a7a;
+  --color-text-muted: #b0a090;
+  --color-text-heading: #7a6a5a;
+  --color-text-light: #c0b0a0;
+  --color-text-accent: #6a5a4a;
+
+  --color-accent: #b09070;
+  --color-accent-dark: #8a7a60;
+  --color-accent-light: #d0c0a8;
+  --color-accent-gold: #c8b898;
+
+  --color-folder-1: #b8a88a;
+  --color-folder-2: #c8b898;
+  --color-folder-3: #d8c8a8;
+  --color-folder-4: #e8d8b8;
+
+  --color-hover: rgba(180, 120, 80, 0.1);
+  --color-active: rgba(200, 100, 50, 0.08);
+  --color-success: #6a8a4a;
+  --color-error: #b04030;
+
+  --shadow-sm: 6px 6px 0 rgba(0, 0, 0, 0.04);
+  --shadow-md: 8px 8px 0 rgba(0, 0, 0, 0.04);
+  --shadow-lg: 12px 12px 0 rgba(0, 0, 0, 0.03);
+  --shadow-xl: 0 0 40px rgba(0, 0, 0, 0.02);
+  --shadow-focus: 0 0 20px rgba(180, 120, 80, 0.08);
+  --shadow-glow: 0 0 40px rgba(200, 160, 120, 0.05);
+
+  --font-family-serif: 'Patrick Hand', 'Comic Sans MS', cursive;
+  --font-family-display: 'Press Start 2P', 'Courier New', monospace;
+  --font-family-mono: 'Press Start 2P', 'Courier New', monospace;
+  --font-family-base: 'Patrick Hand', 'Comic Sans MS', cursive;
+}
+
+html[data-theme="lofi"] body {
+    background-color: #e5d9c8 !important;
+    background-image:
+        /* 1. 密集短纤维 */
+        repeating-linear-gradient(45deg, rgba(160, 140, 120, 0.08) 0px, rgba(160, 140, 120, 0.08) 1px, transparent 1px, transparent 5px),
+        repeating-linear-gradient(-45deg, rgba(160, 140, 120, 0.06) 0px, rgba(160, 140, 120, 0.06) 1px, transparent 1px, transparent 7px),
+        /* 2. 纸张纹路 */
+        repeating-linear-gradient(0deg, rgba(180, 160, 140, 0.05) 0px, rgba(180, 160, 140, 0.05) 2px, transparent 2px, transparent 15px),
+        /* 3. 随机斑点 */
+        radial-gradient(circle at 15% 25%, rgba(140, 110, 80, 0.08) 0%, transparent 15%),
+        radial-gradient(circle at 75% 65%, rgba(120, 90, 60, 0.06) 0%, transparent 20%),
+        radial-gradient(circle at 40% 85%, rgba(160, 130, 100, 0.05) 0%, transparent 12%),
+        radial-gradient(circle at 90% 15%, rgba(100, 70, 40, 0.07) 0%, transparent 18%),
+        /* 4. 模糊水渍 */
+        radial-gradient(ellipse at 30% 50%, rgba(200, 180, 160, 0.12) 0%, transparent 40%),
+        radial-gradient(ellipse at 70% 30%, rgba(200, 180, 160, 0.08) 0%, transparent 35%);
+    background-blend-mode: overlay, overlay, overlay, normal, normal, normal, normal, normal, normal !important;
+}
+
+/* 关键：移除伪元素的纹理 */
+html[data-theme="lofi"] body::before {
+    content: none !important;
+    display: none !important;
+    background-image: none !important;
+}
+
+html[data-theme="lofi"] body::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+  background: repeating-linear-gradient(0deg, rgba(0,0,0,0.03) 0px, rgba(0,0,0,0.03) 2px, transparent 2px, transparent 6px);
+  mix-blend-mode: overlay;
+}
+
+html[data-theme="lofi"] body,
+html[data-theme="lofi"] p,
+html[data-theme="lofi"] div,
+html[data-theme="lofi"] span,
+html[data-theme="lofi"] a,
+html[data-theme="lofi"] button,
+html[data-theme="lofi"] input,
+html[data-theme="lofi"] textarea {
+  color: var(--color-text-primary);
+  letter-spacing: 2px;
+  line-height: 2;
+}
+
+html[data-theme="lofi"] h1,
+html[data-theme="lofi"] h2,
+html[data-theme="lofi"] h3,
+html[data-theme="lofi"] h4,
+html[data-theme="lofi"] h5,
+html[data-theme="lofi"] h6,
+html[data-theme="lofi"] .folder-title {
+  font-family: var(--font-family-display);
+  letter-spacing: 4px;
+  word-spacing: 6px;
+  color: var(--color-text-heading);
+  font-weight: 400;
+  text-align: right;
+  transform: rotate(-0.2deg);
+}
+
+html[data-theme="lofi"] .card {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: 2px;
+  box-shadow: var(--shadow-lg);
+  transform: rotate(0.5deg) scale(1.01);
+  transition: all 0.2s ease;
+  padding: 22px 24px;
+  margin-bottom: 32px;
+  max-width: 100%;
+  background-image: repeating-linear-gradient(45deg, rgba(0,0,0,0.01) 0px, rgba(0,0,0,0.01) 1px, transparent 1px, transparent 3px);
+}
+html[data-theme="lofi"] .card:nth-child(even) {
+  transform: rotate(-0.3deg) translateY(-2px);
+}
+html[data-theme="lofi"] .card:nth-child(odd) {
+  transform: rotate(0.8deg) translateY(2px);
+}
+html[data-theme="lofi"] .card:hover {
+  transform: rotate(0deg) scale(1.02);
+  filter: saturate(0.8);
+  box-shadow: var(--shadow-xl);
+}
+html[data-theme="lofi"] .card h3 {
+  font-size: 1.4rem;
+  letter-spacing: 6px;
+  text-align: right;
+  border-bottom: 1px dashed var(--color-border);
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+  color: var(--color-text-heading);
+}
+html[data-theme="lofi"] .card-content {
+  font-family: var(--font-family-serif);
+  font-size: 1rem;
+  line-height: 2.2;
+  color: var(--color-text-secondary);
+  text-align: left;
+}
+html[data-theme="lofi"] .card-meta {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  letter-spacing: 3px;
+  text-align: right;
+  border-top: 1px dotted var(--color-border-light);
+  padding-top: 12px;
+  margin-top: 16px;
+}
+
+html[data-theme="lofi"] .sidebar {
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-secondary);
+  box-shadow: var(--shadow-lg);
+  backdrop-filter: blur(2px);
+  border-radius: 2px;
+}
+html[data-theme="lofi"] .sidebar-header {
+  background: var(--color-bg-tertiary);
+  border-bottom: 1px solid var(--color-border);
+  padding: 10px 12px;
+}
+html[data-theme="lofi"] .sidebar-header h3 {
+  font-size: 1.2rem;
+  letter-spacing: 6px;
+  text-align: right;
+  transform: rotate(0deg);
+}
+html[data-theme="lofi"] .tree-node-content {
+  padding: 6px 10px;
+  border-left: 1px solid transparent;
+}
+html[data-theme="lofi"] .tree-node-content:hover {
+  background: var(--color-hover);
+  border-left-color: var(--color-border-highlight);
+  transform: translateX(4px);
+}
+html[data-theme="lofi"] .tree-node-content.active {
+  background: var(--color-active);
+  border-left: 3px solid var(--color-border-highlight);
+}
+html[data-theme="lofi"] .node-title {
+  font-family: var(--font-family-display);
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--color-text-secondary);
+}
+
+html[data-theme="lofi"] button,
+html[data-theme="lofi"] .btn,
+html[data-theme="lofi"] .theme-btn,
+html[data-theme="lofi"] .avatar-upload-btn,
+html[data-theme="lofi"] .login-submit-btn {
+  font-family: var(--font-family-display);
+  font-size: 10px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  border: 1px solid var(--color-border);
+  border-radius: 2px;
+  background: var(--color-bg-card);
+  color: var(--color-text-muted);
+  box-shadow: 2px 2px 0 rgba(0,0,0,0.03), -1px -1px 0 rgba(255,255,255,0.05);
+  padding: 8px 16px;
+  transition: all 0.15s ease;
+  cursor: pointer;
+  text-align: center;
+  min-height: 32px;
+  touch-action: manipulation;
+}
+html[data-theme="lofi"] button:hover,
+html[data-theme="lofi"] .btn:hover,
+html[data-theme="lofi"] .theme-btn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 4px 4px 0 rgba(0,0,0,0.03), -2px -2px 0 rgba(255,255,255,0.02);
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+}
+html[data-theme="lofi"] button:active,
+html[data-theme="lofi"] .btn:active,
+html[data-theme="lofi"] .theme-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 0 0 0 rgba(0,0,0,0);
+}
+
+html[data-theme="lofi"] .admin-panel button,
+html[data-theme="lofi"] .admin-panel .btn,
+html[data-theme="lofi"] .admin-panel .theme-btn {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+  opacity: 1 !important;
+}
+
+html[data-theme="lofi"] input[type="text"],
+html[data-theme="lofi"] input[type="password"],
+html[data-theme="lofi"] textarea {
+  font-family: var(--font-family-mono);
+  font-size: 13px;
+  letter-spacing: 2px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: 2px;
+  box-shadow: inset 2px 2px 0 rgba(0, 0, 0, 0.02);
+  padding: 8px 12px;
+  color: var(--color-text-secondary);
+  line-height: 1.8;
+}
+
+html[data-theme="lofi"] .admin-panel {
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-secondary);
+  box-shadow: var(--shadow-lg);
+  border-radius: 2px;
+  max-height: 70vh;
+  overflow: hidden;
+}
+html[data-theme="lofi"] .panel-header {
+  background: var(--color-bg-tertiary);
+  border-bottom: 1px solid var(--color-border);
+  padding: 8px 12px;
+}
+html[data-theme="lofi"] .panel-header h4 {
+  font-size: 1rem;
+  letter-spacing: 6px;
+  text-align: left;
+  transform: rotate(0deg);
+}
+html[data-theme="lofi"] .panel-content {
+  padding: 12px 16px;
+  max-height: calc(70vh - 50px);
+  overflow-y: auto;
+  background: var(--color-bg-primary);
+}
+html[data-theme="lofi"] .panel-content .control-group {
+  margin-bottom: 16px;
+}
+html[data-theme="lofi"] .panel-content label {
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--color-text-muted);
+  display: block;
+  margin-bottom: 4px;
+}
+html[data-theme="lofi"] .panel-content input[type="range"] {
+  width: 100%;
+  height: 6px;
+  background: var(--color-border-light);
+  border: none;
+  border-radius: 2px;
+  appearance: none;
+}
+html[data-theme="lofi"] .panel-content input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  background: var(--color-border);
+  border-radius: 0;
+  cursor: pointer;
+}
+html[data-theme="lofi"] .panel-content .theme-btn {
+  margin: 4px 0;
+  flex: 1;
+  min-width: 60px;
+}
+
+html[data-theme="lofi"] .login-modal {
+  border: 1px solid var(--color-border);
+  border-radius: 2px;
+  background: var(--color-bg-card);
+  box-shadow: var(--shadow-xl);
+}
+html[data-theme="lofi"] .login-modal .modal-header {
+  background: var(--color-bg-tertiary);
+  border-bottom: 1px solid var(--color-border);
+}
+html[data-theme="lofi"] .login-modal .modal-body {
+  padding: 20px;
+}
+html[data-theme="lofi"] .login-submit-btn {
+  width: 100%;
+  margin-top: 8px;
+}
+
+html[data-theme="lofi"] .tree-node.dragging {
+  opacity: 0.4;
+}
+html[data-theme="lofi"] .tree-node.drag-over {
+  border-left: 3px solid var(--color-border-highlight) !important;
+  background: var(--color-hover) !important;
+}
+html[data-theme="lofi"] .tree-node.dropzone-sibling-highlight {
+  border-bottom: 2px dashed var(--color-border-highlight) !important;
+  background: var(--color-active) !important;
+}
+
+html[data-theme="lofi"] .articles-grid {
+  gap: 60px;
+  padding: 10px 0 40px;
+}
+html[data-theme="lofi"] .group-header .folder-title {
+  font-size: 1.8rem;
+  letter-spacing: 10px;
+  text-align: right;
+  border-bottom: 1px dotted var(--color-border-light);
+  padding-bottom: 8px;
+  margin-bottom: 20px;
+}
+html[data-theme="lofi"] .group-header .folder-title.level-1 {
+  transform: rotate(-0.3deg);
+}
+html[data-theme="lofi"] .group-header .folder-title.level-2 {
+  transform: rotate(0.5deg);
+  padding-left: 24px;
+}
+html[data-theme="lofi"] .group-header .folder-title.level-3 {
+  transform: rotate(-0.1deg);
+  padding-left: 48px;
+}
+
+html[data-theme="lofi"] ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+html[data-theme="lofi"] ::-webkit-scrollbar-track {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+}
+html[data-theme="lofi"] ::-webkit-scrollbar-thumb {
+  background: var(--color-accent);
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+}
+html[data-theme="lofi"] ::-webkit-scrollbar-thumb:hover {
+  background: var(--color-accent-dark);
+}
+

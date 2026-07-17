@@ -93,12 +93,18 @@ export const WebSocketManager = {
   },
 
   scheduleReconnect() {
+    // 如果 WS_URL 未配置，不进行重连
+    if (!CONFIG.WS_URL) {
+        console.log('[WebSocket] WS_URL 未配置，跳过重连');
+        return;
+    }
+    
     if (this.reconnectTimer) clearTimeout(this.reconnectTimer);
     this.reconnectTimer = setTimeout(() => {
-      console.log('[WebSocket] 尝试重连...');
-      this.connect(CONFIG.WS_URL);
+        console.log('[WebSocket] 尝试重连...');
+        this.connect(CONFIG.WS_URL);
     }, this.reconnectInterval);
-  },
+},
 
   close() {
     if (this.ws) {

@@ -13,6 +13,15 @@ export const DecoShelf = {
   _clipboardId: null,
 
   /**
+   * 检测是否为移动端（仅用于功能禁用，不用于渲染控制）
+   */
+  _isMobile() {
+    return window.innerWidth <= 768 || 
+           ('ontouchstart' in window) || 
+           navigator.maxTouchPoints > 0;
+  },
+
+  /**
    * 标准化贴图对象：确保有 dataUrl 字段
    */
   _normalizeItem(item) {
@@ -79,7 +88,7 @@ export const DecoShelf = {
       throw new Error('格式不支持');
     }
 
-    const compressedDataUrl = await this._compressImageToDataUrl(file,0.6);
+    const compressedDataUrl = await this._compressImageToDataUrl(file, 0.6);
     const id = this._generateId();
     const item = {
       id: id,
@@ -92,7 +101,6 @@ export const DecoShelf = {
     };
 
     const savedItem = await DecoRepository.save(item);
-    // 从仓库重新获取并标准化
     const allItems = DecoRepository.getAll();
     this._library = this._normalizeItems(allItems);
     this._renderAllDecos();
@@ -100,37 +108,35 @@ export const DecoShelf = {
     return savedItem;
   },
 
-// 在 deco.js 中，替换 _compressImageToDataUrl 方法
-_compressImageToDataUrl(file, quality = 0.6) {
+  _compressImageToDataUrl(file, quality = 0.6) {
     return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const img = new Image();
-            img.onload = () => {
-                const canvas = document.createElement('canvas');
-                // ★★★ 保持原始尺寸，不缩放 ★★★
-                canvas.width = img.width;
-                canvas.height = img.height;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0);
-                canvas.toBlob(
-                    (blob) => {
-                        const reader2 = new FileReader();
-                        reader2.onload = (e2) => resolve(e2.target.result);
-                        reader2.onerror = reject;
-                        reader2.readAsDataURL(blob);
-                    },
-                    'image/webp',
-                    quality  // 质量参数，默认 0.6，可调整
-                );
-            };
-            img.onerror = reject;
-            img.src = e.target.result;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          canvas.width = img.width;
+          canvas.height = img.height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0);
+          canvas.toBlob(
+            (blob) => {
+              const reader2 = new FileReader();
+              reader2.onload = (e2) => resolve(e2.target.result);
+              reader2.onerror = reject;
+              reader2.readAsDataURL(blob);
+            },
+            'image/webp',
+            quality
+          );
         };
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
+        img.onerror = reject;
+        img.src = e.target.result;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
     });
-},
+  },
 
   duplicate(id) {
     const original = this.get(id);
@@ -201,6 +207,7 @@ _compressImageToDataUrl(file, quality = 0.6) {
     item.position = null;
     DecoRepository.save(item).then(() => {
       this._library = this._normalizeItems(DecoRepository.getAll());
+      this._renderAllDecos();
       EventBus.emit(EVENTS.DECO_LIBRARY_CHANGED);
     });
     return true;
@@ -251,8 +258,14 @@ _compressImageToDataUrl(file, quality = 0.6) {
     return true;
   },
 
-  // 编辑位置相关
+  // ===== 编辑位置相关（移动端禁用） =====
   startEditingPosition(id) {
+    // 移动端禁用贴纸位置编辑
+    if (this._isMobile()) {
+      Utils.showToast('移动端不支持贴纸位置编辑', true);
+      return;
+    }
+
     if (this._editingId && this._editingId !== id) {
       this.stopEditingPosition(false);
     }
@@ -297,6 +310,26 @@ _compressImageToDataUrl(file, quality = 0.6) {
   },
 
   stopEditingPosition(save = true) {
+    // 移动端禁用（但保留清理逻辑以防万一）
+    if (this._isMobile()) {
+      // 如果有正在编辑的贴纸，清理它
+      if (this._editingId) {
+        const id = this._editingId;
+        const el = document.getElementById('deco-' + id);
+        if (el) {
+          el.style.border = 'none';
+          el.style.boxShadow = 'none';
+          el.style.cursor = '';
+          this._disableDragging(el);
+        }
+        const resetBtn = document.getElementById('deco-reset-btn-' + id);
+        if (resetBtn) resetBtn.remove();
+        this._editingId = null;
+        EventBus.emit(EVENTS.DECO_EDITING_STOPPED, { id: id, saved: false });
+      }
+      return;
+    }
+
     if (!this._editingId) return;
     const id = this._editingId;
     const el = document.getElementById('deco-' + id);
@@ -327,6 +360,11 @@ _compressImageToDataUrl(file, quality = 0.6) {
   },
 
   confirmEditing: function () {
+    // 移动端禁用
+    if (this._isMobile()) {
+      Utils.showToast('移动端不支持贴纸位置编辑', true);
+      return;
+    }
     if (!this._editingId) {
       Utils.showToast(UI.deco.noEditing, true);
       return;
@@ -336,6 +374,11 @@ _compressImageToDataUrl(file, quality = 0.6) {
   },
 
   cancelEditing: function () {
+    // 移动端禁用
+    if (this._isMobile()) {
+      Utils.showToast('移动端不支持贴纸位置编辑', true);
+      return;
+    }
     if (!this._editingId) {
       Utils.showToast(UI.deco.noEditing, true);
       return;
@@ -344,8 +387,9 @@ _compressImageToDataUrl(file, quality = 0.6) {
     Utils.showToast(UI.deco.editCancelled, false);
   },
 
-  // ----- 渲染方法 -----
+  // ===== 渲染方法（所有设备都渲染，由CSS控制显示） =====
   _renderAllDecos: function () {
+    // 清理所有旧贴纸
     document.querySelectorAll('[id^="deco-"]').forEach(function (el) {
       if (el.id.startsWith('deco-') && !el.id.startsWith('deco-reset-btn-')) {
         if (el._longPressCleanup) {
@@ -355,6 +399,8 @@ _compressImageToDataUrl(file, quality = 0.6) {
         el.remove();
       }
     });
+
+    // 遍历贴纸，渲染有位置的
     this._library.forEach((item) => {
       if (item.position) {
         this._renderSingleDeco(item.id);
@@ -420,8 +466,11 @@ _compressImageToDataUrl(file, quality = 0.6) {
     el._longPressCleanup = cleanup;
   },
 
-  // 拖拽相关
+  // ===== 拖拽相关（移动端禁用） =====
   _enableDragging: function (el) {
+    // 移动端禁用拖拽
+    if (this._isMobile()) return;
+
     el.style.cursor = 'grab';
     const onMouseDown = (e) => {
       if (e.button !== 0) return;
@@ -458,6 +507,9 @@ _compressImageToDataUrl(file, quality = 0.6) {
   },
 
   _showResetButton: function (id) {
+    // 移动端禁用重置按钮
+    if (this._isMobile()) return;
+
     const existing = document.getElementById('deco-reset-btn-' + id);
     if (existing) existing.remove();
     const btn = document.createElement('div');
@@ -527,4 +579,4 @@ export const Deco = {
   },
 };
 
-console.log('✅ DecoShelf 已加载（仓库版本 + dataUrl 标准化）');
+console.log('✅ DecoShelf 已加载（移动端贴纸功能已精简）');

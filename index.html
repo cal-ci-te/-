@@ -2,10 +2,17 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <title>REVACHOL - 原创角色档案馆</title>
+
+    <!-- ===== 字体 ===== -->
+    <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Special+Elite&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Press+Start+2P&family=Patrick+Hand&display=swap" rel="stylesheet">
+
+    <!-- ===== 默认主题（暗色） ===== -->
+    <link rel="stylesheet" href="/css/themes/dark.css" id="theme-stylesheet">
+
+    <!-- ===== 主样式 ===== -->
     <link rel="stylesheet" href="css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Special+Elite&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -118,9 +125,9 @@
             </div>
             <div id="positionModeControls" style="display:none; padding: 8px 12px; border-bottom:1px solid #3a2a1a;">
                 <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
-                    <button id="enterPositionModeBtn" style="width:auto;background:#5a3e2b;padding:4px 12px;font-size:11px;border:none;color:#e8d5b5;border-radius:4px;cursor:pointer;"></button>
-                    <button id="savePositionChangesBtn" style="width:auto;background:#3a5a2b;padding:4px 12px;font-size:11px;border:none;color:#e8d5b5;border-radius:4px;cursor:pointer;display:none;"></button>
-                    <button id="cancelPositionChangesBtn" style="width:auto;background:#3a2a1a;padding:4px 12px;font-size:11px;border:none;color:#e8d5b5;border-radius:4px;cursor:pointer;display:none;"></button>
+                    <button id="enterPositionModeBtn" style="width:auto;background:#5a3e2b;padding:4px 12px;font-size:11px;border:none;color:#e8d5b5;border-radius:4px;cursor:pointer;">📌 进入位置管理</button>
+                    <button id="savePositionChangesBtn" style="width:auto;background:#3a5a2b;padding:4px 12px;font-size:11px;border:none;color:#e8d5b5;border-radius:4px;cursor:pointer;display:none;">💾 保存更改</button>
+                    <button id="cancelPositionChangesBtn" style="width:auto;background:#3a2a1a;padding:4px 12px;font-size:11px;border:none;color:#e8d5b5;border-radius:4px;cursor:pointer;display:none;">❌ 取消</button>
                 </div>
                 <div style="font-size:9px;color:#7a6a58;margin-top:4px;" id="positionModeHint"></div>
             </div>
@@ -160,6 +167,13 @@
     </div>
 </div>
 
+<script type="importmap">
+    {
+        "imports": {
+            "./js/": "./js/"
+        }
+    }
+</script>
 <script type="module" src="js/app.js"></script>
 </body>
 </html>

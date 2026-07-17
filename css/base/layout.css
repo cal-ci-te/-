@@ -23,13 +23,13 @@
   gap: 16px;
   margin-bottom: 20px;
   flex-wrap: wrap;
-  border-bottom: 1px solid #5a3e2b;
+  border-bottom: 1px solid var(--color-border);
   padding-bottom: 20px;
 }
 
 /* 移除右侧空 div 的宽度，或将其隐藏 */
 .toolbar > div:last-child {
-  display: none; /* 或 width: 0; */
+  display: none;
 }
 
 .header-decoration {
@@ -40,30 +40,30 @@
 .avatar {
   width: 60px;
   height: 60px;
-  background: #2a231c;
-  border: 2px solid #c47a44;
+  background: var(--color-bg-tertiary);
+  border: 2px solid var(--color-border-highlight);
   margin: 0 auto 10px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 30px;
   transform: rotate(1deg);
-  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.3);
-  border-radius: 8px;
+  box-shadow: var(--shadow-sm);
+  border-radius: var(--radius-md);
 }
 
 h1 {
-  font-family: 'Special Elite', monospace;
-  color: #e8d5b5;
+  font-family: var(--font-family-display);
+  color: var(--color-text-heading);
   font-size: 1.6rem;
   letter-spacing: 4px;
   text-transform: uppercase;
-  text-shadow: 3px 3px 0 #3a2a1a;
+  text-shadow: 3px 3px 0 var(--color-bg-tertiary);
   font-weight: 400;
 }
 
 .subtitle {
-  color: #c4b5a0;
+  color: var(--color-text-muted);
   font-size: 0.8rem;
   font-style: italic;
   letter-spacing: 2px;
@@ -72,11 +72,11 @@ h1 {
 .copyright-bar {
   text-align: center;
   font-size: 10px;
-  color: #7a6a58;
-  font-family: 'Courier New', monospace;
+  color: var(--color-text-muted);
+  font-family: var(--font-family-mono);
   letter-spacing: 1px;
   padding: 6px 0;
-  border-bottom: 1px solid #5a3e2b;
+  border-bottom: 1px solid var(--color-border);
   margin-bottom: 10px;
 }
 
@@ -88,10 +88,10 @@ h1 {
   justify-content: center;
   padding: 40px 20px;
   text-align: center;
-  border-bottom: 1px solid #5a3e2b;
+  border-bottom: 1px solid var(--color-border);
   margin-bottom: 40px;
   position: relative;
-  z-index: 1; /* 确保内容在视频背景之上 */
+  z-index: 1;
 }
 
 .hero-content {
@@ -101,11 +101,11 @@ h1 {
 }
 
 .hero-content h2 {
-  font-family: 'Special Elite', monospace;
-  color: #e8d5b5;
+  font-family: var(--font-family-display);
+  color: var(--color-text-heading);
   font-size: 1rem;
   letter-spacing: 4px;
-  text-shadow: 3px 3px 0 #3a2a1a;
+  text-shadow: 3px 3px 0 var(--color-bg-tertiary);
   margin-bottom: 10px;
 }
 
@@ -113,11 +113,9 @@ h1 {
   text-align: left;
   font-size: 0.5rem;
   line-height: 1.2;
-  color: #c4b5a0;
-  /*background: rgba(30, 26, 21, 0.6);*/
+  color: var(--color-text-secondary);
   padding: 24px 32px;
-  border-radius: 12px;
-  /*border-left: 4px solid #c47a44;*/
+  border-radius: var(--radius-lg);
 }
 
 .hero-description p {
@@ -129,7 +127,7 @@ h1 {
 }
 
 .hero-description strong {
-  color: #e8c88a;
+  color: var(--color-text-heading);
 }
 
 /* ========== 全屏视频背景 ========== */
@@ -139,30 +137,15 @@ h1 {
   left: 0;
   width: 100vw;
   height: 100vh;
-  z-index: 0; /* 低于水印 (z-index:2) 和贴纸 (z-index:99) */
-  pointer-events: none; /* 不干扰交互 */
-  background: #1a1612; /* 视频加载前的底色 */
+  z-index: 0;
+  pointer-events: none;
+  background: var(--color-bg-primary);
   transition: opacity 0.15s ease;
 }
 
 .fullscreen-bg video {
   width: 100%;
   height: 100%;
-  object-fit: cover; /* 铺满且不变形 */
+  object-fit: cover;
   display: block;
-}
-
-/* 移动端适配 */
-@media (max-width: 768px) {
-  .hero-section {
-    min-height: calc(100vh - 100px);
-    padding: 20px 16px;
-  }
-  .hero-content h2 {
-    font-size: 1.8rem;
-  }
-  .hero-description {
-    font-size: 0.9rem;
-    padding: 16px 20px;
-  }
 }

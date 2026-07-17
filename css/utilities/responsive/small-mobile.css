@@ -1,0 +1,158 @@
+/* ===== 超小屏手机（480px） ===== */
+@media (max-width: 480px) {
+
+  .app-layout {
+    padding: 8px;
+    padding-top: 56px;
+  }
+
+  .main-content {
+    padding: 0 4px;
+  }
+
+  .hero-description {
+    font-size: 0.5rem;
+    padding: 10px 12px;
+  }
+
+  .hero-content h2 {
+    font-size: 0.9rem;
+  }
+
+  /* ===== 侧边栏 ===== */
+  .sidebar {
+    left: 4px !important;
+    top: 52px !important;
+    width: 180px !important;
+    max-width: calc(100vw - 8px) !important;
+  }
+
+  .sidebar.open {
+    width: 160px !important;
+  }
+
+  .sidebar.collapsed {
+    width: 36px !important;
+    min-width: 36px !important;
+    max-width: 36px !important;
+  }
+
+  /* ===== 管理员面板 ===== */
+  .admin-panel {
+    width: 170px !important;
+    max-width: calc(100vw - 8px) !important;
+    bottom: 6px !important;
+    right: 6px !important;
+  }
+
+  .admin-panel.collapsed {
+    width: 34px !important;
+    min-width: 34px !important;
+    max-width: 34px !important;
+  }
+
+  /* ===== 登录组件 ===== */
+  .login-widget {
+    top: 4px !important;
+    right: 4px !important;
+    max-width: calc(100vw - 8px) !important;
+  }
+
+  .login-trigger {
+    padding: 2px 8px 2px 4px;
+  }
+
+  .login-avatar {
+    width: 22px;
+    height: 22px;
+  }
+
+  .login-label {
+    font-size: 7px;
+  }
+
+  .welcome-text {
+    font-size: 6px;
+  }
+
+  /* ===== 弹窗 ===== */
+  .login-modal {
+    width: 95%;
+  }
+
+  .detail-pane {
+    padding: 12px;
+  }
+
+  .detail-tab {
+    padding: 4px 8px;
+    font-size: 10px;
+  }
+
+  .detail-tab .tab-title {
+    max-width: 60px;
+  }
+
+  /* ===== 卡片 ===== */
+  .card {
+    padding: 12px !important;
+    margin-bottom: 16px !important;
+  }
+
+  .card h3 {
+    font-size: 0.85rem !important;
+  }
+
+  .card-content {
+    font-size: 0.7rem !important;
+  }
+
+  .card-meta {
+    font-size: 8px !important;
+  }
+
+  .card .card-click-hint {
+    font-size: 7px !important;
+  }
+
+  /* ===== Toast ===== */
+  .toast-message {
+    font-size: 10px;
+    padding: 8px 16px;
+    max-width: 92%;
+  }
+
+  /* ===== 最小化栏 ===== */
+  .minimized-bar {
+    left: 4px !important;
+    bottom: 4px !important;
+    max-width: calc(100vw - 8px) !important;
+    height: 28px !important;
+  }
+
+  .minimized-item {
+    height: 20px !important;
+    padding: 0 4px !important;
+  }
+
+  .minimized-item .minimized-title {
+    max-width: 40px !important;
+    font-size: 9px !important;
+  }
+
+  #positionModeControls {
+        padding: 8px 8px !important;
+    }
+
+  #positionModeControls button {
+        font-size: 10px !important;
+        padding: 4px 10px !important;
+    }
+
+  #positionModeControls .pos-hint {
+        font-size: 9px !important;
+    }
+
+}
+
+   

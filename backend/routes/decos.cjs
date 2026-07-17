@@ -16,21 +16,43 @@ function registerDecoRoutes(GET, PUT, DELETE) {
         send(res, result);
     });
 
-    // ===== GET /api/decos/:id/image =====
-    GET('/api/decos/:id/image', async (req, res) => {
-        const id = req.params.id;
-        const row = dbModule.query('SELECT image_data FROM decos WHERE id = ?', [id]);
-        if (row && row.image_data) {
-            const buffer = row.image_data instanceof Buffer ? row.image_data : Buffer.from(row.image_data);
+// ===== GET /api/decos/:id/image =====
+GET('/api/decos/:id/image', async (req, res) => {
+    const id = req.params.id;
+    console.log('[Decos] 请求图片 ID:', id);
+
+    try {
+        // 使用 prepare + get 直接获取
+        const db = dbModule.getDb();
+        const stmt = db.prepare('SELECT image_data FROM decos WHERE id = ?');
+        stmt.bind([id]);
+        let blob = null;
+        if (stmt.step()) {
+            blob = stmt.get()[0]; // 获取第一列
+        }
+        stmt.free();
+
+        console.log('[Decos] blob 类型:', typeof blob, '长度:', blob ? blob.length : 0);
+
+        if (blob && blob.length > 0) {
+            const buffer = Buffer.from(blob);
+            console.log('[Decos] ✅ 返回图片, 大小:', buffer.length);
             res.writeHead(200, {
                 'Content-Type': 'image/webp',
                 'Cache-Control': 'public, max-age=31536000',
             });
             res.end(buffer);
-        } else {
-            send(res, { error: 'Image not found' }, 404);
+            return;
         }
-    });
+
+        console.warn('[Decos] ❌ 图片数据不存在或为空, ID:', id);
+        send(res, { error: 'Image not found' }, 404);
+    } catch (err) {
+        console.error('[Decos] ❌ 获取图片错误:', err);
+        res.writeHead(500);
+        res.end(JSON.stringify({ error: 'Database error' }));
+    }
+});
 
     // ===== PUT /api/decos/:id =====
     PUT('/api/decos/:id', async (req, res) => {

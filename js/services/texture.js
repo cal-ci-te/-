@@ -1,4 +1,4 @@
-// ========== 纹理与背景模块（支持渐变） ==========
+// ========== 纹理与背景模块（支持渐变 + 主题模式兼容） ==========
 import { CONFIG } from '../config.js';
 import { Utils } from '../utils.js';
 
@@ -17,6 +17,9 @@ export const Texture = {
 
   // 色卡库
   palettes: [],
+
+  // ===== 主题模式标志 =====
+  _themeActive: false,
 
   // ===== 初始化 =====
   loadConfig() {
@@ -48,7 +51,13 @@ export const Texture = {
       this.savePalettes();
     }
 
-    this.applyBackground();
+    // ===== 主题模式下不应用背景 =====
+    if (!this._themeActive) {
+      this.applyBackground();
+    } else {
+      console.log('[Texture] 主题模式已激活，跳过背景应用');
+    }
+
     const tex = Utils.storage.get('texture_config');
     if (tex) {
       this.textureConfig = tex;
@@ -56,8 +65,29 @@ export const Texture = {
     }
   },
 
+  // ===== 设置主题模式 =====
+  setThemeMode(active) {
+    this._themeActive = active;
+    if (active) {
+      // 清除内联背景样式，让 CSS 控制
+      document.body.style.background = '';
+      document.body.style.backgroundColor = '';
+      document.body.style.backgroundImage = '';
+      document.body.style.backgroundBlendMode = '';
+      console.log('[Texture] 主题模式已启用，背景由 CSS 控制');
+    } else {
+      // 恢复背景应用（用户自定义）
+      this.applyBackground();
+      console.log('[Texture] 主题模式已禁用，恢复 Texture 背景控制');
+    }
+  },
+
   // ===== 背景应用 =====
   applyBackground() {
+    if (this._themeActive) {
+      console.log('[Texture] 主题模式已激活，跳过背景应用');
+      return;
+    }
     if (this.bgMode === 'solid') {
       document.body.style.background = this.bgColor;
     } else {
@@ -126,6 +156,10 @@ export const Texture = {
 
   // ===== 设置纯色 =====
   setBgColor(color) {
+    if (this._themeActive) {
+      console.log('[Texture] 主题模式已激活，请先退出主题模式再设置背景');
+      return;
+    }
     this.bgColor = color;
     this.bgMode = 'solid';
     this.applyBackground();
@@ -133,6 +167,10 @@ export const Texture = {
   },
 
   resetBgColor() {
+    if (this._themeActive) {
+      console.log('[Texture] 主题模式已激活，请先退出主题模式再重置背景');
+      return;
+    }
     this.bgColor = CONFIG.bgColorDefault || '#1a1612';
     this.bgMode = 'solid';
     this.applyBackground();
@@ -141,6 +179,10 @@ export const Texture = {
 
   // ===== 设置渐变 =====
   setGradient(colors, direction, feather) {
+    if (this._themeActive) {
+      console.log('[Texture] 主题模式已激活，请先退出主题模式再设置渐变');
+      return;
+    }
     if (!colors || colors.length < 2) {
       Utils.showToast('至少需要两种颜色', true);
       return;
@@ -156,7 +198,7 @@ export const Texture = {
   // ===== 羽化值更新 =====
   setFeather(value) {
     this.gradientFeather = Math.max(0, Math.min(100, value));
-    if (this.bgMode === 'gradient') {
+    if (this.bgMode === 'gradient' && !this._themeActive) {
       this.applyBackground();
     }
     this.saveBgConfig();
@@ -165,7 +207,7 @@ export const Texture = {
   // ===== 方向更新 =====
   setDirection(direction) {
     this.gradientDirection = direction;
-    if (this.bgMode === 'gradient') {
+    if (this.bgMode === 'gradient' && !this._themeActive) {
       this.applyBackground();
     }
     this.saveBgConfig();
@@ -202,6 +244,10 @@ export const Texture = {
   },
 
   applyPalette(id) {
+    if (this._themeActive) {
+      console.log('[Texture] 主题模式已激活，请先退出主题模式再应用色卡');
+      return;
+    }
     const palette = this.palettes.find((p) => p.id === id);
     if (!palette) {
       Utils.showToast('色卡不存在', true);
@@ -215,7 +261,7 @@ export const Texture = {
     Utils.showToast(`已应用色卡：${palette.name}`, false);
   },
 
-  // ===== 纹理（保持不变） =====
+  // ===== 纹理 =====
   applyTexture() {
     const textureDiv = document.getElementById('customTexture');
     if (!textureDiv) return;
@@ -306,7 +352,8 @@ export const Texture = {
   },
 };
 
-// 自动加载
+// 自动加载（但此时 _themeActive 默认为 false，所以会应用背景）
+// 我们将在 ThemeService 初始化时设置为 true
 Texture.loadConfig();
 
 console.log('✅ Texture 已加载 (ES Module)');

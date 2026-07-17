@@ -1,4 +1,5 @@
-/* ========== 目录树 ========== */
+/* ========== 目录树样式（使用 CSS 变量，支持主题切换） ========== */
+
 .directory-tree {
   padding: var(--spacing-xs) 0;
 }
@@ -17,16 +18,17 @@
   margin: 1px var(--spacing-xs);
   border-left: 2px solid transparent;
   border-radius: var(--radius-sm);
+  color: var(--color-text-secondary);
 }
 
 .tree-node-content:hover {
   background: var(--color-hover);
-  border-left-color: var(--color-accent);
+  border-left-color: var(--color-border-highlight);
 }
 
 .tree-node-content.active {
   background: var(--color-active);
-  border-left-color: var(--color-accent);
+  border-left-color: var(--color-border-highlight);
 }
 
 .node-icon {
@@ -45,11 +47,12 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  color: var(--color-text-secondary);
 }
 
 .folder > .tree-node-content .node-title {
   font-weight: var(--font-weight-semibold);
-  color: var(--color-accent-light);
+  color: var(--color-text-heading);
   font-family: var(--font-family-display);
 }
 
@@ -69,13 +72,13 @@
   font-size: var(--font-size-sm);
   text-align: center;
   margin-right: var(--spacing-xs);
-  color: #8a6a4a;
+  color: var(--color-text-muted);
   flex-shrink: 0;
 }
 
 .tree-node-content.search-highlight {
   background: rgba(196, 122, 68, 0.4) !important;
-  border-left-color: var(--color-accent) !important;
+  border-left-color: var(--color-border-highlight) !important;
   box-shadow: 0 0 15px rgba(196, 122, 68, 0.2);
 }
 
@@ -85,6 +88,57 @@
 
 /* 空白放置区拖拽悬停 */
 .dropzone-background.drag-over {
-    border-color: #c47a44 !important;
-    background: rgba(196, 122, 68, 0.15) !important;
+  border-color: var(--color-border-highlight) !important;
+  background: var(--color-hover) !important;
+}
+
+/* 可见性切换按钮 */
+.visibility-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  margin-left: 8px;
+  padding: 0 2px;
+  color: var(--color-text-muted);
+}
+.visibility-toggle:hover {
+  color: var(--color-text-heading);
+}
+
+/* 文件夹折叠状态指示 */
+.tree-node.folder .toggle-icon {
+  cursor: pointer;
+}
+
+/* 拖拽时的样式 */
+.tree-node.dragging {
+  opacity: 0.4;
+}
+.tree-node.drag-over {
+  border-left: 3px solid var(--color-border-highlight) !important;
+  background: var(--color-hover) !important;
+}
+.tree-node.dropzone-sibling-highlight {
+  border-bottom: 2px dashed var(--color-border-highlight) !important;
+  background: var(--color-active) !important;
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+  .tree-node-content {
+    padding: 3px 6px;
+    font-size: 12px;
+  }
+  .node-title {
+    font-size: 12px;
+  }
+  .children {
+    margin-left: 12px;
+    padding-left: 4px;
+  }
+  .toggle-icon {
+    width: 14px;
+    font-size: 10px;
+  }
 }

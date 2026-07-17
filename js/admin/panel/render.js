@@ -188,6 +188,17 @@ AdminPanel.renderContent = function () {
             </div>
         </div>
 
+        <!-- 主题切换 -->
+        <div class="control-group" style="border-top: 1px solid #5a3e2b; padding-top: 12px; margin-top: 12px;">
+            <label>🎨 主题切换</label>
+            <div id="themeSelector" style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px;">
+                <button data-action="theme-switch" data-theme="dark" class="theme-btn" style="flex:1; background:#3a2a1a; color:#e8d5b5; border:2px solid #5a3e2b; border-radius:4px; padding:6px 12px; cursor:pointer;">🌙 暗色</button>
+                <button data-action="theme-switch" data-theme="light" class="theme-btn" style="flex:1; background:#ebe5db; color:#3a322a; border:2px solid #c4b8a8; border-radius:4px; padding:6px 12px; cursor:pointer;">☀️ 亮色</button>
+                <button data-action="theme-switch" data-theme="lofi" class="theme-btn" style="flex:1; background:#f0ebe0; color:#1a0e08; border:2px solid #c0b0a0; border-radius:4px; padding:6px 12px; cursor:pointer;">📼 低保真</button>
+            </div>
+            <div style="font-size:9px; color:#7a6a58; margin-top:4px;">点击切换主题，偏好自动保存</div>
+        </div>
+
         <button id="logoutBtn" data-action="logout" style="margin-top:12px;background:#3a2a1a;">${UI.admin.logoutButton}</button>
     `;
 
@@ -221,12 +232,11 @@ AdminPanel.renderContent = function () {
     // 绑定折叠按钮
     AdminPanel._bindToggleIconDirect();
 
-    // ===== 绑定贴图上传事件（显式 click + 详细日志） =====
+    // ===== 绑定贴图上传事件 =====
     const uploadBtn = document.getElementById('assetUploadBtn');
     const assetFileInput = document.getElementById('assetFileInput');
 
     if (uploadBtn && assetFileInput) {
-        // 移除旧监听
         if (AdminPanel._uploadClickHandler) {
             uploadBtn.removeEventListener('click', AdminPanel._uploadClickHandler);
         }
@@ -234,32 +244,19 @@ AdminPanel.renderContent = function () {
             assetFileInput.removeEventListener('change', AdminPanel._assetFileHandler);
         }
 
-        // 按钮点击 → 触发文件选择
         AdminPanel._uploadClickHandler = function(e) {
             e.stopPropagation();
-            console.log('[Upload] 点击上传按钮，准备触发文件选择');
+            console.log('[Upload] 点击上传按钮');
             assetFileInput.value = '';
-            console.log('[Upload] 已清空 input.value，调用 click()');
             assetFileInput.click();
         };
         uploadBtn.addEventListener('click', AdminPanel._uploadClickHandler);
 
-        // 文件选择后的处理（修正：先保存文件对象，再清空 value）
         AdminPanel._assetFileHandler = async function(event) {
             const fileInput = event.target;
-            console.log('[Upload] change 事件触发，input 元素:', fileInput);
-            // ★★★ 关键修复：先获取文件对象，再清空 value ★★★
             const file = fileInput.files[0];
-            // 清空 value 以便下次选择
             fileInput.value = '';
-            console.log('[Upload] 已清空 input.value');
-
-            if (!file) {
-                console.warn('[Upload] 无文件（可能用户取消）');
-                return;
-            }
-
-            console.log('[Upload] 选择文件:', file.name, file.type, file.size);
+            if (!file) return;
 
             const validTypes = ['image/png', 'image/webp', 'image/jpeg'];
             if (!validTypes.includes(file.type)) {
@@ -269,39 +266,27 @@ AdminPanel.renderContent = function () {
 
             const defaultName = file.name.replace(/\.[^.]+$/, '');
             const name = prompt('请输入贴图名称（不含扩展名）：', defaultName);
-            if (name === null) {
-                console.log('[Upload] 用户取消命名');
-                return;
-            }
+            if (name === null) return;
 
             try {
-                console.log('[Upload] 开始上传:', name);
                 await DecoShelf.upload(file, name);
                 Utils.showToast('贴图 "' + name + '" 上传成功', false);
-                console.log('[Upload] 上传成功');
             } catch (err) {
-                console.error('[Upload] 上传失败:', err);
                 Utils.showToast('上传失败：' + (err.message || '未知错误'), true);
             }
         };
         assetFileInput.addEventListener('change', AdminPanel._assetFileHandler);
 
-        console.log('[Upload] 上传事件绑定完成（显式 click）');
-    } else {
-        console.warn('[AdminPanel] 上传控件未找到，请检查 DOM');
+        console.log('[Upload] 上传事件绑定完成');
     }
 
-    // 标记为已渲染
     AdminPanel._rendered = true;
 };
 
-// 其他函数（_bindToggleIconDirect, unbindEvents）保持不变
+// ===== 折叠按钮直接绑定 =====
 AdminPanel._bindToggleIconDirect = function () {
     const toggleIcon = document.getElementById('panelToggleIcon');
-    if (!toggleIcon) {
-        console.warn('[AdminPanel] #panelToggleIcon 不存在');
-        return;
-    }
+    if (!toggleIcon) return;
     if (AdminPanel._directToggleHandler) {
         toggleIcon.removeEventListener('click', AdminPanel._directToggleHandler);
     }
@@ -313,33 +298,29 @@ AdminPanel._bindToggleIconDirect = function () {
         }
     };
     toggleIcon.addEventListener('click', AdminPanel._directToggleHandler);
-    console.log('[AdminPanel] 直接绑定折叠按钮完成');
 };
 
-// 保持 unbindEvents 兼容
+// ===== unbindEvents 清理 =====
 const originalUnbind = AdminPanel.unbindEvents;
 AdminPanel.unbindEvents = function () {
     const toggleIcon = document.getElementById('panelToggleIcon');
     if (toggleIcon && AdminPanel._directToggleHandler) {
         toggleIcon.removeEventListener('click', AdminPanel._directToggleHandler);
         delete AdminPanel._directToggleHandler;
-        console.log('[AdminPanel] 直接绑定已清理');
     }
     const uploadBtn = document.getElementById('assetUploadBtn');
     const assetFileInput = document.getElementById('assetFileInput');
     if (uploadBtn && AdminPanel._uploadClickHandler) {
         uploadBtn.removeEventListener('click', AdminPanel._uploadClickHandler);
         delete AdminPanel._uploadClickHandler;
-        console.log('[AdminPanel] 上传点击事件已清理');
     }
     if (assetFileInput && AdminPanel._assetFileHandler) {
         assetFileInput.removeEventListener('change', AdminPanel._assetFileHandler);
         delete AdminPanel._assetFileHandler;
-        console.log('[AdminPanel] 上传 change 事件已清理');
     }
     if (typeof originalUnbind === 'function') {
         originalUnbind.call(this);
     }
 };
 
-console.log('✅ AdminPanel.renderContent 已加载（显式 click + 日志）');
+console.log('✅ AdminPanel.renderContent 已加载（包含主题切换）');

@@ -1,11 +1,21 @@
 ﻿import { defineConfig, loadEnv } from "vite";
-import errpulse from '@errpulse/vite';  // ← 新增
+import errpulse from '@errpulse/vite';
+import { nodePolyfills } from 'vite-plugin-node-polyfills';  // 新增
 
 export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, process.cwd(), "");
     return {
         plugins: [
-            errpulse(),  // ← 新增
+            // 注意：nodePolyfills 需要在 errpulse 之前
+            nodePolyfills({
+                include: ['crypto', 'buffer', 'stream', 'util'],
+                globals: {
+                    Buffer: true,
+                    global: true,
+                    process: true,
+                },
+            }),
+            errpulse(),
         ],
         root: "./",
         server: {

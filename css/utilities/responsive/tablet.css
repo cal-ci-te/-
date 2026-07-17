@@ -1,0 +1,253 @@
+/* ===== 平板及以下（1025px） ===== */
+@media (max-width: 1025px) {
+
+  /* ===== 布局 ===== */
+  .app-layout {
+    max-width: 100%;
+    overflow-x: hidden;
+    padding: var(--spacing-lg);
+    padding-top: 70px;
+  }
+
+  .main-content {
+    padding: 0 var(--spacing-md);
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  /* ===== 顶部工具栏 ===== */
+  .toolbar {
+    justify-content: center;
+    gap: 0;
+  }
+
+  .toolbar .header-decoration {
+    flex: 0 0 auto;
+    width: 100%;
+    text-align: center;
+  }
+
+  .toolbar > div:last-child {
+    display: none;
+  }
+
+  .avatar {
+    width: 40px;
+    height: 40px;
+    font-size: 24px;
+  }
+
+  h1 {
+    font-size: 1.4rem;
+    letter-spacing: 2px;
+  }
+
+  .subtitle {
+    font-size: 0.7rem;
+  }
+
+  /* ===== 侧边栏 ===== */
+  .sidebar {
+    left: var(--spacing-lg) !important;
+    top: 60px !important;
+    width: 260px !important;
+    max-width: calc(100vw - 24px) !important;
+    max-height: 60vh !important;
+  }
+
+  .sidebar.open {
+    width: 200px !important;
+    max-height: 60vh !important;
+  }
+
+  .sidebar.collapsed {
+    width: 44px !important;
+    min-width: 44px !important;
+    max-width: 44px !important;
+  }
+
+  /* ===== 文章网格 ===== */
+  .articles-grid {
+    gap: var(--spacing-10xl);
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .article-group {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-4xl);
+  }
+
+  .card {
+    transform: rotate(0deg) !important;
+    padding: var(--spacing-4xl);
+    max-width: 100% !important;
+  }
+
+  .card h3 {
+    font-size: var(--font-size-xl);
+  }
+
+  .card-content {
+    font-size: var(--font-size-md);
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+  }
+
+  /* ===== 目录树 ===== */
+  .group-header .folder-title.level-1 {
+    font-size: var(--font-size-2xl);
+  }
+
+  .group-header .folder-title.level-2 {
+    font-size: var(--font-size-xl);
+    padding-left: var(--spacing-md);
+  }
+
+  .group-header .folder-title.level-3 {
+    font-size: var(--font-size-md);
+    padding-left: var(--spacing-3xl);
+  }
+
+  /* ===== 管理员面板 ===== */
+  .admin-panel {
+    width: 250px !important;
+    max-width: calc(100vw - 24px) !important;
+    max-height: calc(100vh - 120px);
+    bottom: var(--spacing-lg) !important;
+    right: var(--spacing-lg) !important;
+  }
+
+  .admin-panel.collapsed {
+    width: 44px !important;
+    min-width: 44px !important;
+    max-width: 44px !important;
+  }
+
+  /* ===== 登录组件 ===== */
+  .login-widget {
+    top: var(--spacing-lg);
+    right: var(--spacing-lg);
+    max-width: calc(100vw - 24px) !important;
+  }
+
+  .login-trigger {
+    padding: var(--spacing-xs) var(--spacing-lg) var(--spacing-xs) var(--spacing-sm);
+  }
+
+  .login-avatar {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+  }
+
+  .login-info {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .login-label {
+    font-size: var(--font-size-xs);
+  }
+
+  .welcome-text {
+    font-size: var(--font-size-xs);
+  }
+
+  /* ===== 弹窗 ===== */
+  .login-modal {
+    width: 280px;
+    max-width: 90%;
+  }
+
+  .crop-modal {
+    width: 320px;
+    max-width: 95%;
+  }
+
+  /* ===== 详情页 ===== */
+  .detail-content {
+    padding: var(--spacing-4xl);
+    margin: var(--spacing-lg);
+  }
+
+  .detail-content .detail-title {
+    font-size: var(--font-size-4xl);
+  }
+
+  .detail-overlay {
+    padding: var(--spacing-4xl);
+  }
+
+  /* ===== 顶部工具栏（覆盖） ===== */
+  .toolbar {
+    gap: var(--spacing-lg);
+    padding-bottom: var(--spacing-2xl);
+  }
+
+  .avatar {
+    width: 45px;
+    height: 45px;
+    font-size: var(--font-size-5xl);
+  }
+
+  h1 {
+    font-size: var(--font-size-2xl);
+    letter-spacing: 2px;
+  }
+
+  .deco-logo,
+  .deco-raven {
+    opacity: 0.2;
+  }
+
+  /* ===== 首屏说明区域 ===== */
+  .hero-section {
+    min-height: auto;
+    padding: 20px 16px;
+    margin-bottom: 20px;
+  }
+
+  .hero-content {
+    margin-top: 0;
+    padding-top: 10px;
+  }
+
+  .hero-content h2 {
+    font-size: 1.2rem;
+  }
+
+  .hero-description {
+    padding: 16px 18px;
+    line-height: 1.5;
+  }
+
+  .hero-description p {
+    margin-bottom: 6px;
+  }
+
+  /* ===== 文章编辑器 ===== */
+  .editor-sidebar {
+    width: 180px !important;
+    max-width: calc(100vw - 16px) !important;
+  }
+
+  .editor-sidebar.collapsed {
+    width: 0 !important;
+    margin-left: 0 !important;
+  }
+
+  .editor-content {
+    padding: 20px 16px;
+  }
+
+  .editor-sidebar-header h3 {
+    font-size: 13px;
+  }
+
+  .tree-node-content {
+    padding: 3px 6px;
+    font-size: 12px;
+  }
+}

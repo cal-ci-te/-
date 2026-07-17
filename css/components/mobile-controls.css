@@ -1,0 +1,101 @@
+/* ========== 移动端位置管理控件 ========== */
+
+.mobile-position-controls {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: #1a1612;
+    border-bottom: 2px solid #c47a44;
+    padding: 10px 12px;
+    margin: 0 0 8px 0;
+    border-radius: 0 0 8px 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.mobile-position-controls .mobile-pos-hint {
+    color: #e8d5b5;
+    font-size: 12px;
+    font-family: 'Courier New', monospace;
+    text-align: center;
+    margin-bottom: 8px;
+    letter-spacing: 1px;
+}
+
+.mobile-position-controls .mobile-pos-hint::before {
+    content: '📌 ';
+}
+
+.mobile-position-controls .mobile-pos-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.mobile-position-controls .mobile-pos-actions button {
+    flex: 1;
+    max-width: 140px;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    touch-action: manipulation;
+}
+
+.mobile-position-controls .mobile-pos-save {
+    background: #3a5a2b;
+    color: #e8d5b5;
+}
+
+.mobile-position-controls .mobile-pos-save:hover,
+.mobile-position-controls .mobile-pos-save:active {
+    background: #4a7a3a;
+    transform: scale(0.97);
+}
+
+.mobile-position-controls .mobile-pos-cancel {
+    background: #3a2a1a;
+    color: #c4b5a0;
+}
+
+.mobile-position-controls .mobile-pos-cancel:hover,
+.mobile-position-controls .mobile-pos-cancel:active {
+    background: #5a3e2b;
+    transform: scale(0.97);
+}
+
+/* ===== 目录树进入拖拽模式时的视觉效果 ===== */
+.tree-node.dragging {
+    opacity: 0.4;
+}
+
+.tree-node.drag-over {
+    border-left: 3px solid #c47a44 !important;
+    background: rgba(196, 122, 68, 0.15) !important;
+}
+
+.tree-node.dropzone-sibling-highlight {
+    border-bottom: 2px dashed #c47a44 !important;
+    background: rgba(196, 122, 68, 0.1) !important;
+}
+
+/* ===== 移动端适配 ===== */
+@media (max-width: 480px) {
+    .mobile-position-controls {
+        padding: 8px 10px;
+        margin: 0 0 6px 0;
+    }
+
+    .mobile-position-controls .mobile-pos-hint {
+        font-size: 10px;
+        margin-bottom: 6px;
+    }
+
+    .mobile-position-controls .mobile-pos-actions button {
+        font-size: 11px;
+        padding: 6px 12px;
+        max-width: 100px;
+    }
+}
