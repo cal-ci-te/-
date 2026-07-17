@@ -76,8 +76,9 @@ function buildFilteredNode(node, keyword, articleMap) {
  * @param {Array} nodes - 树节点数组
  * @param {number} level - 缩进层级
  * @param {string|null} filterKeyword - 过滤关键字
+ * @param {string} parentPath - 父级路径（用于唯一标识文件夹）
  */
-export function renderTree(nodes, level = 0, filterKeyword = null) {
+export function renderTree(nodes, level = 0, filterKeyword = null, parentPath = '') {
     if (!nodes || nodes.length === 0) {
         return `<div style="padding: 16px; color: #7a6a58; text-align: center;">${UI.directory.emptyTree}</div>`;
     }
@@ -102,16 +103,21 @@ export function renderTree(nodes, level = 0, filterKeyword = null) {
     const isAdmin = AppState.get('isLoggedIn');
     let html = '<ul style="list-style: none; padding-left: 0;">';
     for (const node of filteredNodes) {
+        // ★★★ 构建唯一路径 ★★★
+        const nodePath = parentPath ? parentPath + '/' + node.name : node.name;
+        
         const nodeId = node.type === 'folder'
             ? 'folder-' + node.name.replace(/[^a-zA-Z0-9\u4e00-\u9fa5]/g, '_')
             : 'article-' + node.articleId;
         const isFolder = node.type === 'folder';
         const hasChildren = isFolder && node.children && node.children.length > 0;
-        const storageKey = 'folder-collapsed-' + node.name;
+        
+        // ★★★ 使用唯一路径作为存储键 ★★★
+        const storageKey = 'folder-collapsed-' + nodePath;
         const stored = Utils.storage.get(storageKey);
         // 默认展开（false）
         const isCollapsed = stored !== null ? stored : false;
-        console.log(`[renderTree] ${node.name} => isCollapsed=${isCollapsed} (stored=${stored})`);
+        console.log(`[renderTree] ${nodePath} => isCollapsed=${isCollapsed} (stored=${stored})`);
 
         const icon = isFolder ? (isCollapsed ? UI.directory.folderIconCollapsed : UI.directory.folderIconExpanded) : UI.directory.articleIcon;
 
@@ -127,7 +133,15 @@ export function renderTree(nodes, level = 0, filterKeyword = null) {
         }
 
         const indent = level * 16;
-        html += `<li class="tree-node ${isFolder ? 'folder' : 'article'}" data-node-id="${nodeId}" data-type="${node.type}" data-name="${node.name || ''}" data-article-id="${node.articleId || ''}" data-folder-first-id="${node.firstArticleId || ''}" ${isFolder ? 'draggable="false"' : 'draggable="false"'} style="padding-left:${indent}px;">`;
+        html += `<li class="tree-node ${isFolder ? 'folder' : 'article'}" 
+                    data-node-id="${nodeId}" 
+                    data-type="${node.type}" 
+                    data-name="${node.name || ''}" 
+                    data-path="${nodePath}"
+                    data-article-id="${node.articleId || ''}" 
+                    data-folder-first-id="${node.firstArticleId || ''}" 
+                    ${isFolder ? 'draggable="false"' : 'draggable="false"'} 
+                    style="padding-left:${indent}px;">`;
         html += `<div class="tree-node-content" data-node-id="${nodeId}">`;
 
         // ★★★ 为文件夹的 toggle-icon 添加 data-folder 属性 ★★★
@@ -153,7 +167,8 @@ export function renderTree(nodes, level = 0, filterKeyword = null) {
         html += '</div>';
 
         if (isFolder && hasChildren) {
-            const childHtml = renderTree(node.children, level + 1, filterKeyword);
+            // ★★★ 传递 nodePath 给子节点 ★★★
+            const childHtml = renderTree(node.children, level + 1, filterKeyword, nodePath);
             const displayStyle = isCollapsed ? 'none' : 'block';
             html += `<div class="children" style="display: ${displayStyle}; padding-left:${level * 8}px;">${childHtml}</div>`;
         } else if (isFolder && !hasChildren) {

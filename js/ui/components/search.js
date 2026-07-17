@@ -5,6 +5,7 @@ import { UIDirectory } from './directory.js';
 import { UIHelpers } from './helpers.js';
 import { UI } from '../../utils/ui-strings.js';
 import { ArticleListStore } from '../../stores/article-list-store.js';
+import { ArticleService } from '../../services/article-service.js';
 
 export const UISearch = {
     searchInput: null,
@@ -108,16 +109,26 @@ export const UISearch = {
         this.searchKeyword = keyword;
         // 更新目录树，传入关键字进行过滤
         UIDirectory.updateTree(keyword);
+
+        // ★★★ 获取过滤后的文章列表，设置到 ArticleListStore 搜索模式 ★★★
+        const allVisible = ArticleService.getVisibleArticles();
+        const filtered = allVisible.filter(article => {
+            const titleMatch = article.title && article.title.toLowerCase().includes(keyword.toLowerCase());
+            const contentMatch = article.content && article.content.toLowerCase().includes(keyword.toLowerCase());
+            return titleMatch || contentMatch;
+        });
+        ArticleListStore.setSearchMode(keyword, filtered);
+
         // 更新搜索框占位
         if (this.searchInput) {
-            this.searchInput.placeholder = UI.common.searchResultCount(0) + ' (按 Enter 搜索)';
+            this.searchInput.placeholder = UI.common.searchResultCount(filtered.length) + ' (按 Enter 搜索)';
         }
         // 清空高亮
         this.clearSearchHighlights();
         // 可选：重置导航索引
         this.searchResults = [];
         this.searchCurrentIndex = -1;
-        console.log('[UISearch] 执行搜索:', keyword);
+        console.log('[UISearch] 执行搜索:', keyword, '结果数:', filtered.length);
     },
 
     /**
@@ -130,6 +141,9 @@ export const UISearch = {
         }
         // 恢复目录树（无过滤）
         UIDirectory.updateTree(null);
+        // ★★★ 退出搜索模式，恢复全量列表 ★★★
+        const allVisible = ArticleService.getVisibleArticles();
+        ArticleListStore.resetToFullList(allVisible);
         this.clearSearchHighlights();
         this.searchResults = [];
         this.searchCurrentIndex = -1;

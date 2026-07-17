@@ -224,7 +224,10 @@ export const UIArticles = {
             window.removeEventListener('scroll', this.scrollHandler);
         }
         this.scrollHandler = function () {
+            // ★★★ 双重检查：搜索框有值 或 Store处于搜索模式 → 阻止加载 ★★★
             if (self.searchInput && self.searchInput.value.trim() !== '') return;
+            if (ArticleListStore.getIsSearchMode()) return;
+
             const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
             const windowHeight = window.innerHeight;
             const documentHeight = document.documentElement.scrollHeight;
