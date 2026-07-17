@@ -39,12 +39,13 @@ function json(req) {
 
 /**
  * 极简路由注册器
- * 用法：GET('/api/articles', async (req, res) => { ... })
  */
 const routes = { GET: {}, POST: {}, PUT: {}, DELETE: {} };
 
 function register(method, path, handler) {
+    console.log(`[enhance] 注册路由: ${method} ${path}`);
     routes[method][path] = handler;
+    console.log(`[enhance] 当前 ${method} 路由表:`, Object.keys(routes[method]));
 }
 
 // 导出便捷方法
@@ -54,35 +55,40 @@ const PUT = (path, handler) => register('PUT', path, handler);
 const DELETE = (path, handler) => register('DELETE', path, handler);
 
 /**
- * 路由匹配器（在 server.cjs 中调用）
- * @param {string} method - 'GET', 'POST', etc.
+ * 路由匹配器
+ * @param {string} method
  * @param {string} pathname
- * @returns {Function|null} 匹配的 handler，或 null
+ * @returns {Function|null}
  */
 function match(method, pathname) {
+    console.log(`[match] 查找 ${method} ${pathname}`);
     // 精确匹配
     if (routes[method] && routes[method][pathname]) {
+        console.log('[match] 精确匹配成功');
         return routes[method][pathname];
     }
     // 参数路由：/api/articles/:id
     for (const routePath of Object.keys(routes[method] || {})) {
         const pattern = routePath.replace(/:[^/]+/g, '([^/]+)');
         const regex = new RegExp(`^${pattern}$`);
-        const match = pathname.match(regex);
-        if (match) {
+        const matchResult = pathname.match(regex);
+        if (matchResult) {
+            console.log(`[match] 参数匹配成功: ${routePath}`);
             const handler = routes[method][routePath];
-            // 注入 params
+            const keys = (routePath.match(/:[^/]+/g) || []).map(k => k.slice(1));
             return (req, res) => {
-                const keys = (routePath.match(/:[^/]+/g) || []).map(k => k.slice(1));
                 req.params = {};
-                keys.forEach((key, i) => { req.params[key] = match[i + 1]; });
+                keys.forEach((key, i) => { req.params[key] = matchResult[i + 1]; });
+                console.log(`[match] 注入 params:`, req.params);
                 handler(req, res);
             };
         }
     }
+    console.log('[match] 无匹配路由');
     return null;
 }
 
+// 导出 routes 以便调试
 module.exports = {
     send,
     json,
@@ -91,4 +97,5 @@ module.exports = {
     PUT,
     DELETE,
     match,
+    routes, // 新增导出，用于调试
 };

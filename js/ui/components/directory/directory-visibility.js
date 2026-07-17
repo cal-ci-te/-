@@ -1,0 +1,34 @@
+// ========== 文章可见性切换 ==========
+import { ArticleService } from '../../../services/article-service.js';
+import { Utils } from '../../../utils.js';
+
+/**
+ * 处理可见性切换事件
+ * @param {Event} e - 自定义事件，包含 { id, btn }
+ * @param {Function} onSuccess - 切换成功后的回调
+ */
+export async function handleVisibilityToggle(e, onSuccess) {
+    const { id, btn } = e.detail;
+    const currentVisible = btn.dataset.visible === 'true';
+    const newVisible = !currentVisible;
+    const success = await ArticleService.setVisibility(id, newVisible);
+    if (success) {
+        btn.dataset.visible = newVisible;
+        btn.textContent = newVisible ? '👁️' : '🚫';
+        btn.style.color = newVisible ? '#3a5a2b' : '#5a3e2b';
+        const parentContent = btn.closest('.tree-node-content');
+        const titleSpan = parentContent.querySelector('.node-title');
+        const oldAnnot = parentContent.querySelector('.tree-node-content > span:last-child');
+        if (oldAnnot && oldAnnot.textContent === '(访客不可见)') {
+            oldAnnot.remove();
+        }
+        if (!newVisible) {
+            const annot = document.createElement('span');
+            annot.style.cssText = 'font-size:9px;color:#7a6a58;margin-left:6px;';
+            annot.textContent = '(访客不可见)';
+            titleSpan.after(annot);
+        }
+        if (onSuccess) onSuccess();
+    }
+    return success;
+}

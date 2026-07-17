@@ -1,5 +1,4 @@
 // ========== 文章列表模块（左右交替布局） ==========
-import { Article } from '../../models/article-model.js';
 import { UIHelpers } from './helpers.js';
 import { UIDetail } from './detail.js';
 import { Utils } from '../../utils.js';
@@ -19,20 +18,11 @@ export const UIArticles = {
         this.container = container;
         this.searchInput = searchInputEl;
 
-        // 初始化 Store（首次加载数据）
-        const visibleArticles = Article.getVisibleArticles() || [];
-        ArticleListStore.init(visibleArticles);
+        // ★★★ 初始化 ArticleListStore（订阅数据变更事件） ★★★
+        ArticleListStore.init();
 
-        // 订阅 Store 更新事件
+        // 订阅列表更新事件（由 ArticleListStore 触发）
         this._storeUnsubscribe = EventBus.on(EVENTS.ARTICLES_LIST_UPDATED, () => {
-            this.renderArticles();
-        });
-
-        // ★★★ 监听文章数据加载事件，重置 Store ★★★
-        EventBus.on(EVENTS.ARTICLE_DATA_LOADED, () => {
-            console.log('[UIArticles] 收到数据加载事件，重置 Store');
-            const visibleArticles = Article.getVisibleArticles() || [];
-            ArticleListStore.resetToFullList(visibleArticles);
             this.renderArticles();
         });
 
@@ -41,15 +31,6 @@ export const UIArticles = {
 
         // 绑定滚动监听
         this.bindScrollListener();
-
-        // 监听文章数据变化（来自其他操作，如可见性变更）
-        EventBus.on(EVENTS.ARTICLES_UPDATED, (payload) => {
-            const articles = payload.articles || [];
-            // 如果当前不在搜索模式，重置 Store
-            if (!ArticleListStore.getIsSearchMode()) {
-                ArticleListStore.resetToFullList(articles);
-            }
-        });
 
         console.log('[UIArticles] 初始化完成');
     },
@@ -67,6 +48,7 @@ export const UIArticles = {
         const container = this.container;
         if (!container) return;
 
+        // ★★★ 从 ArticleListStore 获取当前显示的文章列表 ★★★
         const articles = ArticleListStore.getDisplayArticles();
 
         if (!articles || articles.length === 0) {
@@ -224,8 +206,7 @@ export const UIArticles = {
             window.removeEventListener('scroll', this.scrollHandler);
         }
         this.scrollHandler = function () {
-            // ★★★ 双重检查：搜索框有值 或 Store处于搜索模式 → 阻止加载 ★★★
-            if (self.searchInput && self.searchInput.value.trim() !== '') return;
+            // ★★★ 只检查 ArticleListStore 内部状态，搜索框值由 Store 管理 ★★★
             if (ArticleListStore.getIsSearchMode()) return;
 
             const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
@@ -240,14 +221,13 @@ export const UIArticles = {
         window.addEventListener('scroll', this.scrollHandler);
     },
 
-    // 兼容旧调用
-    initInfiniteScroll: function (articles) {
-        ArticleListStore.init(articles);
-        // 由事件触发渲染
+    // ----- 兼容旧接口（已废弃，保留空实现防止调用报错） -----
+    initInfiniteScroll: function () {
+        console.warn('[UIArticles] initInfiniteScroll 已废弃，由 ArticleListStore 自动管理');
     },
 
-    resetInfiniteScroll: function (articles) {
-        ArticleListStore.resetToFullList(articles);
+    resetInfiniteScroll: function () {
+        console.warn('[UIArticles] resetInfiniteScroll 已废弃，由 ArticleListStore 自动管理');
     },
 
     destroy: function () {
@@ -262,4 +242,4 @@ export const UIArticles = {
     }
 };
 
-console.log('✅ UIArticles 已加载（使用 ArticleListStore + 数据同步）');
+console.log('✅ UIArticles 已加载（使用 ArticleListStore 派生数据）');

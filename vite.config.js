@@ -23,19 +23,19 @@ export default defineConfig(({ mode }) => {
             open: true,
             proxy: {
                 "/api": {
-                    target: "http://localhost:9999",
+                    target: "http://127.0.0.1:9999",
                     changeOrigin: true,
                     secure: false,
                     timeout: 10000,
                     rewrite: (path) => path,
                 },
                 "/uploads": {
-                    target: "http://localhost:9999",
+                    target: "http://127.0.0.1:9999",
                     changeOrigin: true,
                     secure: false,
                 },
                 "/websocket": {
-                    target: "ws://localhost:9999",
+                    target: "ws://127.0.0.1:9999",
                     ws: true,
                     changeOrigin: true,
                     secure: false,

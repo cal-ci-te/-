@@ -1,11 +1,10 @@
 // ========== 搜索模块（Enter 触发，仅过滤目录树） ==========
-import { Article } from '../../models/article-model.js';
 import { UIArticles } from './articles.js';
 import { UIDirectory } from './directory.js';
 import { UIHelpers } from './helpers.js';
 import { UI } from '../../utils/ui-strings.js';
 import { ArticleListStore } from '../../stores/article-list-store.js';
-import { ArticleService } from '../../services/article-service.js';
+import { Utils } from '../../utils.js';
 
 export const UISearch = {
     searchInput: null,
@@ -47,12 +46,9 @@ export const UISearch = {
         // input 事件仅更新占位符，不触发搜索
         this._inputHandler = (e) => {
             const keyword = e.target.value.trim();
-            // 如果输入为空，清空搜索（恢复目录树）
             if (keyword === '') {
                 this.clearSearch();
             } else {
-                // 更新占位提示
-                // 不执行搜索，等待 Enter
                 this.searchInput.placeholder = `搜索: ${keyword} (按 Enter 执行)`;
             }
         };
@@ -98,7 +94,7 @@ export const UISearch = {
     },
 
     /**
-     * 执行搜索（按 Enter 触发），仅过滤目录树，不影响卡片列表
+     * 执行搜索（按 Enter 触发），过滤目录树，并通知 ArticleListStore 进入搜索模式
      */
     performSearch(keyword) {
         if (!keyword || keyword.length < 1) {
@@ -110,29 +106,23 @@ export const UISearch = {
         // 更新目录树，传入关键字进行过滤
         UIDirectory.updateTree(keyword);
 
-        // ★★★ 获取过滤后的文章列表，设置到 ArticleListStore 搜索模式 ★★★
-        const allVisible = ArticleService.getVisibleArticles();
-        const filtered = allVisible.filter(article => {
-            const titleMatch = article.title && article.title.toLowerCase().includes(keyword.toLowerCase());
-            const contentMatch = article.content && article.content.toLowerCase().includes(keyword.toLowerCase());
-            return titleMatch || contentMatch;
-        });
-        ArticleListStore.setSearchMode(keyword, filtered);
+        // ★★★ 通知 ArticleListStore 进入搜索模式，由它自己从 ArticleService 派生数据 ★★★
+        ArticleListStore.setSearchMode(keyword);
 
-        // 更新搜索框占位
+        // 更新搜索框占位（显示结果数量）
         if (this.searchInput) {
-            this.searchInput.placeholder = UI.common.searchResultCount(filtered.length) + ' (按 Enter 搜索)';
+            const count = ArticleListStore.getDisplayArticles().length;
+            this.searchInput.placeholder = UI.common.searchResultCount(count) + ' (按 Enter 搜索)';
         }
         // 清空高亮
         this.clearSearchHighlights();
-        // 可选：重置导航索引
         this.searchResults = [];
         this.searchCurrentIndex = -1;
-        console.log('[UISearch] 执行搜索:', keyword, '结果数:', filtered.length);
+        console.log('[UISearch] 执行搜索:', keyword);
     },
 
     /**
-     * 清空搜索，恢复原始目录树
+     * 清空搜索，恢复原始目录树和文章列表
      */
     clearSearch() {
         this.searchKeyword = '';
@@ -141,9 +131,8 @@ export const UISearch = {
         }
         // 恢复目录树（无过滤）
         UIDirectory.updateTree(null);
-        // ★★★ 退出搜索模式，恢复全量列表 ★★★
-        const allVisible = ArticleService.getVisibleArticles();
-        ArticleListStore.resetToFullList(allVisible);
+        // ★★★ 退出搜索模式 ★★★
+        ArticleListStore.exitSearchMode();
         this.clearSearchHighlights();
         this.searchResults = [];
         this.searchCurrentIndex = -1;
@@ -151,9 +140,8 @@ export const UISearch = {
     },
 
     navigateSearchResult(direction) {
-        // 此功能在过滤模式下可能仍有用，但当前我们未存储搜索结果列表（因为过滤在目录树中直接显示）
-        // 可暂不实现导航，或者重新实现为在目录树中定位到下一个高亮节点
-        // 此处保留简单提示
+        // 此功能在过滤模式下可能仍有用，但当前我们未存储搜索结果列表
+        // 简化提示
         Utils.showToast('搜索导航功能已简化，请在目录树中点击查看', false);
     },
 
@@ -164,7 +152,7 @@ export const UISearch = {
     },
 
     expandSearchResults() {
-        // 在过滤模式下，所有文件夹可能已折叠，展开它们
+        // 在过滤模式下，展开所有文件夹
         if (!this.searchKeyword) return;
         const allFolders = this.directoryTreeContainer.querySelectorAll('.tree-node.folder');
         allFolders.forEach(folder => {

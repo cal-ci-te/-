@@ -1,9 +1,8 @@
 // ========== 目录树主模块（协调器） ==========
 import { renderTree } from './render.js';
-import { bindInteractions, handleNodeClick, setActiveNode } from './events.js';
+import { setActiveNode } from './events.js';
 import { showContextMenu } from './context-menu.js';
 import { enableDragDrop, applyDragDropVisuals } from './drag-drop.js';
-import { handleFolderToggle } from './folder-state.js';
 import {
     createMobileControls,
     showMobileControls,
@@ -12,27 +11,32 @@ import {
     recreateMobileControls,
 } from './mobile-controls.js';
 import { createPositionManager } from './position-manager.js';
+import { createPendingMovesManager } from './directory-pending-moves.js';
+import { handleDirectoryDrop } from './directory-drop-handler.js';
+import { bindDirectoryInteractions } from './directory-interactions-binder.js';
 import { Utils } from '../../../utils.js';
 import { AppState } from '../../../core/app-state.js';
 import { EventBus } from '../../../core/event-bus.js';
 import { EVENTS } from '../../../core/event-constants.js';
 import { ArticleService } from '../../../services/article-service.js';
-import { ArticleListStore } from '../../../stores/article-list-store.js';
 import { isMobile, enableTouchDrag, enableTouchContext } from '../../../mobile/index.js';
 
 export const UIDirectory = {
     container: null,
     filterKeyword: null,
-    _unbindEventsFn: null,
-    _toggleVisibilityHandler: null,
+    _unbindInteractionsFn: null,
     _positionManager: null,
     _touchContextDisableFn: null,
     _mobileControls: null,
+    _pendingMovesManager: null,
 
     // ----- 生命周期 -----
     init(container) {
         console.log('[UIDirectory] 初始化...');
         this.container = container;
+
+        // 初始化待移动操作管理器
+        this._pendingMovesManager = createPendingMovesManager();
 
         // 初始化位置管理器
         this._positionManager = createPositionManager({
@@ -42,6 +46,8 @@ export const UIDirectory = {
             enableDragDrop: (el, cb) => enableDragDrop(el, cb),
             enableTouchDrag: (el, onDrop, onEnd) => enableTouchDrag(el, onDrop, onEnd),
             handleDrop: (sourceData, targetData) => this._handleDrop(sourceData, targetData),
+            onSave: () => this._pendingMovesManager.commitMoves(() => this.updateTree(this.filterKeyword)),
+            onCancel: () => this._pendingMovesManager.clearMoves(),
         });
 
         // 移动端控件
@@ -80,13 +86,11 @@ export const UIDirectory = {
         const treeData = ArticleService.buildDirectoryTree(sortedArticles);
         this.container.innerHTML = renderTree(treeData, 0, filterKeyword, '');
 
-        this.bindInteractions();
+        // 绑定交互（使用新的绑定器）
+        this._bindInteractions();
 
         if (!filterKeyword) {
             EventBus.emit(EVENTS.ARTICLES_UPDATED, { articles: sortedArticles });
-            if (!ArticleListStore.getIsSearchMode()) {
-                ArticleListStore.resetToFullList(sortedArticles);
-            }
         }
 
         // 移动端控件重建
@@ -102,11 +106,6 @@ export const UIDirectory = {
 
         // 如果处于位置模式，重新启用拖拽
         if (this._positionManager.isActiveMode()) {
-            // 位置管理器内部会根据设备类型启用对应拖拽
-            // 但 updateTree 后需要重新启用，因为 DOM 重建了
-            // 我们通过重新 enter 来触发启用（但 enter 会检查 isActive）
-            // 更优雅：让位置管理器暴露 reapply 方法
-            // 临时方案：手动调用启用
             this._positionManager.disableAllDrag();
             if (isMobile()) {
                 enableTouchDrag(
@@ -126,75 +125,23 @@ export const UIDirectory = {
         console.log('[UIDirectory] 目录树已更新，文章数:', sortedArticles.length);
     },
 
-    // ----- 事件绑定 -----
-    bindInteractions() {
-        if (this._unbindEventsFn) {
-            this._unbindEventsFn();
-            this._unbindEventsFn = null;
-        }
-        if (this._toggleVisibilityHandler) {
-            this.container.removeEventListener('directory-toggle-visibility', this._toggleVisibilityHandler);
+    // ----- 绑定交互（使用新绑定器）-----
+    _bindInteractions() {
+        // 移除旧绑定
+        if (this._unbindInteractionsFn) {
+            this._unbindInteractionsFn();
+            this._unbindInteractionsFn = null;
         }
 
         const self = this;
-
-        // 可见性切换
-        this._toggleVisibilityHandler = async function (e) {
-            const { id, btn } = e.detail;
-            const currentVisible = btn.dataset.visible === 'true';
-            const newVisible = !currentVisible;
-            const success = await ArticleService.setVisibility(id, newVisible);
-            if (success) {
-                btn.dataset.visible = newVisible;
-                btn.textContent = newVisible ? '👁️' : '🚫';
-                btn.style.color = newVisible ? '#3a5a2b' : '#5a3e2b';
-                const parentContent = btn.closest('.tree-node-content');
-                const titleSpan = parentContent.querySelector('.node-title');
-                const oldAnnot = parentContent.querySelector('.tree-node-content > span:last-child');
-                if (oldAnnot && oldAnnot.textContent === '(访客不可见)') {
-                    oldAnnot.remove();
-                }
-                if (!newVisible) {
-                    const annot = document.createElement('span');
-                    annot.style.cssText = 'font-size:9px;color:#7a6a58;margin-left:6px;';
-                    annot.textContent = '(访客不可见)';
-                    titleSpan.after(annot);
-                }
-            }
-        };
-        this.container.addEventListener('directory-toggle-visibility', this._toggleVisibilityHandler);
-
-        // 交互事件（单击、双击、右键）
-        const contextMenuHandler = (x, y, type, name, articleId, nodeLi) => {
-            showContextMenu(x, y, type, name, articleId, nodeLi, () => {
-                self.updateTree(self.filterKeyword);
-            });
-        };
-
-        const handleNodeClickFn = (nodeElement, nodeData, isDouble) => {
-            handleNodeClick(nodeElement, nodeData, isDouble, (nodeId) => {
-                self.setActiveNode(nodeId);
-            });
-        };
-
-        const setActiveNodeFn = (nodeId) => {
-            self.setActiveNode(nodeId);
-        };
-
-        const unbind = bindInteractions(
-            this.container,
-            contextMenuHandler,
-            handleNodeClickFn,
-            setActiveNodeFn
-        );
-        this._unbindEventsFn = unbind;
-
-        // ★★★ 折叠状态切换（委托给 folder-state 模块） ★★★
-        this.container.addEventListener('click', (e) => {
-            handleFolderToggle(e, this.container);
+        this._unbindInteractionsFn = bindDirectoryInteractions(this.container, {
+            onUpdateTree: () => self.updateTree(self.filterKeyword),
+            onSetActiveNode: (nodeId) => self.setActiveNode(nodeId),
+            onVisibilityToggleSuccess: () => {
+                // 可见性切换成功，触发列表更新
+                // 由于切换后 ArticleService 会触发事件，这里无需额外操作
+            },
         });
-
-        console.log('[UIDirectory] 交互事件已绑定');
     },
 
     // ----- 辅助方法 -----
@@ -209,7 +156,6 @@ export const UIDirectory = {
         if (this._mobileControls) {
             this._mobileControls.style.display = 'none';
         }
-        Utils.showToast('位置更改已保存', false);
     },
 
     _handleMobileCancel() {
@@ -218,7 +164,6 @@ export const UIDirectory = {
         if (this._mobileControls) {
             this._mobileControls.style.display = 'none';
         }
-        // Toast 已由 position-manager 显示
     },
 
     // ----- 移动端长按支持 -----
@@ -238,71 +183,21 @@ export const UIDirectory = {
         console.log('[UIDirectory] 移动端长按支持已启用');
     },
 
-    // ----- 拖拽放置业务逻辑（保持不变） -----
+    // ----- 拖拽放置（委托给外部模块）-----
     async _handleDrop(sourceData, targetData) {
-        const { type: sourceType, id: sourceId } = sourceData;
-        const { targetFolderId, isSibling } = targetData;
-
-        if (sourceType === 'folder') {
-            const finalParent = isSibling ? targetFolderId : targetFolderId;
-            const success = ArticleService.moveCategory(sourceId, finalParent);
-            if (success) {
-                const msg = finalParent ? '到 "' + finalParent + '"' : '到根目录';
-                Utils.showToast('文件夹已移动' + msg, false);
-                await ArticleService.fetchArticles(true);
-                this.updateTree(this.filterKeyword);
-            } else {
-                Utils.showToast('移动失败', true);
-            }
-            return;
-        }
-
-        if (sourceType === 'article') {
-            const allArticles = ArticleService.getAllArticles();
-            const article = allArticles.find(a => a.id === parseInt(sourceId));
-            if (!article) {
-                Utils.showToast('源文章不存在', true);
-                return;
-            }
-
-            let newCategory = isSibling ? (targetFolderId || '未分类') : (targetFolderId || '未分类');
-            if (article.category === newCategory) {
-                Utils.showToast('文章已在目标文件夹中', false);
-                return;
-            }
-
-            try {
-                const response = await fetch('/api/articles/' + article.id, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        title: article.title,
-                        content: article.content,
-                        category: newCategory
-                    })
-                });
-                if (response.ok) {
-                    Utils.showToast('文章已移动到 "' + newCategory + '"', false);
-                    await ArticleService.fetchArticles(true);
-                    this.updateTree(this.filterKeyword);
-                } else {
-                    Utils.showToast('移动失败: ' + response.statusText, true);
-                }
-            } catch (err) {
-                console.error('[UIDirectory] 移动文章失败:', err);
-                Utils.showToast('移动失败: ' + err.message, true);
-            }
-            return;
-        }
-
-        Utils.showToast('未知拖拽类型', true);
+        await handleDirectoryDrop(sourceData, targetData, {
+            positionManager: this._positionManager,
+            pendingMovesManager: this._pendingMovesManager,
+            updateTreeFn: () => this.updateTree(this.filterKeyword),
+            isPositionMode: this._positionManager.isActiveMode(),
+        });
     },
 
     // ----- 销毁 -----
     destroy() {
-        if (this._unbindEventsFn) {
-            this._unbindEventsFn();
-            this._unbindEventsFn = null;
+        if (this._unbindInteractionsFn) {
+            this._unbindInteractionsFn();
+            this._unbindInteractionsFn = null;
         }
         if (this._touchContextDisableFn) {
             this._touchContextDisableFn();
@@ -310,6 +205,9 @@ export const UIDirectory = {
         }
         if (this._positionManager) {
             this._positionManager.disableAllDrag();
+        }
+        if (this._pendingMovesManager) {
+            this._pendingMovesManager.clearMoves();
         }
         destroyMobileControls();
         console.log('[UIDirectory] 已销毁');

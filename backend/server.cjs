@@ -10,7 +10,7 @@ const { storage } = require('./storage/index.cjs');
 console.log('[Server] 存储服务已初始化:', storage.isLocal() ? '本地' : 'RustFS');
 
 // ===== 增强层 =====
-const { GET, POST, PUT, DELETE, match } = require('./enhance.cjs');
+const { GET, POST, PUT, DELETE, match, routes } = require('./enhance.cjs');
 
 // ===== ErrPulse 集成 =====
 const { init } = require('@errpulse/node');
@@ -26,10 +26,27 @@ const { registerDecoRoutes } = require('./routes/decos.cjs');
 const { registerSettingsRoutes } = require('./routes/settings.cjs');
 const { registerDraftsRoutes } = require('./routes/drafts.cjs');
 
+console.log('[Server] 开始注册路由...');
+
 registerArticleRoutes(GET, POST, PUT, DELETE);
+console.log('[Server] ✅ 文章路由已注册');
+
 registerDecoRoutes(GET, PUT, DELETE);
+console.log('[Server] ✅ 贴图路由已注册');
+
 registerSettingsRoutes(GET, PUT);
-registerDraftsRoutes(GET, POST, PUT, DELETE);  // ✅ 修复
+console.log('[Server] ✅ 设置路由已注册');
+
+registerDraftsRoutes(GET, POST, PUT, DELETE);
+console.log('[Server] ✅ 草稿路由已注册');
+
+// ★★★ 打印路由表（直接检查 routes 对象） ★★★
+console.log('[Server] ===== 已注册路由 =====');
+console.log('GET:', Object.keys(routes.GET || {}));
+console.log('POST:', Object.keys(routes.POST || {}));
+console.log('PUT:', Object.keys(routes.PUT || {}));
+console.log('DELETE:', Object.keys(routes.DELETE || {}));
+console.log('[Server] ========================');
 
 ensureUploadDir();
 
@@ -51,14 +68,22 @@ const server = http.createServer(async (req, res) => {
 
     // ===== 特殊路由：贴图上传 =====
     if (pathname === '/api/decos' && method === 'POST') {
-        console.log('[Server] 匹配到 /api/decos POST 路由');
+        console.log('[Server] 匹配到 /api/decos POST 路由（特殊处理）');
         handleDecoUpload(req, res);
         return;
     }
 
+    // ★★★ 调试：在匹配前打印当前所有 PUT 路由 ★★★
+    if (method === 'PUT') {
+        console.log(`[Server] 当前 PUT 路由表:`, Object.keys(PUT || {}));
+    }
+
     // 路由匹配
+    console.log(`[Server] 尝试匹配路由: ${method} ${pathname}`);
     const handler = match(method, pathname);
+    
     if (handler) {
+        console.log(`[Server] ✅ 路由匹配成功: ${method} ${pathname}`);
         try {
             await handler(req, res);
         } catch (err) {
@@ -67,6 +92,7 @@ const server = http.createServer(async (req, res) => {
             res.end(JSON.stringify({ error: err.message || 'Internal error' }));
         }
     } else {
+        console.log(`[Server] ❌ 无匹配路由: ${method} ${pathname}`);
         res.writeHead(404, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: 'Not found' }));
     }

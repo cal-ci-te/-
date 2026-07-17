@@ -10,7 +10,15 @@ import { showMobileControls, hideMobileControls } from './mobile-controls.js';
 
 /**
  * 创建位置模式管理器
- * @param {Object} context - 上下文（container, filterKeyword, updateTree, _enableDragDrop, _enableTouchDrag 等）
+ * @param {Object} context - 上下文
+ * @param {HTMLElement} context.container
+ * @param {Function} context.getFilterKeyword
+ * @param {Function} context.updateTree
+ * @param {Function} context.enableDragDrop
+ * @param {Function} context.enableTouchDrag
+ * @param {Function} context.handleDrop
+ * @param {Function} context.onSave   // [新增] 保存回调
+ * @param {Function} context.onCancel // [新增] 取消回调
  * @returns {Object} 管理器实例
  */
 export function createPositionManager(context) {
@@ -25,6 +33,9 @@ export function createPositionManager(context) {
         updateTree,
         enableDragDrop: enablePCDrag,
         enableTouchDrag: enableTouchDragFn,
+        handleDrop,
+        onSave,   // [新增] 保存回调
+        onCancel, // [新增] 取消回调
     } = context;
 
     // ----- 快照操作 -----
@@ -69,16 +80,16 @@ export function createPositionManager(context) {
             touchDragDisableFn = enableTouchDragFn(
                 container,
                 async (sourceData, targetData) => {
-                    await context.handleDrop(sourceData, targetData);
+                    await handleDrop(sourceData, targetData);
                 },
                 () => {
-                    updateTree(context.getFilterKeyword());
+                    updateTree(getFilterKeyword());
                 }
             );
             showMobileControls();
         } else {
             dragDisableFn = enablePCDrag(container, () => {
-                updateTree(context.getFilterKeyword());
+                updateTree(getFilterKeyword());
             });
             applyDragDropVisuals(container, true);
         }
@@ -103,19 +114,15 @@ export function createPositionManager(context) {
 
         if (!shouldSave && snapshot) {
             restoreSnapshot();
-            // 重新渲染
-            updateTree(context.getFilterKeyword());
-            const visibleArticles = ArticleService.getVisibleArticles();
-            EventBus.emit(EVENTS.ARTICLES_UPDATED, { articles: visibleArticles });
-            if (!ArticleListStore.getIsSearchMode()) {
-                ArticleListStore.resetToFullList(visibleArticles);
-            }
+            updateTree(getFilterKeyword());
+            // [新增] 调用取消回调（清空待处理列表）
+            if (onCancel) onCancel();
             Utils.showToast('已取消，未保存更改', false);
         } else {
             clearSnapshot();
-            // 保存时不需要额外操作，数据已在拖拽时持久化
-            // 但如果拖拽是即时 API 调用，这里无需再保存
-            Utils.showToast('位置更改已保存', false);
+            // [新增] 调用保存回调（提交待处理列表）
+            if (onSave) onSave();
+            // Toast 由外部处理
         }
     }
 

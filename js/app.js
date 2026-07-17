@@ -116,6 +116,11 @@ function setupPositionModeControls() {
             cancelBtn.style.display = 'none';
             const hint = controls.querySelector('.pos-hint');
             if (hint) hint.remove();
+        } else {
+            // ★★★ 登录时恢复默认显示状态 ★★★
+            enterBtn.style.display = 'inline-block';
+            saveBtn.style.display = 'none';
+            cancelBtn.style.display = 'none';
         }
     };
 
@@ -150,19 +155,43 @@ function setupPositionModeControls() {
 
     cancelBtn = bindSafeEvent(cancelBtn, function(e) {
         e.preventDefault();
-        EventBus.emit('admin:position-mode-exit');
+        // ★★★ 取消事件 ★★★
+        EventBus.emit('admin:position-mode-cancel');
         enterBtn.style.display = 'inline-block';
         saveBtn.style.display = 'none';
         cancelBtn.style.display = 'none';
         const hint = controls.querySelector('.pos-hint');
         if (hint) hint.remove();
-        Utils.showToast('已取消，未保存更改', false);
     });
 
+    // 初始检查登录状态
     const isLoggedIn = AppState.get('isLoggedIn');
     updateVisibility(isLoggedIn);
 
     console.log('[app] 位置管理控件事件已绑定（支持移动端 touch）');
+
+
+saveBtn = bindSafeEvent(saveBtn, function(e) {
+    e.preventDefault();
+    EventBus.emit('admin:position-mode-exit');
+    enterBtn.style.display = 'inline-block';
+    saveBtn.style.display = 'none';
+    cancelBtn.style.display = 'none';
+    const hint = controls.querySelector('.pos-hint');
+    if (hint) hint.remove();
+    Utils.showToast('位置更改已保存', false);
+});
+
+cancelBtn = bindSafeEvent(cancelBtn, function(e) {
+    e.preventDefault();
+    // ★★★ 关键修复：取消应触发 cancel 事件 ★★★
+    EventBus.emit('admin:position-mode-cancel');
+    enterBtn.style.display = 'inline-block';
+    saveBtn.style.display = 'none';
+    cancelBtn.style.display = 'none';
+    const hint = controls.querySelector('.pos-hint');
+    if (hint) hint.remove();
+});
 }
 
 // ===== 9. 登录UI事件绑定 =====

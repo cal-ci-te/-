@@ -93,28 +93,23 @@ export const UIController = {
 
   _doRefresh() {
     console.log('[UIController] 刷新显示...');
-    const allArticles = ArticleService.getAllArticles();
-    const visibleArticles = ArticleService.getVisibleArticles();
+    console.log('[UIController] 刷新显示...');
+   // ArticleListStore 已订阅数据变更事件，自动管理列表
+   // 这里只需确保加载状态显示正确
+   if (!this._dataLoaded) {
+       if (this.elements.treeContainer) {
+           this.elements.treeContainer.innerHTML =
+               '<div style="padding: 20px; text-align: center; color: #7a6a58;">📖 加载中...</div>';
+       }
+       if (this.elements.articlesContainer) {
+           this.elements.articlesContainer.innerHTML =
+               '<div class="loading">⏳ 正在加载角色...</div>';
+       }
+   }
+   // 数据加载完成后，ArticleListStore 会自动触发 ARTICLES_LIST_UPDATED
+   // UIArticles 会响应并重新渲染
+   console.log('[UIController] 刷新完成');
 
-    if (!allArticles || allArticles.length === 0) {
-      if (!this._dataLoaded) {
-        if (this.elements.treeContainer) {
-          this.elements.treeContainer.innerHTML =
-            '<div style="padding: 20px; text-align: center; color: #7a6a58;">📖 加载中...</div>';
-        }
-        if (this.elements.articlesContainer) {
-          this.elements.articlesContainer.innerHTML =
-            '<div class="loading">⏳ 正在加载角色...</div>';
-        }
-        return;
-      }
-      UIArticles.initInfiniteScroll([]);
-      console.log('[UIController] 刷新完成，无文章数据');
-      return;
-    }
-
-    UIArticles.initInfiniteScroll(visibleArticles);
-    console.log('[UIController] 刷新完成，可见文章数:', visibleArticles.length);
   },
 
   loadData() {

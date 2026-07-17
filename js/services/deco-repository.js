@@ -24,7 +24,7 @@ export const DecoRepository = {
         }
         const localData = StorageAdapter.get(STORAGE_KEY);
         if (localData && Array.isArray(localData) && !forceRemote) {
-            // ★★★ 为每个贴图补充 dataUrl 字段（图片路由） ★★★
+            // 为每个贴图补充 dataUrl 字段（图片路由）
             const enriched = localData.map(item => ({
                 ...item,
                 dataUrl: `/api/decos/${item.id}/image`
@@ -47,8 +47,12 @@ export const DecoRepository = {
                     throw new Error('缺少 dataUrl');
                 }
                 const result = await this._postToServer(item);
-                const newItem = { ...item, id: result.id };
-                if (result.dataUrl) newItem.dataUrl = result.dataUrl;
+                // ★★★ 核心修复：使用服务器返回的 dataUrl（图片路由）替代 base64 ★★★
+                const newItem = {
+                    ...item,
+                    id: result.id,
+                    dataUrl: result.dataUrl || `/api/decos/${result.id}/image`
+                };
                 this._ensureCache();
                 this._cache.push(newItem);
                 this._syncToStorage();
