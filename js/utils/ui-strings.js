@@ -1,8 +1,25 @@
 // ========== UI 文案集中管理 ==========
 export const UI = {
+
+        // ----- 主题切换 -----
+    theme: {
+        dark: '🌙 暗色',
+        light: '☀️ 亮色',
+        lofi: '📼 低保真',
+    },
+
+    gradient: {
+        directionBottom: '上→下',
+        directionTop: '下→上',
+        directionLeft: '右→左',
+        directionRight: '左→右',
+        directionBottomRight: '左上→右下',
+        directionBottomLeft: '右上→左下',
+    },
+
     // ----- 全局通用 -----
     common: {
-        siteTitle: 'REVACHO',
+        siteTitle: 'REVACHOL',
         siteSubtitle: '· 原创角色档案馆 ·',
         appName: 'REVACHOL',
         loading: '加载中...',
@@ -264,24 +281,24 @@ export const UI = {
         shortcutCancel: 'Esc 取消编辑',
     },
 
-    // ----- 历史记录 -----
-    history: {
-        empty: '暂无草稿历史',
-        loadError: '加载失败',
+    draft: {
         previewTitle: '📄 草稿预览',
         previewClose: '关闭',
-        previewBtn: '查看',
-        restoreBtn: '恢复',
-        deleteBtn: '删除',
-        savedAtPrefix: '保存于',
         emptyContent: '（空内容）',
+        selectArticle: '请选择文章',
+        noHistory: '暂无草稿历史',
+        loadFailed: '加载失败',
+        saveSuccess: '草稿已保存',
+        saveFailed: (msg) => `草稿保存失败: ${msg}`,
         restoreConfirm: (time) => `确定要将文章恢复为 ${time} 的草稿版本吗？`,
+        restoreSuccess: '已恢复草稿版本',
+        restoreFailed: (msg) => `恢复失败: ${msg}`,
         deleteConfirm: (time) => `确定要删除 ${time} 的草稿吗？`,
         deleteSuccess: '草稿已删除',
-        deleteFailed: '删除失败: ',
-        restoreSuccess: '已恢复草稿版本',
-        restoreFailed: '恢复失败: ',
-        deleteError: '草稿数据异常，无法删除',
+        deleteFailed: (msg) => `删除失败: ${msg}`,
+        previewBtn: '👁️ 查看',
+        restoreBtn: '↩️ 恢复',
+        deleteBtn: '🗑️ 删除',
     },
 
     // ----- 首页首屏说明 -----
@@ -314,4 +331,108 @@ export const UI = {
         defaultTextureOpacity: 0.12,
         defaultWatermarkOpacity: 0.15,
     },
+
+    // ----- Toast 提示（统一管理） -----
+    toast: {
+        // ----- 位置管理 -----
+        positionModeEnter: '已进入位置管理模式，拖拽节点调整位置',
+        positionModeExit: '已退出位置管理模式',
+        positionModeSaved: '位置更改已保存',
+        positionModeCancelled: '已取消，未保存更改',
+        positionModeSavePartialError: '部分位置变更保存失败，请检查网络后重试',
+        positionModeSaveError: (message) => `保存位置变更失败: ${message}`,
+
+        // ----- 文件夹操作 -----
+        folderMoveSuccess: (target) => `文件夹已移动到 ${target}`,
+        folderMoveFailed: '移动失败',
+        folderCreateSuccess: (name) => `文件夹 "${name}" 已创建`,
+        folderCreateFailed: '创建失败，可能同名',
+        folderDeleteSuccess: '文件夹已删除，子文件夹提升至根目录，文章移至"未分类"',
+        folderDeleteFailed: '删除文件夹失败',
+        folderNotFound: '文件夹不存在',
+        folderDuplicateName: '同级已存在同名文件夹',
+
+        // ----- 文章操作 -----
+        articleMoveSuccess: (category) => `文章已移动到 "${category}"`,
+        articleMovePending: '文章已移动（保存后将持久化）',
+        articleMoveFailed: (status) => `移动失败: ${status}`,
+        articleNotFound: '源文章不存在',
+        articleAlreadyInTarget: '文章已在目标文件夹中',
+        articleTitleEmpty: '标题不能为空',
+
+        // ----- 拖拽通用 -----
+        dragTargetFolderNotFound: '目标文件夹不存在',
+        dragCannotMoveToSelf: '不能移动到自身',
+        dragCannotMoveToChild: '不能移动到子文件夹中',
+        dragUnknownType: '未知拖拽类型',
+
+        // ----- 认证 -----
+        loginFailed: '用户名或密码错误',
+        logoutConfirm: '确定要退出登录吗？',
+
+        // ----- 搜索 -----
+        searchNavigationSimplified: '搜索导航功能已简化，请在目录树中点击查看',
+
+        // ----- 文章 -----
+        articleIdExpired: '文章 ID 已过期，请刷新页面后再试',
+
+        // ----- 头像 -----
+        avatarUploadSuccess: '头像上传成功',
+
+        // ----- 管理员面板 -----
+        adminBgColorApplied: '背景颜色已应用',
+        adminBgColorReset: '背景颜色已重置',
+        adminTextureUploadFirst: '请先上传纹理图片',
+        adminTextureSaved: '纹理配置已保存',
+        adminTextureRemoved: '纹理已移除',
+        adminWatermarkApplied: '水印设置已应用',
+        adminArticleListUpdated: '文章列表已更新',
+
+        // ----- 草稿历史 -----
+        draftSelectArticleFirst: '请先选择一篇文章',
+        draftTitleEmpty: '标题不能为空',
+        draftSaved: '草稿已保存',
+        draftSaveFailed: (msg) => `草稿保存失败: ${msg}`,
+        draftRestored: '已恢复草稿版本',
+        draftRestoreFailed: (msg) => `恢复失败: ${msg}`,
+        draftDataCorrupted: '草稿数据异常，无法删除',
+        draftInvalidArticleId: '无效的文章ID，无法删除',
+        draftDeleted: '草稿已删除',
+        draftDeleteFailed: (msg) => `删除失败: ${msg}`,
+
+        // ----- 移动端交互 -----
+        touchAdminRequired: '需要管理员权限',
+        touchAdminRequiredDrag: '需要管理员权限才能拖拽',
+        touchDragToValidTarget: '请拖拽到有效的文件夹或空白区域',
+        touchMoveFailed: (msg) => `移动失败: ${msg}`,
+
+        // ----- 文章编辑器 -----
+        editorPositionModeEnter: '已进入位置管理模式，拖拽节点调整顺序',
+        editorPositionModeSaved: '位置更改已保存',
+        editorPositionModeCancelled: '已取消更改',
+
+        // ----- 文章服务 -----
+        articleServiceCannotDeleteDefaultCategory: '不能删除"未分类"文件夹',
+
+        // ----- 贴纸 -----
+        decoMobileNotSupported: '移动端不支持贴纸位置编辑',
+        decoImageNotFound: '图片资源不存在',
+
+        // ----- 纹理 -----
+        textureSolidColorApplied: '纯色背景已应用',
+        textureBgReset: '背景已重置为默认',
+        textureNeedAtLeastTwoColors: '至少需要两种颜色',
+        textureGradientApplied: '渐变背景已应用',
+        texturePaletteSaved: '色卡已保存',
+        texturePaletteDeleted: '色卡已删除',
+        texturePaletteNotFound: '色卡不存在',
+        textureCompressingImage: '正在压缩转换图片...',
+        textureImageProcessingFailed: (msg) => `图片处理失败: ${msg}`,
+        textureTextureRemoved: '纹理已移除',
+
+        imageFormatInvalid: '格式不正确，只支持 PNG、WebP、JPG 格式',
+        decoUploadSuccess: (name) => `贴图 "${name}" 上传成功`,
+        decoUploadFailed: (msg) => `上传失败：${msg}`,
+    },
+
 };

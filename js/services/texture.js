@@ -1,6 +1,7 @@
 // ========== 纹理与背景模块（支持渐变 + 主题模式兼容） ==========
 import { CONFIG } from '../config.js';
 import { Utils } from '../utils.js';
+import { UI } from '../utils/ui-strings.js';
 
 export const Texture = {
   // 纯色背景
@@ -163,7 +164,7 @@ export const Texture = {
     this.bgColor = color;
     this.bgMode = 'solid';
     this.applyBackground();
-    Utils.showToast('纯色背景已应用', false);
+    Utils.showToast(UI.toast.textureSolidColorApplied, false);
   },
 
   resetBgColor() {
@@ -174,7 +175,7 @@ export const Texture = {
     this.bgColor = CONFIG.bgColorDefault || '#1a1612';
     this.bgMode = 'solid';
     this.applyBackground();
-    Utils.showToast('背景已重置为默认', false);
+    Utils.showToast(UI.toast.textureBgReset, false);
   },
 
   // ===== 设置渐变 =====
@@ -184,7 +185,7 @@ export const Texture = {
       return;
     }
     if (!colors || colors.length < 2) {
-      Utils.showToast('至少需要两种颜色', true);
+      Utils.showToast(UI.toast.textureNeedAtLeastTwoColors, true);
       return;
     }
     this.bgMode = 'gradient';
@@ -192,7 +193,7 @@ export const Texture = {
     if (direction) this.gradientDirection = direction;
     if (feather !== undefined) this.gradientFeather = Math.max(0, Math.min(100, feather));
     this.applyBackground();
-    Utils.showToast('渐变背景已应用', false);
+    Utils.showToast(UI.toast.textureGradientApplied, false);
   },
 
   // ===== 羽化值更新 =====
@@ -230,7 +231,7 @@ export const Texture = {
     };
     this.palettes.push(entry);
     this.savePalettes();
-    Utils.showToast('色卡已保存', false);
+    Utils.showToast(UI.toast.texturePaletteSaved, false);
     return entry;
   },
 
@@ -239,7 +240,7 @@ export const Texture = {
     if (idx === -1) return false;
     this.palettes.splice(idx, 1);
     this.savePalettes();
-    Utils.showToast('色卡已删除', false);
+    Utils.showToast(UI.toast.texturePaletteDeleted, false);
     return true;
   },
 
@@ -250,7 +251,7 @@ export const Texture = {
     }
     const palette = this.palettes.find((p) => p.id === id);
     if (!palette) {
-      Utils.showToast('色卡不存在', true);
+      Utils.showToast(UI.toast.texturePaletteNotFound, true);
       return;
     }
     if (palette.mode === 'solid') {
@@ -278,14 +279,14 @@ export const Texture = {
 
   async uploadTexture(file) {
     try {
-      Utils.showToast('正在压缩转换图片...', false);
+      Utils.showToast(UI.toast.textureCompressingImage, false);
       const result = await this.compressAndConvertToWebP(file, 0.85);
       this.textureConfig.dataUrl = result.dataUrl;
       this.applyTexture();
       this.saveConfig();
       Utils.showToast(`纹理已应用（WebP格式，${(result.size / 1024).toFixed(1)}KB）`, false);
     } catch (err) {
-      Utils.showToast('图片处理失败：' + err.message, true);
+      Utils.showToast(UI.toast.textureImageProcessingFailed(err.message), true);
     }
   },
 
@@ -293,7 +294,7 @@ export const Texture = {
     this.textureConfig.dataUrl = null;
     this.applyTexture();
     this.saveConfig();
-    Utils.showToast('纹理已移除', false);
+    Utils.showToast(UI.toast.textureTextureRemoved, false);
   },
 
   setOpacity(opacity) {

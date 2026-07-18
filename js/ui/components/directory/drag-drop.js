@@ -2,6 +2,8 @@
 import { Utils } from '../../../utils.js';
 import { Article } from '../../../models/article-model.js';
 import { ArticleService } from '../../../services/article-service.js';
+// [新增] 导入 UI 文案
+import { UI } from '../../../utils/ui-strings.js';
 
 export function enableDragDrop(container, updateTreeFn) {
     if (!container) return;
@@ -114,7 +116,8 @@ export function enableDragDrop(container, updateTreeFn) {
                     // 平级目标：该文件夹的父级
                     targetFolderId = ArticleService.getCategoryParent(target.dataset.name);
                     if (targetFolderId === undefined) {
-                        Utils.showToast('目标文件夹不存在', true);
+                        // [修改] 使用 UI 文案
+                        Utils.showToast(UI.toast.dragTargetFolderNotFound, true);
                         dragData = null;
                         return;
                     }
@@ -127,26 +130,26 @@ export function enableDragDrop(container, updateTreeFn) {
                 const articleId = parseInt(target.dataset.articleId);
                 const article = Article.allArticles.find(a => a.id === articleId);
                 if (!article) {
-                    Utils.showToast('目标文章不存在', true);
+                    Utils.showToast(UI.toast.articleNotFound, true);
                     dragData = null;
                     return;
                 }
                 targetFolderId = article.category || '未分类';
                 isSibling = false; // 拖到文章视为拖入该文章所在文件夹（默认）
             } else {
-                Utils.showToast('无效目标', true);
+                Utils.showToast(UI.toast.dragUnknownType, true);
                 dragData = null;
                 return;
             }
         } else {
-            Utils.showToast('无效目标', true);
+            Utils.showToast(UI.toast.dragUnknownType, true);
             dragData = null;
             return;
         }
 
         // 如果源是文件夹，平级移动时目标不能是源自身
         if (sourceType === 'folder' && isSibling && targetFolderId === sourceId) {
-            Utils.showToast('不能移动到自身', true);
+            Utils.showToast(UI.toast.dragCannotMoveToSelf, true);
             dragData = null;
             return;
         }
@@ -163,7 +166,7 @@ export function enableDragDrop(container, updateTreeFn) {
                 return false;
             };
             if (targetFolderId && isDescendant(sourceId, targetFolderId)) {
-                Utils.showToast('不能移动到子文件夹中', true);
+                Utils.showToast(UI.toast.dragCannotMoveToChild, true);
                 dragData = null;
                 return;
             }
@@ -176,12 +179,12 @@ export function enableDragDrop(container, updateTreeFn) {
             const success = ArticleService.moveCategory(sourceId, finalParent);
             if (success) {
                 const msg = finalParent ? '到 "' + finalParent + '"' : '到根目录';
-                Utils.showToast('文件夹已移动' + msg, false);
+                Utils.showToast(UI.toast.folderMoveSuccess(msg), false);
                 ArticleService.fetchArticles(true).then(() => {
                     if (updateTreeFn) updateTreeFn();
                 });
             } else {
-                Utils.showToast('移动失败', true);
+                Utils.showToast(UI.toast.folderMoveFailed, true);
             }
             dragData = null;
             return;
@@ -191,7 +194,7 @@ export function enableDragDrop(container, updateTreeFn) {
             // 文章移动
             const article = Article.allArticles.find(a => a.id === parseInt(sourceId));
             if (!article) {
-                Utils.showToast('源文章不存在', true);
+                Utils.showToast(UI.toast.articleNotFound, true);
                 dragData = null;
                 return;
             }
@@ -204,7 +207,7 @@ export function enableDragDrop(container, updateTreeFn) {
                 newCategory = targetFolderId || '未分类';
             }
             if (article.category === newCategory) {
-                Utils.showToast('文章已在目标文件夹中', false);
+                Utils.showToast(UI.toast.articleAlreadyInTarget, false);
                 dragData = null;
                 return;
             }
@@ -217,16 +220,18 @@ export function enableDragDrop(container, updateTreeFn) {
                     category: newCategory
                 })
             }).then(() => {
-                Utils.showToast('文章已移动到 "' + newCategory + '"', false);
+                Utils.showToast(UI.toast.articleMoveSuccess(newCategory), false);
                 ArticleService.fetchArticles(true).then(() => {
                     if (updateTreeFn) updateTreeFn();
                 });
-            }).catch(err => Utils.showToast('移动失败', true));
+            }).catch(err => {
+                Utils.showToast(UI.toast.articleMoveFailed(err.message), true);
+            });
             dragData = null;
             return;
         }
 
-        Utils.showToast('未知拖拽类型', true);
+        Utils.showToast(UI.toast.dragUnknownType, true);
         dragData = null;
     };
 

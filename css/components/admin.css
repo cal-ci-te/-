@@ -240,3 +240,111 @@ input[type='color'] {
   cursor: pointer;
   border-radius: 4px;
 }
+
+/* ========== 管理员面板 - 扩展样式 ========== */
+
+/* 控制组 */
+.admin-control-group {
+    margin-bottom: 12px;
+}
+.admin-control-group:last-child {
+    margin-bottom: 0;
+}
+
+/* 滑块容器 */
+.admin-slider-container {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+.admin-slider-container input[type="range"] {
+    flex: 1;
+}
+
+/* Flex 行 */
+.admin-flex-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+.admin-flex-row > * {
+    flex: 1;
+}
+
+/* 按钮组 */
+.admin-button-group {
+    display: flex;
+    gap: 8px;
+    margin-top: 6px;
+}
+.admin-button-group button {
+    margin: 0;
+    width: auto;
+}
+
+/* 颜色选择器组 */
+.admin-color-pickers {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.admin-color-pickers input[type="color"] {
+    flex: 1;
+    min-width: 60px;
+}
+
+/* 色卡输入框 */
+.admin-palette-input {
+    flex: 1;
+    min-width: 120px;
+    background: #1e1a15;
+    border: 1px solid #5a3e2b;
+    color: #e8d5b5;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+/* 贴图容器 */
+.admin-asset-list {
+    min-height: 60px;
+    overflow-y: auto;
+    border-top: 1px solid #5a3e2b;
+    padding-top: 8px;
+}
+
+/* 主题按钮 */
+.theme-btn {
+    flex: 1;
+    border-radius: 4px;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-family: var(--font-family-base);
+    transition: all 0.2s;
+}
+.theme-btn-dark {
+    background: #3a2a1a;
+    color: #e8d5b5;
+    border: 2px solid #5a3e2b;
+}
+.theme-btn-light {
+    background: #ebe5db;
+    color: #3a322a;
+    border: 2px solid #c4b8a8;
+}
+.theme-btn-lofi {
+    background: #f0ebe0;
+    color: #1a0e08;
+    border: 2px solid #c0b0a0;
+}
+.theme-btn:hover {
+    transform: scale(1.02);
+    opacity: 0.9;
+}
+
+/* 头像上传提示 */
+.admin-avatar-hint {
+    font-size: 9px;
+    color: #7a6a58;
+    margin-top: 4px;
+}

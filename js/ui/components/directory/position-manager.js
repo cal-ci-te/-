@@ -17,8 +17,8 @@ import { showMobileControls, hideMobileControls } from './mobile-controls.js';
  * @param {Function} context.enableDragDrop
  * @param {Function} context.enableTouchDrag
  * @param {Function} context.handleDrop
- * @param {Function} context.onSave   // [新增] 保存回调
- * @param {Function} context.onCancel // [新增] 取消回调
+ * @param {Function} context.onSave   // 保存回调
+ * @param {Function} context.onCancel // 取消回调
  * @returns {Object} 管理器实例
  */
 export function createPositionManager(context) {
@@ -34,8 +34,8 @@ export function createPositionManager(context) {
         enableDragDrop: enablePCDrag,
         enableTouchDrag: enableTouchDragFn,
         handleDrop,
-        onSave,   // [新增] 保存回调
-        onCancel, // [新增] 取消回调
+        onSave,   // 保存回调
+        onCancel, // 取消回调
     } = context;
 
     // ----- 快照操作 -----
@@ -101,7 +101,7 @@ export function createPositionManager(context) {
         isActive = true;
         saveSnapshot();
         enableDragForCurrentDevice();
-        Utils.showToast('已进入位置管理模式，拖拽节点调整位置', false);
+        Utils.showToast(UI.toast.positionModeEnter, false);
     }
 
     function exit(shouldSave = true) {
@@ -115,12 +115,12 @@ export function createPositionManager(context) {
         if (!shouldSave && snapshot) {
             restoreSnapshot();
             updateTree(getFilterKeyword());
-            // [新增] 调用取消回调（清空待处理列表）
+            //调用取消回调（清空待处理列表）
             if (onCancel) onCancel();
-            Utils.showToast('已取消，未保存更改', false);
+            Utils.showToast(UI.toast.positionModeCancelled, false);
         } else {
             clearSnapshot();
-            // [新增] 调用保存回调（提交待处理列表）
+            //调用保存回调（提交待处理列表）
             if (onSave) onSave();
             // Toast 由外部处理
         }

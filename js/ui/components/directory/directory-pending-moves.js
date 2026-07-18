@@ -49,7 +49,7 @@ export function createPendingMovesManager() {
                 console.log('[PendingMoves] 提交成功:', move.articleId);
             } catch (err) {
                 console.error('[PendingMoves] 提交移动失败:', move.articleId, err);
-                Utils.showToast('保存位置变更失败: ' + err.message, true);
+                Utils.showToast(UI.toast.positionModeSaveError(err.message), true);
                 hasError = true;
             }
         }
@@ -57,9 +57,9 @@ export function createPendingMovesManager() {
         await ArticleService.fetchArticles(true);
         if (updateTreeFn) updateTreeFn();
         if (!hasError) {
-            Utils.showToast('位置更改已保存', false);
+            Utils.showToast(UI.toast.positionModeSaved, false);
         } else {
-            Utils.showToast('部分位置变更保存失败，请检查网络后重试', true);
+            Utils.showToast(UI.toast.positionModeSavePartialError, true);
         }
     }
 

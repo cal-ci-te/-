@@ -24,10 +24,10 @@ export async function handleDirectoryDrop(sourceData, targetData, context) {
         const success = ArticleService.moveCategory(sourceId, finalParent);
         if (success) {
             const msg = finalParent ? '到 "' + finalParent + '"' : '到根目录';
-            Utils.showToast('文件夹已移动' + msg, false);
+            Utils.showToast(UI.toast.folderMoveSuccess(msg), false);
             if (updateTreeFn) updateTreeFn();
         } else {
-            Utils.showToast('移动失败', true);
+            Utils.showToast(UI.toast.folderMoveFailed, true);
         }
         return;
     }
@@ -36,13 +36,13 @@ export async function handleDirectoryDrop(sourceData, targetData, context) {
         const allArticles = ArticleService.getAllArticles();
         const article = allArticles.find(a => a.id === parseInt(sourceId));
         if (!article) {
-            Utils.showToast('源文章不存在', true);
+            Utils.showToast(UI.toast.articleNotFound, true);
             return;
         }
 
         let newCategory = isSibling ? (targetFolderId || '未分类') : (targetFolderId || '未分类');
         if (article.category === newCategory) {
-            Utils.showToast('文章已在目标文件夹中', false);
+            Utils.showToast(UI.toast.articleAlreadyInTarget, false);
             return;
         }
 
@@ -52,7 +52,7 @@ export async function handleDirectoryDrop(sourceData, targetData, context) {
             article.category = newCategory;
             pendingMovesManager.recordMove(article.id, newCategory);
             if (updateTreeFn) updateTreeFn();
-            Utils.showToast('文章已移动（保存后将持久化）', false);
+            Utils.showToast(UI.toast.articleMovePending, false);
             return;
         }
 
@@ -68,18 +68,18 @@ export async function handleDirectoryDrop(sourceData, targetData, context) {
                 })
             });
             if (response.ok) {
-                Utils.showToast('文章已移动到 "' + newCategory + '"', false);
+                Utils.showToast(UI.toast.articleMoveSuccess(newCategory), false);
                 await ArticleService.fetchArticles(true);
                 if (updateTreeFn) updateTreeFn();
             } else {
-                Utils.showToast('移动失败: ' + response.statusText, true);
+                Utils.showToast(UI.toast.articleMoveFailed(response.statusText), true);
             }
         } catch (err) {
             console.error('[DropHandler] 移动文章失败:', err);
-            Utils.showToast('移动失败: ' + err.message, true);
+            Utils.showToast(UI.toast.articleMoveFailed(err.message), true);
         }
         return;
     }
 
-    Utils.showToast('未知拖拽类型', true);
+    Utils.showToast(UI.toast.dragUnknownType, true);
 }

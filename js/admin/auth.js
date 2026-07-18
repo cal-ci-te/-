@@ -12,6 +12,8 @@ import { AdminEvents } from './events/index.js';
 import { DecoShelf } from '../services/deco.js';
 // 注意：DOMRefs 在 login 方法中被使用，需要导入
 import { DOMRefs } from '../core/dom-refs.js';
+// [新增] 导入 UI 文案
+import { UI } from '../utils/ui-strings.js';
 
 export const AdminAuth = {
   checkStatus: function () {
@@ -55,7 +57,8 @@ export const AdminAuth = {
         AdminAvatar.setAvatarImage(savedAvatar);
       }
 
-      Utils.showToast('欢迎管理员登录', false);
+      // [修改] 使用 UI 文案
+      Utils.showToast(UI.notification.loginSuccess, false);
       AdminUI.showPanel();
 
       setTimeout(function () {
@@ -75,7 +78,8 @@ export const AdminAuth = {
       console.log('[AdminAuth] 登录成功');
       return true;
     } else {
-      Utils.showToast('用户名或密码错误', true);
+      // [修改] 使用 UI 文案
+      Utils.showToast(UI.toast.loginFailed, true);
       console.log('[AdminAuth] 登录失败');
       return false;
     }
@@ -91,7 +95,8 @@ export const AdminAuth = {
     AppState.commit(MUTATIONS.SET_LOGGED_IN, false);
     Utils.storage.set('admin_logged_in', false);
     AdminUI.hidePanel();
-    Utils.showToast('已退出管理员模式', false);
+    // [修改] 使用 UI 文案
+    Utils.showToast(UI.notification.logoutSuccess, false);
     EventBus.emit(EVENTS.AUTH_LOGGED_OUT);
     console.log('[AdminAuth] 已登出');
   },

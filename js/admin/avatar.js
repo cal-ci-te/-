@@ -2,6 +2,7 @@
 import { DOMRefs } from '../core/dom-refs.js';
 import { Utils } from '../utils.js';
 import { CONFIG } from '../config.js';
+import { UI } from '../utils/ui-strings.js';
 
 export const AdminAvatar = {
   originalImage: null,
@@ -346,7 +347,7 @@ export const AdminAvatar = {
           const reader = new FileReader();
           reader.onload = function (e) {
             AdminAvatar.setAvatarImage(e.target.result);
-            Utils.showToast('头像上传成功', false);
+            Utils.showToast(UI.toast.avatarUploadSuccess, false);
             const adminPreview = DOMRefs.get(DOMRefs.adminControls.adminAvatarPreview);
             if (adminPreview) adminPreview.src = e.target.result;
           };

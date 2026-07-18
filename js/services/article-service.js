@@ -8,6 +8,7 @@ import { EVENTS } from '../core/event-constants.js';
 import { NotificationService } from './notification-service.js';
 import { StorageAdapter } from './storage-adapter.js';
 import { ApiClient } from './api-client.js';
+import { UI } from '../utils/ui-strings.js';
 
 export const ArticleService = {
     _data: [],
@@ -120,7 +121,7 @@ export const ArticleService = {
         const cat = this._categories.find(c => c.id === categoryId);
         if (!cat) return false;
         if (categoryId === '未分类') {
-            NotificationService.showToast('不能删除“未分类”文件夹', true);
+            Utils.showToast(UI.toast.articleServiceCannotDeleteDefaultCategory, true);
             return false;
         }
         const getDescendantIds = (id) => {

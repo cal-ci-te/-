@@ -21,6 +21,8 @@ import { EVENTS } from '../../../core/event-constants.js';
 import { ArticleService } from '../../../services/article-service.js';
 import { isMobile, enableTouchDrag, enableTouchContext } from '../../../mobile/index.js';
 
+
+
 export const UIDirectory = {
     container: null,
     filterKeyword: null,

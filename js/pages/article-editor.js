@@ -13,6 +13,7 @@ import { UI } from '../utils/ui-strings.js';
 import { EditorCore } from '../editor/editor-core.js';
 import { HistoryUI } from '../editor/history-ui.js';
 import { AutoSave } from '../editor/auto-save.js';
+import { UI } from '../utils/ui-strings.js';
 
 // ===== 1. 模拟登录 =====
 AppState.commit(MUTATIONS.SET_LOGGED_IN, true);
@@ -223,18 +224,18 @@ if (enterPosBtn && savePosBtn && cancelPosBtn) {
 
     enterPosBtn.addEventListener('click', () => {
         updatePositionControls('enter');
-        Utils.showToast('已进入位置管理模式，拖拽节点调整顺序', false);
+        Utils.showToast(UI.toast.editorPositionModeEnter, false);
     });
 
     savePosBtn.addEventListener('click', () => {
         updatePositionControls('exit');
         // 保存位置（实际由 UIDirectory.exitPositionMode 内部保存，此处仅提示）
-        Utils.showToast('位置更改已保存', false);
+        Utils.showToast(UI.toast.editorPositionModeSaved, false);
     });
 
     cancelPosBtn.addEventListener('click', () => {
         updatePositionControls('exit');
-        Utils.showToast('已取消更改', false);
+        Utils.showToast(UI.toast.editorPositionModeCancelled, false);
     });
 
     // 初始状态：隐藏保存/取消按钮

@@ -139,7 +139,7 @@ function setupPositionModeControls() {
             hint.textContent = '💡 拖拽节点到目标位置，点击"保存更改"生效';
             controls.appendChild(hint);
         }
-        Utils.showToast('已进入位置管理模式，拖拽节点调整位置', false);
+        Utils.showToast(UI.toast.positionModeEnter, false);
     });
 
     saveBtn = bindSafeEvent(saveBtn, function(e) {
@@ -179,7 +179,7 @@ saveBtn = bindSafeEvent(saveBtn, function(e) {
     cancelBtn.style.display = 'none';
     const hint = controls.querySelector('.pos-hint');
     if (hint) hint.remove();
-    Utils.showToast('位置更改已保存', false);
+    Utils.showToast(UI.toast.positionModeSaved, false);
 });
 
 cancelBtn = bindSafeEvent(cancelBtn, function(e) {

@@ -132,7 +132,7 @@ async function handleContextAction(action, data, nodeLi, updateTreeFn) {
         if (!confirm(UI.notification.articleDeleteConfirm || '确定要删除这篇文章吗？')) return;
         const all = ArticleService.getAllArticles();
         if (!all.some(a => a.id === data)) {
-            Utils.showToast('文章 ID 已过期，请刷新页面后再试', true);
+            Utils.showToast(UI.toast.articleIdExpired, true);
             return;
         }
         try {
@@ -144,7 +144,6 @@ async function handleContextAction(action, data, nodeLi, updateTreeFn) {
             console.log('[ContextMenu] 数据刷新完成，更新目录树...');
             if (updateTreeFn) updateTreeFn();
             console.log('[ContextMenu] 目录树更新完成');
-            // ★★★ 发送 BroadcastChannel 消息 ★★★
             broadcastChange('article_deleted', { articleId: data });
         } catch (err) {
             console.error('[ContextMenu] 删除失败:', err);
@@ -159,10 +158,10 @@ async function handleContextAction(action, data, nodeLi, updateTreeFn) {
         if (!folderName || !folderName.trim()) return;
         const trimmed = folderName.trim();
         if (ArticleService.addCategory(trimmed, null)) {
-            Utils.showToast(`文件夹 "${trimmed}" 已创建`, false);
+            Utils.showToast(UI.toast.folderCreateSuccess(trimmed), false);
             if (updateTreeFn) updateTreeFn();
         } else {
-            Utils.showToast('创建失败，可能同名', true);
+            Utils.showToast(UI.toast.folderCreateFailed, true);
         }
         return;
     }
@@ -173,10 +172,10 @@ async function handleContextAction(action, data, nodeLi, updateTreeFn) {
         if (!folderName || !folderName.trim()) return;
         const trimmed = folderName.trim();
         if (ArticleService.addCategory(trimmed, data)) {
-            Utils.showToast(`子文件夹 "${trimmed}" 已创建`, false);
+            Utils.showToast(UI.toast.folderCreateSuccess(trimmed), false);
             if (updateTreeFn) updateTreeFn();
         } else {
-            Utils.showToast('创建失败，可能同名或循环', true);
+            Utils.showToast(UI.toast.folderCreateFailed, true);
         }
         return;
     }
@@ -191,7 +190,7 @@ async function handleContextAction(action, data, nodeLi, updateTreeFn) {
         if (title === null) return;
         const trimmedTitle = title.trim();
         if (!trimmedTitle) {
-            Utils.showToast('标题不能为空', true);
+            Utils.showToast(UI.toast.articleTitleEmpty, true);
             return;
         }
         console.log('[ContextMenu] 新建文章，标题:', trimmedTitle, '分类:', category);
@@ -207,7 +206,6 @@ async function handleContextAction(action, data, nodeLi, updateTreeFn) {
             const newArticle = response;
             console.log('[ContextMenu] 新文章 ID:', newArticle.id);
 
-            // 手动插入缓存
             const allArticles = ArticleService.getAllArticles();
             const exists = allArticles.some(a => a.id === newArticle.id);
             if (!exists && newArticle.id > 0) {
@@ -228,7 +226,6 @@ async function handleContextAction(action, data, nodeLi, updateTreeFn) {
             }
 
             EventBus.emit(EVENTS.ARTICLE_VISIBILITY_CHANGED, { articleCreated: newArticle.id });
-            // ★★★ 发送 BroadcastChannel 消息 ★★★
             broadcastChange('article_created', { articleId: newArticle.id });
 
         } catch (err) {
@@ -245,12 +242,12 @@ async function handleContextAction(action, data, nodeLi, updateTreeFn) {
             const trimmed = newName.trim();
             const cat = ArticleService._categories.find(c => c.id === data);
             if (!cat) {
-                Utils.showToast('文件夹不存在', true);
+                Utils.showToast(UI.toast.folderNotFound, true);
                 return;
             }
             const siblings = ArticleService._categories.filter(c => c.parent === cat.parent);
             if (siblings.some(c => c.name === trimmed && c.id !== data)) {
-                Utils.showToast('同级已存在同名文件夹', true);
+                Utils.showToast(UI.toast.folderDuplicateName, true);
                 return;
             }
             const oldId = cat.id;
@@ -285,7 +282,7 @@ async function handleContextAction(action, data, nodeLi, updateTreeFn) {
         if (!confirm(UI.directory.menuDeleteFolderOnly + '？')) return;
         const cat = ArticleService._categories.find(c => c.id === data);
         if (!cat) {
-            Utils.showToast('文件夹不存在', true);
+            Utils.showToast(UI.toast.folderNotFound, true);
             return;
         }
         const children = ArticleService._categories.filter(c => c.parent === data);
@@ -303,11 +300,11 @@ async function handleContextAction(action, data, nodeLi, updateTreeFn) {
                     category: '未分类'
                 });
             }
-            Utils.showToast('文件夹已删除，子文件夹提升至根目录，文章移至“未分类”', false);
+            Utils.showToast(UI.toast.folderDeleteSuccess, false);
             await ArticleService.fetchArticles(true);
             if (updateTreeFn) updateTreeFn();
         } catch (err) {
-            Utils.showToast('删除文件夹失败', true);
+            Utils.showToast(UI.toast.folderDeleteFailed, true);
         }
         return;
     }
@@ -317,7 +314,7 @@ async function handleContextAction(action, data, nodeLi, updateTreeFn) {
         if (!confirm(UI.directory.menuDeleteFolderWithArticles + '？')) return;
         const cat = ArticleService._categories.find(c => c.id === data);
         if (!cat) {
-            Utils.showToast('文件夹不存在', true);
+            Utils.showToast(UI.toast.folderNotFound, true);
             return;
         }
         const getDescendantIds = (id) => {
@@ -336,11 +333,11 @@ async function handleContextAction(action, data, nodeLi, updateTreeFn) {
             }
             ArticleService._categories = ArticleService._categories.filter(c => !idsToDelete.includes(c.id));
             ArticleService._saveCategories();
-            Utils.showToast('文件夹及所有内容已删除', false);
+            Utils.showToast(UI.toast.folderDeleteSuccess, false);
             await ArticleService.fetchArticles(true);
             if (updateTreeFn) updateTreeFn();
         } catch (err) {
-            Utils.showToast('删除失败', true);
+            Utils.showToast(UI.toast.folderDeleteFailed, true);
         }
         return;
     }

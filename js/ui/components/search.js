@@ -142,7 +142,7 @@ export const UISearch = {
     navigateSearchResult(direction) {
         // 此功能在过滤模式下可能仍有用，但当前我们未存储搜索结果列表
         // 简化提示
-        Utils.showToast('搜索导航功能已简化，请在目录树中点击查看', false);
+        Utils.showToast(UI.toast.searchNavigationSimplified, false);
     },
 
     clearSearchHighlights() {

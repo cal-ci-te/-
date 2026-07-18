@@ -3,6 +3,7 @@ import { Utils } from '../utils.js';
 import { ArticleService } from '../services/article-service.js';
 import { EventBus } from '../core/event-bus.js';
 import { EVENTS } from '../core/event-constants.js';
+import { UI } from '../utils/ui-strings.js';
 
 let touchDragData = null;
 let touchClone = null;
@@ -33,7 +34,7 @@ export function enableTouchDrag(container, onDrop, updateTreeFn) {
         // 检查是否有管理员权限
         const isAdmin = window.AppState?.get('isLoggedIn') || false;
         if (!isAdmin) {
-            Utils.showToast('需要管理员权限才能拖拽', true);
+            Utils.showToast(UI.toast.touchAdminRequiredDrag, true);
             return;
         }
 
@@ -166,7 +167,7 @@ export function enableTouchDrag(container, onDrop, updateTreeFn) {
         const dropTarget = target.closest('.tree-node, .dropzone-background');
         if (!dropTarget) {
             touchDragData = null;
-            Utils.showToast('请拖拽到有效的文件夹或空白区域', true);
+            Utils.showToast(UI.toast.touchDragToValidTarget, true);
             return;
         }
 
@@ -209,7 +210,7 @@ export function enableTouchDrag(container, onDrop, updateTreeFn) {
                 if (updateTreeFn) updateTreeFn();
             } catch (err) {
                 console.error('[TouchDrag] 拖拽失败:', err);
-                Utils.showToast('移动失败: ' + err.message, true);
+                Utils.showToast(UI.toast.touchMoveFailed(err.message), true);
             }
         } else {
             console.warn('[TouchDrag] onDrop 回调未提供');

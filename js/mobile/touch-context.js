@@ -1,4 +1,6 @@
 // ========== 移动端长按上下文菜单 ==========
+import { UI } from '../utils/ui-strings.js';
+
 
 let longPressTimer = null;
 let longPressTarget = null;
@@ -24,7 +26,7 @@ export function enableTouchContext(container, showMenuFn, duration = 500) {
             if (!nodeLi) return;
             const isAdmin = window.AppState?.get('isLoggedIn') || false;
             if (!isAdmin) {
-                Utils.showToast('需要管理员权限', true);
+                Utils.showToast(UI.toast.touchAdminRequired, true);
                 return;
             }
             const type = nodeLi.dataset.type;

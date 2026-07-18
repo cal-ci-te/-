@@ -1,0 +1,120 @@
+/* ========== 草稿历史样式 ========== */
+
+/* 历史面板 */
+.history-panel {
+    background: #1e1a15;
+    border-top: 1px solid #5a3e2b;
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 8px 12px;
+    flex-shrink: 0;
+}
+
+/* 历史列表项 */
+.history-item {
+    border-bottom: 1px solid #3a2a1a;
+    padding: 6px 0;
+}
+.history-item:last-child {
+    border-bottom: none;
+}
+
+.history-item .history-path {
+    font-size: 11px;
+    color: #e8d5b5;
+    font-weight: bold;
+}
+.history-item .history-time {
+    font-size: 10px;
+    color: #7a6a58;
+}
+.history-item .history-preview-text {
+    font-size: 11px;
+    color: #c4b5a0;
+    margin: 2px 0;
+}
+
+.history-item .history-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+    flex-wrap: wrap;
+}
+.history-item .history-actions button {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    border: none;
+}
+.history-preview-btn {
+    background: none;
+    border: 1px solid #5a3e2b !important;
+    color: #e8d5b5;
+}
+.history-restore-btn {
+    background: #5a3e2b;
+    color: #e8d5b5;
+}
+.history-restore-btn:hover {
+    background: #c47a44;
+    color: #1e1a15;
+}
+.history-delete-btn {
+    background: none;
+    color: #c44a44;
+}
+.history-delete-btn:hover {
+    background: #3a2a1a;
+}
+
+/* 预览弹窗（复用 modal 样式） */
+.draft-preview-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+.draft-preview-box {
+    background: #2a231c;
+    border: 1px solid #5a3e2b;
+    border-radius: 12px;
+    padding: 24px;
+    max-width: 600px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+.draft-preview-box h3 {
+    color: #e8c88a;
+    margin-bottom: 8px;
+}
+.draft-preview-box .draft-preview-meta {
+    color: #c4b5a0;
+    font-size: 12px;
+    border-bottom: 1px solid #5a3e2b;
+    padding-bottom: 6px;
+}
+.draft-preview-box .draft-preview-body {
+    color: #e8d5b5;
+    line-height: 1.6;
+    font-size: 14px;
+    margin-top: 10px;
+    white-space: pre-wrap;
+}
+.draft-preview-box .draft-preview-close {
+    margin-top: 16px;
+    background: #5a3e2b;
+    border: none;
+    color: #e8d5b5;
+    padding: 6px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+}

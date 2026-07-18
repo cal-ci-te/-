@@ -40,7 +40,7 @@ EventBus
   // --- 背景颜色 ---
   .on('admin:bg-color-apply', function (data) {
     Texture.setBgColor(data.color);
-    Utils.showToast('背景颜色已应用', false);
+    Utils.showToast(UI.toast.adminBgColorApplied, false);
     Utils.storage.set('bg_color', data.color);
   })
   .on('admin:bg-color-reset', function () {
@@ -49,7 +49,7 @@ EventBus
     const preview = document.getElementById('bgColorPreview');
     if (picker) picker.value = '#1a1612';
     if (preview) preview.style.backgroundColor = '#1a1612';
-    Utils.showToast('背景颜色已重置', false);
+    Utils.showToast(UI.toast.adminBgColorReset, false);
   })
 
   // --- 纹理 ---
@@ -58,15 +58,16 @@ EventBus
   })
   .on('admin:texture-apply', function () {
     if (!Texture.textureConfig || !Texture.textureConfig.dataUrl) {
-      Utils.showToast('请先上传纹理图片', true);
+      Utils.showToast(UI.toast.adminTextureUploadFirst, true);
+
       return;
     }
     Texture.saveConfig();
-    Utils.showToast('纹理配置已保存', false);
+    Utils.showToast(UI.toast.adminTextureSaved, false);
   })
   .on('admin:texture-reset', function () {
     Texture.removeTexture();
-    Utils.showToast('纹理已移除', false);
+    Utils.showToast(UI.toast.adminTextureRemoved, false);
   })
   .on('admin:texture-opacity-change', function (data) {
     Texture.setOpacity(data.opacity);
@@ -75,7 +76,7 @@ EventBus
   // --- 水印 ---
   .on('admin:watermark-apply', function (data) {
     Watermark.apply(data.text, data.opacity);
-    Utils.showToast('水印设置已应用', false);
+    Utils.showToast(UI.toast.adminWatermarkApplied, false);
   })
 
   // --- 文件夹过滤（文章列表更新） ---
@@ -84,7 +85,7 @@ EventBus
     if (UIController && Article && Article.allArticles) {
       const categories = Article.buildDirectoryTree(Article.allArticles);
       UIController.updateArticleListPanel(Article.allArticles, categories);
-      Utils.showToast('文章列表已更新', false);
+      Utils.showToast(UI.toast.adminArticleListUpdated, false);
     }
   })
 

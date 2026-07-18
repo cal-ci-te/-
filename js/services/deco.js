@@ -262,7 +262,7 @@ export const DecoShelf = {
   startEditingPosition(id) {
     // 移动端禁用贴纸位置编辑
     if (this._isMobile()) {
-      Utils.showToast('移动端不支持贴纸位置编辑', true);
+      Utils.showToast(UI.toast.decoMobileNotSupported, true);
       return;
     }
 
@@ -362,7 +362,7 @@ export const DecoShelf = {
   confirmEditing: function () {
     // 移动端禁用
     if (this._isMobile()) {
-      Utils.showToast('移动端不支持贴纸位置编辑', true);
+      Utils.showToast(UI.toast.decoMobileNotSupported, true);
       return;
     }
     if (!this._editingId) {
@@ -376,7 +376,7 @@ export const DecoShelf = {
   cancelEditing: function () {
     // 移动端禁用
     if (this._isMobile()) {
-      Utils.showToast('移动端不支持贴纸位置编辑', true);
+      Utils.showToast(UI.toast.decoMobileNotSupported, true);
       return;
     }
     if (!this._editingId) {
@@ -537,7 +537,7 @@ export const DecoShelf = {
     if (!item) return;
     const imgSrc = item.dataUrl || item.url;
     if (!imgSrc) {
-      Utils.showToast('图片资源不存在', true);
+      Utils.showToast(UI.toast.decoImageNotFound, true);
       return;
     }
     const a = document.createElement('a');
