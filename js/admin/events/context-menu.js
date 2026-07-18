@@ -42,8 +42,9 @@ export const ContextMenu = {
       }
     });
 
-    // 监听贴图右键事件
+    // 监听贴图右键事件（仅管理员可用）
     EventBus.on('deco:context-menu', function (data) {
+      if (!window.AppState || !window.AppState.get('isLoggedIn')) return;
       ContextMenu.show(data.decoId, data.x, data.y);
     });
 
@@ -170,4 +171,3 @@ export const ContextMenu = {
   },
 };
 
-console.log('✅ ContextMenu 已加载 (ES Module)');

@@ -1,4 +1,3 @@
-// ========== 管理员面板位置管理 ==========
 import { DOMRefs } from '../core/dom-refs.js';
 import { AppState } from '../core/app-state.js';
 import { Utils } from '../utils.js';
@@ -82,4 +81,3 @@ export const AdminPosition = {
   },
 };
 
-console.log('✅ AdminPosition 已加载 (ES Module)');

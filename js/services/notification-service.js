@@ -3,12 +3,10 @@ import { Utils } from '../utils.js';
 import { UI } from '../utils/ui-strings.js';
 
 export const NotificationService = {
-  // ----- Toast 提示 -----
   showToast(message, isError = false) {
     Utils.showToast(message, isError);
   },
 
-  // ----- 确认对话框 -----
   showConfirm(message, callback, cancelCallback) {
     if (confirm(message)) {
       if (typeof callback === 'function') callback();
@@ -17,10 +15,8 @@ export const NotificationService = {
     }
   },
 
-  // ----- 预定义消息库（直接从 UI 导入） -----
   messages: UI.notification,
 
-  // ----- 便捷方法 -----
   showVisibilityChanged(visible) {
     this.showToast(this.messages.visibilityChanged(visible));
   },
@@ -66,4 +62,3 @@ export const NotificationService = {
   },
 };
 
-console.log('✅ NotificationService 已加载 (ES Module)');

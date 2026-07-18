@@ -1,4 +1,5 @@
-// ========== 主题管理服务 ==========
+// 动态替换 <link> 标签加载主题 CSS（而非切换 CSS 变量），因三套主题的颜色值差异过大，
+// 使用变量回退会导致开发和调试成本高于直接维护三份独立样式文件。
 import { Utils } from '../utils.js';
 import { EventBus } from '../core/event-bus.js';
 import { Texture } from './texture.js';
@@ -91,7 +92,6 @@ export const ThemeService = {
         // 更新管理面板中的按钮状态
         this._updateThemeButtons(themeId);
 
-        // ===== 强制刷新目录树和右键菜单 =====
         setTimeout(() => {
             // 刷新目录树
             if (window.UIDirectory && typeof window.UIDirectory.updateTree === 'function') {

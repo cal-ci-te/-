@@ -1,4 +1,6 @@
-// ========== 贴图上传（使用 StorageService） ==========
+// 贴图上传处理器：接收 base64 JSON（前端已压缩为 WebP），解码后通过 StorageService 存储。
+// 走特殊路由而非通用 JSON 解析是因为请求体可能很大（>100KB base64），
+// 流式读取避免阻塞事件循环。
 const { storage } = require('./storage/index.cjs');
 const { broadcast } = require('./websocket.cjs');
 const dbModule = require('./db.cjs');

@@ -1,4 +1,5 @@
-// ========== 存储配置管理 ==========
+// 通过 dotenv 读取环境变量，支持 STORAGE_TYPE=local|rustfs 切换。
+// RustFS 兼容 S3 协议（MinIO/Ceph/AWS S3 均可），forcePathStyle=true 适配自建服务。
 const path = require('path');
 require('dotenv').config(); // 如果使用 dotenv
 

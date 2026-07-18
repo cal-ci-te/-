@@ -1,4 +1,3 @@
-// ========== 目录树折叠状态管理 ==========
 import { Utils } from '../../../utils.js';
 
 /**
@@ -14,7 +13,7 @@ export function handleFolderToggle(e, container) {
     const nodeLi = toggleIcon.closest('.tree-node.folder');
     if (!nodeLi) return;
 
-    const childrenDiv = nodeLi.querySelector(':scope > .children');
+    const childrenDiv = nodeLi.querySelector('.children');
     if (!childrenDiv) return;
 
     const isVisible = childrenDiv.style.display !== 'none';

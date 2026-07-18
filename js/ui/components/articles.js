@@ -1,4 +1,3 @@
-// ========== 文章列表模块（左右交替布局） ==========
 import { UIHelpers } from './helpers.js';
 import { UIDetail } from './detail.js';
 import { Utils } from '../../utils.js';
@@ -221,7 +220,6 @@ export const UIArticles = {
         window.addEventListener('scroll', this.scrollHandler);
     },
 
-    // ----- 兼容旧接口（已废弃，保留空实现防止调用报错） -----
     initInfiniteScroll: function () {
         console.warn('[UIArticles] initInfiniteScroll 已废弃，由 ArticleListStore 自动管理');
     },
@@ -242,4 +240,3 @@ export const UIArticles = {
     }
 };
 
-console.log('✅ UIArticles 已加载（使用 ArticleListStore 派生数据）');

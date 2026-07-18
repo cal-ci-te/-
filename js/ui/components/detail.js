@@ -1,4 +1,3 @@
-// ========== 详情页模块 ==========
 import { Article } from '../../models/article-model.js';
 import { ArticleService } from '../../services/article-service.js';
 import { AppState } from '../../core/app-state.js';
@@ -412,4 +411,3 @@ export const UIDetail = {
   },
 };
 
-console.log('✅ UIDetail 已加载 (ES Module)');

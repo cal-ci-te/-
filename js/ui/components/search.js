@@ -1,4 +1,3 @@
-// ========== 搜索模块（Enter 触发，仅过滤目录树） ==========
 import { UIArticles } from './articles.js';
 import { UIDirectory } from './directory.js';
 import { UIHelpers } from './helpers.js';
@@ -166,4 +165,3 @@ export const UISearch = {
     },
 };
 
-console.log('✅ UISearch 已加载 (ES Module)');

@@ -1,6 +1,4 @@
-// ============================================================
 // 历史记录 UI 模块（渲染、查看、恢复、删除）
-// ============================================================
 import { ApiClient } from '../services/api-client.js';
 import { Utils } from '../utils.js';
 import { ArticleService } from '../services/article-service.js';

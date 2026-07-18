@@ -1,4 +1,5 @@
-// ========== 贴图库模块（使用 DecoRepository） ==========
+// WebP 压缩（quality 0.6）：前端上传时即压缩为 WebP，减少存储和传输体积约 40-60%。
+// 移动端禁用位置编辑（触摸拖拽冲突），仅桌面端可调整贴图位置。
 import { Utils } from '../utils.js';
 import { EventBus } from '../core/event-bus.js';
 import { EVENTS } from '../core/event-constants.js';
@@ -258,7 +259,6 @@ export const DecoShelf = {
     return true;
   },
 
-  // ===== 编辑位置相关（移动端禁用） =====
   startEditingPosition(id) {
     // 移动端禁用贴纸位置编辑
     if (this._isMobile()) {
@@ -387,7 +387,6 @@ export const DecoShelf = {
     Utils.showToast(UI.deco.editCancelled, false);
   },
 
-  // ===== 渲染方法（所有设备都渲染，由CSS控制显示） =====
   _renderAllDecos: function () {
     // 清理所有旧贴纸
     document.querySelectorAll('[id^="deco-"]').forEach(function (el) {
@@ -466,7 +465,6 @@ export const DecoShelf = {
     el._longPressCleanup = cleanup;
   },
 
-  // ===== 拖拽相关（移动端禁用） =====
   _enableDragging: function (el) {
     // 移动端禁用拖拽
     if (this._isMobile()) return;
@@ -579,4 +577,3 @@ export const Deco = {
   },
 };
 
-console.log('✅ DecoShelf 已加载（移动端贴纸功能已精简）');

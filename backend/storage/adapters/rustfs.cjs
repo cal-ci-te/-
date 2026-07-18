@@ -1,4 +1,6 @@
-// ========== RustFS (S3 兼容) 适配器 ==========
+// S3 兼容存储适配器（基于 @aws-sdk/client-s3）。
+// 支持 MinIO、Ceph RGW、AWS S3 等任何兼容 S3 协议的服务。
+// 构造函数中自动检测并创建 bucket（HeadBucket → CreateBucket）。
 const {
     S3Client,
     PutObjectCommand,

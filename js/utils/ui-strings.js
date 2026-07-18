@@ -1,7 +1,5 @@
-// ========== UI 文案集中管理 ==========
 export const UI = {
 
-        // ----- 主题切换 -----
     theme: {
         dark: '🌙 暗色',
         light: '☀️ 亮色',
@@ -17,7 +15,6 @@ export const UI = {
         directionBottomLeft: '右上→左下',
     },
 
-    // ----- 全局通用 -----
     common: {
         siteTitle: 'REVACHOL',
         siteSubtitle: '· 原创角色档案馆 ·',
@@ -39,7 +36,6 @@ export const UI = {
         toggleVisible: '切换可见性',
     },
 
-    // ----- 登录 -----
     login: {
         triggerLabel: '登录',
         welcomeText: '欢迎访客',
@@ -56,7 +52,6 @@ export const UI = {
         errorInvalid: '用户名或密码错误',
     },
 
-    // ----- 管理员面板 -----
     admin: {
         panelTitle: '⚙️ 管理',
         collapseIcon: '▶',
@@ -119,7 +114,6 @@ export const UI = {
         positionModeHint: '拖拽文章或文件夹调整位置，保存后生效',
     },
 
-    // ----- 目录树 -----
     directory: {
         emptyTree: '空无一人',
         emptyFolder: '空文件夹',
@@ -144,7 +138,6 @@ export const UI = {
         dragDropHint: '📥 拖拽到此空白区域 → 移动到平级位置',
     },
 
-    // ----- 文章卡片与列表 -----
     articles: {
         empty: '⚡ 意识流空转 ⚡<br><small>尚未记录任何角色</small>',
         cardHint: '双击查看详情',
@@ -159,7 +152,6 @@ export const UI = {
         loading: '⏳ 正在加载角色...',
     },
 
-    // ----- 详情页 -----
     detail: {
         tabClose: '✕',
         paneMinimize: '➖',
@@ -177,7 +169,6 @@ export const UI = {
         defaultContent: '无内容',
     },
 
-    // ----- 贴纸 -----
     deco: {
         menuDuplicate: '📋 复制',
         menuPaste: '📋 粘贴',
@@ -204,7 +195,6 @@ export const UI = {
         pasteSuccess: '粘贴成功',
     },
 
-    // ----- 通知 -----
     notification: {
         visibilityChanged: (visible) => `文章已${visible ? '可见' : '不可见'}`,
         visibilityChangedLocal: (visible) => `文章已${visible ? '可见' : '不可见'}（本地模拟）`,
@@ -250,7 +240,6 @@ export const UI = {
         draftRestored: '已恢复草稿版本',
     },
 
-    // ----- 文章编辑器 -----
     editor: {
         pageTitle: '文章编辑器 - REVACHOL',
         toolbarTitle: '✎ 文章编辑器',
@@ -301,7 +290,6 @@ export const UI = {
         deleteBtn: '🗑️ 删除',
     },
 
-    // ----- 首页首屏说明 -----
     hero: {
         title: '网站使用说明',
         description: `
@@ -312,7 +300,6 @@ export const UI = {
         `
     },
 
-    // ----- 其他（裁剪、版权等）-----
     crop: {
         title: '✂️ 裁剪头像',
         previewLabel: '预览',
@@ -322,7 +309,6 @@ export const UI = {
 
     copyright: '© {siteTitle} · {siteSubtitle} · 内容受版权保护 · 未经授权不得截图、复制或传播',
 
-    // ----- 配置 -----
     config: {
         adminUsername: 'admin',
         adminPassword: 'admin123',
@@ -332,9 +318,7 @@ export const UI = {
         defaultWatermarkOpacity: 0.15,
     },
 
-    // ----- Toast 提示（统一管理） -----
     toast: {
-        // ----- 位置管理 -----
         positionModeEnter: '已进入位置管理模式，拖拽节点调整位置',
         positionModeExit: '已退出位置管理模式',
         positionModeSaved: '位置更改已保存',
@@ -342,7 +326,6 @@ export const UI = {
         positionModeSavePartialError: '部分位置变更保存失败，请检查网络后重试',
         positionModeSaveError: (message) => `保存位置变更失败: ${message}`,
 
-        // ----- 文件夹操作 -----
         folderMoveSuccess: (target) => `文件夹已移动到 ${target}`,
         folderMoveFailed: '移动失败',
         folderCreateSuccess: (name) => `文件夹 "${name}" 已创建`,
@@ -352,7 +335,6 @@ export const UI = {
         folderNotFound: '文件夹不存在',
         folderDuplicateName: '同级已存在同名文件夹',
 
-        // ----- 文章操作 -----
         articleMoveSuccess: (category) => `文章已移动到 "${category}"`,
         articleMovePending: '文章已移动（保存后将持久化）',
         articleMoveFailed: (status) => `移动失败: ${status}`,
@@ -360,26 +342,20 @@ export const UI = {
         articleAlreadyInTarget: '文章已在目标文件夹中',
         articleTitleEmpty: '标题不能为空',
 
-        // ----- 拖拽通用 -----
         dragTargetFolderNotFound: '目标文件夹不存在',
         dragCannotMoveToSelf: '不能移动到自身',
         dragCannotMoveToChild: '不能移动到子文件夹中',
         dragUnknownType: '未知拖拽类型',
 
-        // ----- 认证 -----
         loginFailed: '用户名或密码错误',
         logoutConfirm: '确定要退出登录吗？',
 
-        // ----- 搜索 -----
         searchNavigationSimplified: '搜索导航功能已简化，请在目录树中点击查看',
 
-        // ----- 文章 -----
         articleIdExpired: '文章 ID 已过期，请刷新页面后再试',
 
-        // ----- 头像 -----
         avatarUploadSuccess: '头像上传成功',
 
-        // ----- 管理员面板 -----
         adminBgColorApplied: '背景颜色已应用',
         adminBgColorReset: '背景颜色已重置',
         adminTextureUploadFirst: '请先上传纹理图片',
@@ -388,7 +364,6 @@ export const UI = {
         adminWatermarkApplied: '水印设置已应用',
         adminArticleListUpdated: '文章列表已更新',
 
-        // ----- 草稿历史 -----
         draftSelectArticleFirst: '请先选择一篇文章',
         draftTitleEmpty: '标题不能为空',
         draftSaved: '草稿已保存',
@@ -400,25 +375,20 @@ export const UI = {
         draftDeleted: '草稿已删除',
         draftDeleteFailed: (msg) => `删除失败: ${msg}`,
 
-        // ----- 移动端交互 -----
         touchAdminRequired: '需要管理员权限',
         touchAdminRequiredDrag: '需要管理员权限才能拖拽',
         touchDragToValidTarget: '请拖拽到有效的文件夹或空白区域',
         touchMoveFailed: (msg) => `移动失败: ${msg}`,
 
-        // ----- 文章编辑器 -----
         editorPositionModeEnter: '已进入位置管理模式，拖拽节点调整顺序',
         editorPositionModeSaved: '位置更改已保存',
         editorPositionModeCancelled: '已取消更改',
 
-        // ----- 文章服务 -----
         articleServiceCannotDeleteDefaultCategory: '不能删除"未分类"文件夹',
 
-        // ----- 贴纸 -----
         decoMobileNotSupported: '移动端不支持贴纸位置编辑',
         decoImageNotFound: '图片资源不存在',
 
-        // ----- 纹理 -----
         textureSolidColorApplied: '纯色背景已应用',
         textureBgReset: '背景已重置为默认',
         textureNeedAtLeastTwoColors: '至少需要两种颜色',

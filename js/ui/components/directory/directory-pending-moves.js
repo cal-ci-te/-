@@ -1,4 +1,3 @@
-// ========== 待提交移动操作管理 ==========
 import { ArticleService } from '../../../services/article-service.js';
 import { Utils } from '../../../utils.js';
 

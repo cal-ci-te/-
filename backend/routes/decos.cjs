@@ -1,3 +1,5 @@
+// 贴图路由：元数据存 SQLite，图片文件通过 StorageService 独立存储。
+// GET /api/decos/:id/image 直接从适配器读取二进制返回，不经过 JSON 序列化。
 const { send, json } = require('../enhance.cjs'); 
 const { storage } = require('../storage/index.cjs');
 const dbModule = require('../db.cjs');
@@ -5,7 +7,6 @@ const { broadcast } = require('../websocket.cjs');
 
 function registerDecoRoutes(GET, PUT, DELETE) {
 
-    // ===== GET /api/decos =====
     GET('/api/decos', async (req, res) => {
         console.log('[GET /api/decos] 开始查询贴图列表');
         try {
@@ -26,7 +27,6 @@ function registerDecoRoutes(GET, PUT, DELETE) {
         }
     });
 
-    // ===== GET /api/decos/:id/image =====
     GET('/api/decos/:id/image', async (req, res) => {
         const id = req.params.id;
         console.log('[GET /api/decos/:id/image] 请求图片 ID:', id);
@@ -44,7 +44,6 @@ function registerDecoRoutes(GET, PUT, DELETE) {
                 ? row.image_path.split('/').pop() 
                 : row.image_path;
 
-            // ===== 通过 StorageService 读取 =====
             let buffer = await storage.read(filename);
             
             // 如果 RustFS 没找到，尝试从本地读取（兼容旧数据）
@@ -74,7 +73,6 @@ function registerDecoRoutes(GET, PUT, DELETE) {
         }
     });
 
-    // ===== PUT /api/decos/:id (完整修复版) =====
     PUT('/api/decos/:id', async (req, res) => {
         const id = req.params.id;
         console.log('[PUT /api/decos/:id] ===== 开始处理 =====');
@@ -206,7 +204,6 @@ function registerDecoRoutes(GET, PUT, DELETE) {
         }
     });
 
-    // ===== DELETE /api/decos/:id =====
     DELETE('/api/decos/:id', async (req, res) => {
         const id = req.params.id;
         console.log('[DELETE /api/decos/:id] 删除贴图:', id);

@@ -1,4 +1,3 @@
-// ========== UI 控制器 ==========
 import { DOMRefs } from '../core/dom-refs.js';
 import { EventBus } from '../core/event-bus.js';
 import { EVENTS } from '../core/event-constants.js';
@@ -136,4 +135,3 @@ export const UIController = {
   },
 };
 
-console.log('✅ UIController 已加载 (ES Module)');

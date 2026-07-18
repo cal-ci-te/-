@@ -1,10 +1,8 @@
-// ========== 文章列表视图状态存储（从 ArticleService 派生） ==========
 import { EventBus } from '../core/event-bus.js';
 import { EVENTS } from '../core/event-constants.js';
 import { ArticleService } from '../services/article-service.js';
 
 export const ArticleListStore = {
-    // ----- 视图状态（不存储数据副本） -----
     _currentPage: 1,
     _pageSize: 10,
     _isSearchMode: false,
@@ -12,7 +10,6 @@ export const ArticleListStore = {
     _isLoadingMore: false,
     _initialized: false,
 
-    // ----- 初始化（订阅事件） -----
     init() {
         if (this._initialized) return;
         this._initialized = true;
@@ -53,7 +50,6 @@ export const ArticleListStore = {
         }
     },
 
-    // ----- 内部方法 -----
     _resetPagination() {
         this._currentPage = 1;
         this._isLoadingMore = false;
@@ -71,7 +67,6 @@ export const ArticleListStore = {
         return all;
     },
 
-    // ----- 对外接口 -----
 
     /** 获取当前显示的文章列表（分页后的） */
     getDisplayArticles() {
@@ -142,12 +137,10 @@ export const ArticleListStore = {
         return this._isLoadingMore;
     },
 
-    // ----- 内部通知 -----
     _notify() {
         EventBus.emit(EVENTS.ARTICLES_LIST_UPDATED);
     },
 
-    // ----- 废弃方法（保留空实现防止调用报错） -----
     resetToFullList() {
         console.warn('[ArticleListStore] resetToFullList 已废弃，由事件驱动刷新');
         // 如果外部调用，重置分页并通知
@@ -167,4 +160,3 @@ export const ArticleListStore = {
 // 自动初始化
 ArticleListStore.init();
 
-console.log('✅ ArticleListStore 已加载（派生式，单一数据源）');

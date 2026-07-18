@@ -1,4 +1,3 @@
-// ========== 移动端位置管理控件 ==========
 
 let _controlsInstance = null;
 

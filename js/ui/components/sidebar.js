@@ -1,4 +1,3 @@
-// ========== 侧边栏模块（PC 5px / 移动端 10px 阈值 + 拖拽状态保留） ==========
 import { Utils } from '../../utils.js';
 
 export const Sidebar = {
@@ -19,7 +18,6 @@ export const Sidebar = {
 
   currentThreshold: 5,
 
-  // ----- 初始化 -----
   init: function (sidebarEl, overlayEl, treeContainer) {
     console.log('[Sidebar] 初始化...');
     this.sidebar = sidebarEl;
@@ -36,7 +34,6 @@ export const Sidebar = {
     console.log('[Sidebar] 初始化完成');
   },
 
-  // ----- 状态管理 -----
   loadState: function () {
     const saved = Utils.storage.get('sidebar_state');
     if (saved) {
@@ -137,7 +134,6 @@ export const Sidebar = {
     this.saveState();
   },
 
-  // ----- 事件绑定 -----
   bindEvents: function () {
     if (!this.sidebar) return;
 
@@ -163,7 +159,6 @@ export const Sidebar = {
     console.log('[Sidebar] 拖拽事件已绑定');
   },
 
-  // ----- 鼠标拖拽 -----
   startDrag: function (e) {
     if (e.button !== 0) return;
 
@@ -191,7 +186,6 @@ export const Sidebar = {
     e.preventDefault();
   },
 
-  // ----- 触摸拖拽（移动端） -----
   startDragTouch: function (e) {
     const touch = e.touches[0];
     if (!touch) return;
@@ -222,7 +216,6 @@ export const Sidebar = {
     e.preventDefault();
   },
 
-  // ----- 鼠标拖拽移动 -----
   onDrag: function (e) {
     if (!this.isDraggingSidebar) return;
 
@@ -250,7 +243,6 @@ export const Sidebar = {
     this.sidebar.style.transform = 'none';
   },
 
-  // ----- 触摸拖拽移动 -----
   onDragTouch: function (e) {
     if (!this.isDraggingSidebar) return;
     const touch = e.touches[0];
@@ -282,7 +274,6 @@ export const Sidebar = {
     e.preventDefault();
   },
 
-  // ----- 拖拽结束 -----
   stopDrag: function () {
     if (this.isDraggingSidebar) {
       this.isDraggingSidebar = false;
@@ -305,7 +296,6 @@ export const Sidebar = {
     }
   },
 
-  // ----- 辅助方法 -----
   wasDragAction: function () {
     return this.isDragging || this._dragOccurred;
   },
@@ -320,4 +310,3 @@ export const Sidebar = {
   },
 };
 
-console.log('✅ Sidebar 已加载 (ES Module)');

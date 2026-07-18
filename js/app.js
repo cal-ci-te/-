@@ -1,4 +1,5 @@
-// ========== 应用入口（轻量化版本） ==========
+// 应用入口。无框架依赖——使用自研 AppState（类 Vuex）+ EventBus 实现单向数据流。
+// 模块初始化顺序通过 AppInitializer 拓扑排序保证依赖关系。
 import { CONFIG } from './config.js';
 import { Utils } from './utils.js';
 import { DOMRefs } from './core/dom-refs.js';
@@ -8,12 +9,10 @@ import { EVENTS } from './core/event-constants.js';
 import { ApiClient } from './services/api-client.js';
 import { UI } from './utils/ui-strings.js';
 
-// ----- 导入 bootstrap 模块 -----
 import { injectUITexts } from './bootstrap/ui-injector.js';
 import { registerAllModules, AppInitializer } from './bootstrap/module-registry.js';
 import { setupBroadcastChannel } from './bootstrap/broadcast-setup.js';
 
-// ----- 导入服务/UI -----
 import { Article } from './models/article-model.js';
 import { ArticleService } from './services/article-service.js';
 import { DecoShelf } from './services/deco.js';
@@ -26,69 +25,51 @@ import { ContextMenu } from './admin/events/context-menu.js';
 import { ThemeService } from './services/theme-service.js';
 import { Texture } from './services/texture.js';
 
-console.log('🚀 [app] ES Module 入口已加载（轻量化版本）');
+console.log('🚀 [app] ES Module 入口已加载');
 
-// ===== 1. 注入 UI 文案 =====
 injectUITexts();
 
-// ===== 2. 注册 ApiClient 拦截器 =====
+// ApiClient 响应拦截器：自动注入 Auth Token，401 时通知所有模块刷新 UI
 ApiClient.useRequestInterceptor((config) => {
     const token = localStorage.getItem('auth_token');
     if (token) {
-        config.options.headers = {
-            ...config.options.headers,
-            'Authorization': `Bearer ${token}`,
-        };
+        config.options.headers = { ...config.options.headers, 'Authorization': `Bearer ${token}` };
     }
     return config;
 });
-
 ApiClient.useResponseInterceptor(
     (data) => data,
     async (error) => {
-        if (error.status === 401) {
-            EventBus.emit('auth:unauthorized');
-        }
+        if (error.status === 401) EventBus.emit('auth:unauthorized');
         return Promise.reject(error);
     }
 );
 
-// ===== 3. 注册所有模块 =====
 registerAllModules();
-
-// ===== 4. 启动应用 =====
 AppInitializer.start();
-
-// ===== 5. 设置 BroadcastChannel =====
 setupBroadcastChannel();
 
-// ===== 6. 初始化主题服务 =====
-// 在主题服务初始化前，确保 Texture 进入主题模式
 if (Texture && typeof Texture.setThemeMode === 'function') {
     Texture.setThemeMode(true);
 }
 ThemeService.init();
 
-// ===== 7. 初始化右键菜单（延迟） =====
+// 贴纸右键菜单需要 DecoShelf 加载完成后才能获取贴纸数据，延迟 200ms 确保 DecoShelf.loadLibrary 完成
 setTimeout(() => {
     if (ContextMenu && typeof ContextMenu.init === 'function') {
         ContextMenu.init();
-        console.log('[app] 贴纸右键菜单已初始化');
     }
 }, 200);
 
-// ===== 8. 绑定位置管理控件事件 =====
 function setupPositionModeControls() {
     const controls = document.getElementById('positionModeControls');
     let enterBtn = document.getElementById('enterPositionModeBtn');
     let saveBtn = document.getElementById('savePositionChangesBtn');
     let cancelBtn = document.getElementById('cancelPositionChangesBtn');
 
-    if (!controls || !enterBtn || !saveBtn || !cancelBtn) {
-        console.warn('[app] 位置管理控件元素不存在');
-        return;
-    }
+    if (!controls || !enterBtn || !saveBtn || !cancelBtn) return;
 
+    // 使用 cloneNode 移除旧事件监听，防止 HMR 热更新导致重复绑定
     function bindSafeEvent(el, handler) {
         if (!el) return;
         const cloned = el.cloneNode(true);
@@ -117,7 +98,6 @@ function setupPositionModeControls() {
             const hint = controls.querySelector('.pos-hint');
             if (hint) hint.remove();
         } else {
-            // ★★★ 登录时恢复默认显示状态 ★★★
             enterBtn.style.display = 'inline-block';
             saveBtn.style.display = 'none';
             cancelBtn.style.display = 'none';
@@ -155,7 +135,6 @@ function setupPositionModeControls() {
 
     cancelBtn = bindSafeEvent(cancelBtn, function(e) {
         e.preventDefault();
-        // ★★★ 取消事件 ★★★
         EventBus.emit('admin:position-mode-cancel');
         enterBtn.style.display = 'inline-block';
         saveBtn.style.display = 'none';
@@ -164,37 +143,31 @@ function setupPositionModeControls() {
         if (hint) hint.remove();
     });
 
-    // 初始检查登录状态
+    saveBtn = bindSafeEvent(saveBtn, function(e) {
+        e.preventDefault();
+        EventBus.emit('admin:position-mode-exit');
+        enterBtn.style.display = 'inline-block';
+        saveBtn.style.display = 'none';
+        cancelBtn.style.display = 'none';
+        const hint = controls.querySelector('.pos-hint');
+        if (hint) hint.remove();
+        Utils.showToast(UI.toast.positionModeSaved, false);
+    });
+
+    cancelBtn = bindSafeEvent(cancelBtn, function(e) {
+        e.preventDefault();
+        EventBus.emit('admin:position-mode-cancel');
+        enterBtn.style.display = 'inline-block';
+        saveBtn.style.display = 'none';
+        cancelBtn.style.display = 'none';
+        const hint = controls.querySelector('.pos-hint');
+        if (hint) hint.remove();
+    });
+
     const isLoggedIn = AppState.get('isLoggedIn');
     updateVisibility(isLoggedIn);
-
-    console.log('[app] 位置管理控件事件已绑定（支持移动端 touch）');
-
-
-saveBtn = bindSafeEvent(saveBtn, function(e) {
-    e.preventDefault();
-    EventBus.emit('admin:position-mode-exit');
-    enterBtn.style.display = 'inline-block';
-    saveBtn.style.display = 'none';
-    cancelBtn.style.display = 'none';
-    const hint = controls.querySelector('.pos-hint');
-    if (hint) hint.remove();
-    Utils.showToast(UI.toast.positionModeSaved, false);
-});
-
-cancelBtn = bindSafeEvent(cancelBtn, function(e) {
-    e.preventDefault();
-    // ★★★ 关键修复：取消应触发 cancel 事件 ★★★
-    EventBus.emit('admin:position-mode-cancel');
-    enterBtn.style.display = 'inline-block';
-    saveBtn.style.display = 'none';
-    cancelBtn.style.display = 'none';
-    const hint = controls.querySelector('.pos-hint');
-    if (hint) hint.remove();
-});
 }
 
-// ===== 9. 登录UI事件绑定 =====
 function setupLoginUI() {
     const loginTrigger = DOMRefs.get(DOMRefs.login.trigger);
     const modalOverlay = DOMRefs.get(DOMRefs.login.modal);
@@ -224,9 +197,7 @@ function setupLoginUI() {
     if (modalOverlay) {
         modalOverlay.removeEventListener('click', modalOverlay._overlayHandler);
         modalOverlay._overlayHandler = function (e) {
-            if (e.target === modalOverlay) {
-                modalOverlay.classList.remove('active');
-            }
+            if (e.target === modalOverlay) modalOverlay.classList.remove('active');
         };
         modalOverlay.addEventListener('click', modalOverlay._overlayHandler);
     }
@@ -234,9 +205,7 @@ function setupLoginUI() {
     if (modalLoginBtn) {
         modalLoginBtn.removeEventListener('click', modalLoginBtn._loginBtnHandler);
         modalLoginBtn._loginBtnHandler = function () {
-            const username = usernameInput ? usernameInput.value : '';
-            const password = passwordInput ? passwordInput.value : '';
-            Admin.login(username, password);
+            Admin.login(usernameInput ? usernameInput.value : '', passwordInput ? passwordInput.value : '');
         };
         modalLoginBtn.addEventListener('click', modalLoginBtn._loginBtnHandler);
     }
@@ -244,18 +213,12 @@ function setupLoginUI() {
     if (passwordInput) {
         passwordInput.removeEventListener('keypress', passwordInput._keypressHandler);
         passwordInput._keypressHandler = function (e) {
-            if (e.key === 'Enter') {
-                const username = usernameInput ? usernameInput.value : '';
-                Admin.login(username, passwordInput.value);
-            }
+            if (e.key === 'Enter') Admin.login(usernameInput ? usernameInput.value : '', passwordInput.value);
         };
         passwordInput.addEventListener('keypress', passwordInput._keypressHandler);
     }
-
-    console.log('[app] 登录UI事件已绑定');
 }
 
-// ===== 10. DOM 就绪后绑定 =====
 function initializeApp() {
     setupPositionModeControls();
     setupLoginUI();
@@ -267,7 +230,8 @@ if (document.readyState === 'loading') {
     initializeApp();
 }
 
-// ===== 11. 暴露关键模块到全局 =====
+// 暴露关键模块到全局，便于调试和模块间松耦合访问
+// [TODO] 生产环境应收敛到 window.__REVACHOL__ 下避免全局命名污染
 window.EventBus = EventBus;
 window.AppState = AppState;
 window.EVENTS = EVENTS;
@@ -284,7 +248,7 @@ window.UIDirectory = UIDirectory;
 window.ThemeService = ThemeService;
 window.Texture = Texture;
 
-// ===== 左上角工具栏 =====
+// 左上角工具栏：展开/收起切换
 setTimeout(() => {
     const toolbar = document.getElementById('sideToolbar');
     const toggle = document.getElementById('toolbarToggle');
@@ -294,7 +258,6 @@ setTimeout(() => {
             toolbar.classList.toggle('collapsed', !isCollapsed);
             toolbar.classList.toggle('expanded', isCollapsed);
         });
-        // 说明组件：点击在详情页中打开使用说明
         const helpBtn = toolbar.querySelector('[data-tool="help"]');
         if (helpBtn) {
             helpBtn.addEventListener('click', () => {
@@ -311,4 +274,3 @@ setTimeout(() => {
     }
 }, 300);
 
-console.log('✅ app.js 已加载 (轻量化版本)');

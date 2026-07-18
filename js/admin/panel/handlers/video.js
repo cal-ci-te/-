@@ -1,4 +1,3 @@
-// ========== 视频最大透明度处理器 ==========
 import { HeroBackground } from '../../../services/hero-background.js';
 import { Utils } from '../../../utils.js';
 

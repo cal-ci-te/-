@@ -1,4 +1,3 @@
-// ========== 拖拽放置业务逻辑 ==========
 import { ArticleService } from '../../../services/article-service.js';
 import { Utils } from '../../../utils.js';
 

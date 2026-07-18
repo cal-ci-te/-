@@ -1,4 +1,3 @@
-// ========== 管理员面板渲染（HTML生成） ==========
 import { AdminPanel } from './index.js';
 import { AdminAvatar } from '../avatar.js';
 import { AdminPosition } from '../position.js';
@@ -34,7 +33,6 @@ AdminPanel.renderContent = function () {
         return;
     }
 
-    // ===== 首次渲染：生成完整面板HTML =====
     const savedAvatar = AdminAvatar.getAvatarForUser() || 'images/default-avatar.png';
     const currentMaxOpacity = Utils.storage.get('video_max_opacity');
     const opacityValue =
@@ -248,7 +246,6 @@ AdminPanel.renderContent = function () {
     // 绑定折叠按钮
     AdminPanel._bindToggleIconDirect();
 
-    // ===== 绑定贴图上传事件 =====
     const uploadBtn = document.getElementById('assetUploadBtn');
     const assetFileInput = document.getElementById('assetFileInput');
 
@@ -299,7 +296,6 @@ AdminPanel.renderContent = function () {
     AdminPanel._rendered = true;
 };
 
-// ===== 折叠按钮直接绑定 =====
 AdminPanel._bindToggleIconDirect = function () {
     const toggleIcon = document.getElementById('panelToggleIcon');
     if (!toggleIcon) return;
@@ -316,7 +312,6 @@ AdminPanel._bindToggleIconDirect = function () {
     toggleIcon.addEventListener('click', AdminPanel._directToggleHandler);
 };
 
-// ===== unbindEvents 清理 =====
 const originalUnbind = AdminPanel.unbindEvents;
 AdminPanel.unbindEvents = function () {
     const toggleIcon = document.getElementById('panelToggleIcon');
@@ -339,4 +334,3 @@ AdminPanel.unbindEvents = function () {
     }
 };
 
-console.log('✅ AdminPanel.renderContent 已加载（包含主题切换）');

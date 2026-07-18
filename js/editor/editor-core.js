@@ -1,6 +1,4 @@
-// ============================================================
 // 编辑器核心控制模块
-// ============================================================
 import { ArticleService } from '../services/article-service.js';
 import { ApiClient } from '../services/api-client.js';
 import { Utils } from '../utils.js';

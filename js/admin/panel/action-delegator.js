@@ -1,4 +1,3 @@
-// ========== 事件委托器（基于 data-action） ==========
 // 移除未使用的 DOMRefs 导入
 
 export const ActionDelegator = {
@@ -88,4 +87,3 @@ export const ActionDelegator = {
   },
 };
 
-console.log('✅ ActionDelegator 已加载');

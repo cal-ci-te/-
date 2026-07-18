@@ -1,4 +1,3 @@
-// ========== 本地存储工具 ==========
 import { StorageAdapter } from '../services/storage-adapter.js';
 
 /**

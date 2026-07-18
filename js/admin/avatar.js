@@ -1,4 +1,3 @@
-// ========== 管理员头像管理 ==========
 import { DOMRefs } from '../core/dom-refs.js';
 import { Utils } from '../utils.js';
 import { CONFIG } from '../config.js';
@@ -367,4 +366,3 @@ export const AdminAvatar = {
   },
 };
 
-console.log('✅ AdminAvatar 已加载 (ES Module)');

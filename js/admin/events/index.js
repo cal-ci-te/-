@@ -1,4 +1,3 @@
-// ========== Admin 事件绑定统一入口 ==========
 import { ContextMenu } from './context-menu.js';
 import { AdminPanel } from '../panel/index.js';
 
@@ -45,4 +44,3 @@ export const AdminEvents = {
   },
 };
 
-console.log('✅ AdminEvents 已加载 (ES Module)');

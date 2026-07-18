@@ -1,4 +1,7 @@
-// ========== 存储服务门面 ==========
+// 适配器模式门面：隔离存储实现，业务代码调用 storage.upload/read/delete，不感知底层是本地文件还是 S3。
+// 切换存储方式只需改 .env 中 STORAGE_TYPE=local|rustfs，无需改动任何业务代码。
+// ——最初用 BLOB 存图片，发现 sql.js WASM 在 Windows 下序列化损坏后重构为此方案。
+
 const { STORAGE_TYPE } = require('./config.cjs');
 const LocalAdapter = require('./adapters/local.cjs');
 const RustFSAdapter = require('./adapters/rustfs.cjs');
@@ -10,56 +13,15 @@ class StorageService {
         console.log('[StorageService] 使用存储后端:', this.type);
     }
 
-    /**
-     * 上传文件
-     */
-    async upload(buffer, filename, contentType) {
-        return this.adapter.upload(buffer, filename, contentType);
-    }
+    async upload(buffer, filename, contentType) { return this.adapter.upload(buffer, filename, contentType); }
+    getUrl(id, filename)                          { return this.adapter.getUrl(id, filename); }
+    async delete(filename)                        { return this.adapter.delete(filename); }
+    async exists(filename)                        { return this.adapter.exists(filename); }
+    async read(filename)                          { return this.adapter.read(filename); }
 
-    /**
-     * 获取文件访问URL
-     */
-    getUrl(id, filename) {
-        return this.adapter.getUrl(id, filename);
-    }
-
-    /**
-     * 删除文件
-     */
-    async delete(filename) {
-        return this.adapter.delete(filename);
-    }
-
-    /**
-     * 检查文件是否存在
-     */
-    async exists(filename) {
-        return this.adapter.exists(filename);
-    }
-
-    /**
-     * 读取文件内容
-     */
-    async read(filename) {
-        return this.adapter.read(filename);
-    }
-
-    /**
-     * 判断是否是本地存储
-     */
-    isLocal() {
-        return this.type === 'local';
-    }
-
-    /**
-     * 判断是否是 RustFS
-     */
-    isRustFS() {
-        return this.type === 'rustfs';
-    }
+    isLocal()  { return this.type === 'local'; }
+    isRustFS() { return this.type === 'rustfs'; }
 }
 
-// 单例
 const storage = new StorageService();
 module.exports = storage;

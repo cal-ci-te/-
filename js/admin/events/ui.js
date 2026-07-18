@@ -11,4 +11,3 @@ export const AdminUiEvents = {
   },
 };
 
-console.log('✅ AdminUiEvents 已加载 (ES Module，适配新架构)');

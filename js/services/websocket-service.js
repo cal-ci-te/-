@@ -1,4 +1,3 @@
-// ========== WebSocket 连接管理 ==========
 import { CONFIG } from '../config.js';
 import { ArticleService } from './article-service.js';
 import { EventBus } from '../core/event-bus.js';
@@ -118,4 +117,3 @@ export const WebSocketManager = {
   },
 };
 
-console.log('✅ WebSocketManager 已加载 (ES Module)');

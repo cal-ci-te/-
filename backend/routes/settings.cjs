@@ -4,7 +4,6 @@ const { broadcast } = require('../websocket.cjs');
 
 function registerSettingsRoutes(GET, PUT) {
 
-    // ===== GET /api/settings =====
     GET('/api/settings', async (req, res) => {
         const rows = dbModule.queryAll('SELECT key, value FROM settings');
         const settings = {};
@@ -14,7 +13,6 @@ function registerSettingsRoutes(GET, PUT) {
         send(res, settings);
     });
 
-    // ===== PUT /api/settings =====
     PUT('/api/settings', async (req, res) => {
         const settings = await json(req);
         Object.entries(settings).forEach(([key, value]) => {

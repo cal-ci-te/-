@@ -1,4 +1,3 @@
-// ========== 渐变控制处理器 ==========
 import { Texture } from '../../../services/texture.js';
 import { Utils } from '../../../utils.js';
 import { AdminPanel } from '../index.js';

@@ -1,4 +1,3 @@
-// ========== 右键菜单 ==========
 import { Utils } from '../../../utils.js';
 import { Article } from '../../../models/article-model.js';
 import { ArticleService } from '../../../services/article-service.js';
@@ -348,5 +347,5 @@ EventBus.on(EVENTS.AUTH_LOGGED_OUT, () => {
     const dirMenu = document.getElementById('directory-context-menu');
     if (dirMenu) dirMenu.remove();
     const decoMenu = document.getElementById('deco-context-menu');
-    if (decoMenu) decoMenu.remove();
+    if (decoMenu) decoMenu.style.display = 'none';
 });

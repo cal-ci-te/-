@@ -1,4 +1,3 @@
-// ========== 管理员状态（通过 AppState 管理） ==========
 import { AppState } from '../core/app-state.js';
 import { MUTATIONS } from '../core/state-mutations.js';
 
@@ -40,10 +39,8 @@ export const AdminState = {
     AppState.commit(MUTATIONS.SET_DECO_EDITING, value);
   },
 
-  // ===== 拖拽状态（不需要持久化） =====
   isDraggingPanel: false,
   dragStartX: 0,
   dragStartY: 0,
 };
 
-console.log('✅ AdminState 已加载 (ES Module)');

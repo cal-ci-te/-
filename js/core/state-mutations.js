@@ -1,4 +1,3 @@
-// ========== AppState Mutation 类型常量 ==========
 // 用于规范 AppState 的修改操作，所有状态变更均应通过 AppState.commit 并传入以下类型之一。
 
 export const MUTATIONS = {

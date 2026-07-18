@@ -1,4 +1,3 @@
-// ========== UI 文案注入 ==========
 import { UI } from '../utils/ui-strings.js';
 
 export function injectUITexts() {

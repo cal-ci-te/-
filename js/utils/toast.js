@@ -1,4 +1,3 @@
-// ========== Toast 提示工具 ==========
 let toastTimer = null;
 let toastElement = null;
 

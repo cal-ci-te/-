@@ -1,4 +1,3 @@
-// ========== UI 辅助方法 ==========
 import { CONFIG } from '../../config.js';
 import { UI } from '../../utils/ui-strings.js';
 
@@ -147,4 +146,3 @@ export const UIHelpers = {
   },
 };
 
-console.log('✅ UIHelpers 已加载 (ES Module)');

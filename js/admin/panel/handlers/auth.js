@@ -1,4 +1,3 @@
-// ========== 退出登录处理器 ==========
 import { AdminAuth } from '../../auth.js';
 import { Utils } from '../../../utils.js';
 

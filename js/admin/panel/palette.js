@@ -1,11 +1,9 @@
-// ========== 色卡管理（渲染与操作） ==========
 import { AdminPanel } from './index.js';
 import { Texture } from '../../services/texture.js';
 import { NotificationService } from '../../services/notification-service.js';
 import { Utils } from '../../utils.js';
 import { UI } from '../../utils/ui-strings.js';
 
-// ===== 渲染色卡列表 =====
 AdminPanel.renderPalettes = function () {
   const container = document.getElementById('paletteList');
   if (!container) return;
@@ -35,7 +33,6 @@ AdminPanel.renderPalettes = function () {
   });
   container.innerHTML = html;
 
-  // ===== 绑定应用和删除事件 =====
   container.querySelectorAll('.apply-palette').forEach((btn) => {
     btn.addEventListener('click', function () {
       const id = this.dataset.id;
@@ -113,4 +110,3 @@ AdminPanel.renderPalettes = function () {
   });
 };
 
-console.log('✅ AdminPanel 色卡模块已加载 (ES Module)');

@@ -102,4 +102,3 @@ export const Watermark = {
   },
 };
 
-console.log('✅ Watermark 已加载 (ES Module)');

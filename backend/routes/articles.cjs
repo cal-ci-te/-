@@ -1,16 +1,15 @@
+// 文章 CRUD + 可见性控制。每次写操作后通过 WebSocket broadcast 通知所有客户端刷新。
 const { send, json } = require('../enhance.cjs');
 const dbModule = require('../db.cjs');
 const { broadcast } = require('../websocket.cjs');
 
 function registerArticleRoutes(GET, POST, PUT, DELETE) {
 
-    // ===== GET /api/articles =====
     GET('/api/articles', async (req, res) => {
         const rows = dbModule.queryAll('SELECT * FROM articles ORDER BY id');
         send(res, rows);
     });
 
-    // ===== POST /api/articles =====
     POST('/api/articles', async (req, res) => {
         const { title, content, category } = await json(req);
         const now = new Date().toISOString();
@@ -31,7 +30,6 @@ function registerArticleRoutes(GET, POST, PUT, DELETE) {
         send(res, newArticle, 201);
     });
 
-    // ===== PUT /api/articles/:id =====
     PUT('/api/articles/:id', async (req, res) => {
         const id = parseInt(req.params.id);
         const { title, content, category } = await json(req);
@@ -49,7 +47,6 @@ function registerArticleRoutes(GET, POST, PUT, DELETE) {
         send(res, { success: true });
     });
 
-    // ===== DELETE /api/articles/:id =====
     DELETE('/api/articles/:id', async (req, res) => {
         const id = parseInt(req.params.id);
         const existing = dbModule.query('SELECT id FROM articles WHERE id = ?', [id]);
@@ -62,7 +59,6 @@ function registerArticleRoutes(GET, POST, PUT, DELETE) {
         send(res, { success: true });
     });
 
-    // ===== PUT /api/articles/:id/visibility =====
     PUT('/api/articles/:id/visibility', async (req, res) => {
         const id = parseInt(req.params.id);
         const { visible } = await json(req);

@@ -1,4 +1,5 @@
-// ========== 全屏视频背景滚动淡出（支持最大透明度配置） ==========
+// 全屏视频背景：首次加载后 opacity 缓动到 maxOpacity（管理员可调），
+// 背景色作为视频未加载时的后备。视频格式优先 WebM（体积更小），其次 MP4。
 import { Utils } from '../utils.js';
 
 export const HeroBackground = {

@@ -1,4 +1,3 @@
-// ========== 头像上传处理器 ==========
 import { AdminAvatar } from '../../avatar.js';
 import { Utils } from '../../../utils.js';
 

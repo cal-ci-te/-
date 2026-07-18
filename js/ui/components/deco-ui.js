@@ -1,4 +1,3 @@
-// ========== 贴图库 UI 组件 ==========
 import { DecoShelf } from '../../services/deco.js';
 import { Utils } from '../../utils.js';
 import { EventBus } from '../../core/event-bus.js';

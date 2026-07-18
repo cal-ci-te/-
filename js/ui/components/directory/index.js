@@ -1,4 +1,3 @@
-// ========== 目录树主模块（协调器） ==========
 import { renderTree } from './render.js';
 import { setActiveNode } from './events.js';
 import { showContextMenu } from './context-menu.js';
@@ -32,7 +31,6 @@ export const UIDirectory = {
     _mobileControls: null,
     _pendingMovesManager: null,
 
-    // ----- 生命周期 -----
     init(container) {
         console.log('[UIDirectory] 初始化...');
         this.container = container;
@@ -85,7 +83,6 @@ export const UIDirectory = {
         console.log('[UIDirectory] 初始化完成');
     },
 
-    // ----- 更新目录树 -----
     updateTree(filterKeyword = null) {
         this.filterKeyword = filterKeyword;
         const articles = ArticleService.getVisibleArticles();
@@ -133,7 +130,6 @@ export const UIDirectory = {
         console.log('[UIDirectory] 目录树已更新，文章数:', sortedArticles.length);
     },
 
-    // ----- 绑定交互（使用新绑定器）-----
     _bindInteractions() {
         // 移除旧绑定
         if (this._unbindInteractionsFn) {
@@ -152,12 +148,10 @@ export const UIDirectory = {
         });
     },
 
-    // ----- 辅助方法 -----
     setActiveNode(nodeId) {
         setActiveNode(this.container, nodeId);
     },
 
-    // ----- 移动端控件回调 -----
     _handleMobileSave() {
         console.log('[UIDirectory] 移动端保存位置');
         this._positionManager.exit(true);
@@ -174,7 +168,6 @@ export const UIDirectory = {
         }
     },
 
-    // ----- 移动端长按支持 -----
     _initMobileSupport() {
         if (this._touchContextDisableFn) {
             this._touchContextDisableFn();
@@ -191,7 +184,6 @@ export const UIDirectory = {
         console.log('[UIDirectory] 移动端长按支持已启用');
     },
 
-    // ----- 拖拽放置（委托给外部模块）-----
     async _handleDrop(sourceData, targetData) {
         await handleDirectoryDrop(sourceData, targetData, {
             positionManager: this._positionManager,
@@ -201,7 +193,6 @@ export const UIDirectory = {
         });
     },
 
-    // ----- 销毁 -----
     destroy() {
         if (this._unbindInteractionsFn) {
             this._unbindInteractionsFn();
@@ -222,4 +213,3 @@ export const UIDirectory = {
     }
 };
 
-console.log('✅ UIDirectory 已加载（模块化拆分版）');

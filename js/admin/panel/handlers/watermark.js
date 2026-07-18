@@ -1,4 +1,3 @@
-// ========== 水印处理器 ==========
 import { Watermark } from '../../../services/watermark.js';
 import { Utils } from '../../../utils.js';
 

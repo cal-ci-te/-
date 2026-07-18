@@ -1,9 +1,8 @@
-// @ts-check
+// 自研状态管理（类 Vuex）：集中式 state + mutation 变更 + subscriber 通知。
+// 选择自研而非引入 Vuex/Pinia 的原因：项目仅 ~15 个状态键，引入状态库的产物体积 (≈30KB gzip) 
+// 远超自研实现 (<1KB)。若未来状态键增长至 50+ 或需要时间旅行调试，可迁移至 Pinia。
+import { MUTATIONS } from './state-mutations.js';
 
-// ========== 状态管理中心 ==========
-import { MUTATIONS, mutationFor } from './state-mutations.js';
-
-// 定义内部 mutation 处理函数
 const mutationHandlers = {
   [MUTATIONS.SET_LOGGED_IN]: (state, payload) => { state.isLoggedIn = payload; },
   [MUTATIONS.SET_PANEL_POSITION]: (state, payload) => {
@@ -27,15 +26,11 @@ const mutationHandlers = {
   [MUTATIONS.SET_ARTICLE_VISIBILITY]: (state, payload) => { state.articleVisibility = payload; },
   [MUTATIONS.SET_ADMIN]: (state, payload) => { state.admin = payload; },
   [MUTATIONS.SET_UI]: (state, payload) => { state.ui = payload; },
-  // 通用 SET_KEY：支持任意键
   [MUTATIONS.SET_KEY]: (state, payload) => {
-    if (payload && payload.key !== undefined) {
-      state[payload.key] = payload.value;
-    }
+    if (payload && payload.key !== undefined) state[payload.key] = payload.value;
   },
 };
 
-// mutation 类型到 state key 的映射（用于通知）
 const mutationKeyMap = {
   [MUTATIONS.SET_LOGGED_IN]: 'isLoggedIn',
   [MUTATIONS.SET_PANEL_POSITION]: ['panelRight', 'panelBottom'],
@@ -53,141 +48,76 @@ const mutationKeyMap = {
   [MUTATIONS.SET_ARTICLE_VISIBILITY]: 'articleVisibility',
   [MUTATIONS.SET_ADMIN]: 'admin',
   [MUTATIONS.SET_UI]: 'ui',
-  [MUTATIONS.SET_KEY]: null, // 特殊处理
+  [MUTATIONS.SET_KEY]: null,
 };
 
 export const AppState = {
-  // ===== 内部状态 =====
   _state: {
-    isLoggedIn: false,
-    adminUsername: 'admin',
-    panelCollapsed: true,
-    panelRight: 20,
-    panelBottom: 20,
-    sidebarCollapsed: true,
-    sidebarLeft: 20,
-    sidebarTop: 80,
+    isLoggedIn: false, adminUsername: 'admin',
+    panelCollapsed: true, panelRight: 20, panelBottom: 20,
+    sidebarCollapsed: true, sidebarLeft: 20, sidebarTop: 80,
     decoEditing: false,
-    articles: [],
-    visibleArticles: [],
-    articleVisibility: {},
-    watermarkText: 'REVACHOL',
-    watermarkOpacity: 0.08,
-    textureDataUrl: null,
-    textureOpacity: 0.12,
-    bgColor: '#1a1612',
-    admin: null,
-    ui: null,
+    articles: [], visibleArticles: [], articleVisibility: {},
+    watermarkText: 'REVACHOL', watermarkOpacity: 0.08,
+    textureDataUrl: null, textureOpacity: 0.12,
+    bgColor: '#1a1612', admin: null, ui: null,
   },
 
-  // ===== 订阅者列表 =====
   _subscribers: {},
 
-  // ===== 获取状态 =====
-  get: function (key) {
-    return this._state[key];
-  },
+  get(key) { return this._state[key]; },
 
-  // ===== 提交变更（推荐） =====
-  commit: function (type, payload) {
-    if (import.meta.env.DEV) {
-      console.log(`[AppState] Mutation: ${type}`, payload);
-    }
-
+  commit(type, payload) {
     const handler = mutationHandlers[type];
-    if (!handler) {
-      console.warn(`[AppState] 未知的 mutation 类型: ${type}`);
-      return;
-    }
-
-    // 执行 mutation
+    if (!handler) { console.warn(`[AppState] 未知 mutation: ${type}`); return; }
     handler(this._state, payload);
 
-    // 通知订阅者
     const keys = mutationKeyMap[type];
     if (keys === null) {
-      // 对于 SET_KEY，需要从 payload 中提取 key
-      if (payload && payload.key !== undefined) {
-        this._notify(payload.key, payload.value, undefined);
-      }
+      if (payload && payload.key !== undefined) this._notify(payload.key, payload.value);
     } else if (Array.isArray(keys)) {
-      keys.forEach((key) => {
-        this._notify(key, this._state[key], undefined);
-      });
+      keys.forEach((key) => this._notify(key, this._state[key]));
     } else if (keys) {
-      this._notify(keys, this._state[keys], undefined);
+      this._notify(keys, this._state[keys]);
     }
   },
 
-  // ===== 订阅状态变化 =====
-  subscribe: function (key, callback) {
-    if (!this._subscribers[key]) {
-      this._subscribers[key] = [];
-    }
+  subscribe(key, callback) {
+    if (!this._subscribers[key]) this._subscribers[key] = [];
     this._subscribers[key].push(callback);
-    if (this._state[key] !== undefined) {
-      callback(this._state[key], undefined);
-    }
+    if (this._state[key] !== undefined) callback(this._state[key]);
     return this;
   },
 
-  // ===== 取消订阅 =====
-  unsubscribe: function (key, callback) {
+  unsubscribe(key, callback) {
     if (!this._subscribers[key]) return this;
     if (callback) {
-      this._subscribers[key] = this._subscribers[key].filter(function (cb) {
-        return cb !== callback;
-      });
+      this._subscribers[key] = this._subscribers[key].filter(cb => cb !== callback);
     } else {
       delete this._subscribers[key];
     }
     return this;
   },
 
-  // ===== 通知订阅者 =====
-  _notify: function (key, newValue, oldValue) {
+  _notify(key, newValue) {
     if (!this._subscribers[key]) return;
-    const callbacks = this._subscribers[key];
-    for (let i = 0; i < callbacks.length; i++) {
-      try {
-        callbacks[i](newValue, oldValue);
-      } catch (e) {
-        console.error('[AppState] 状态更新错误:', key, e);
-      }
-    }
+    this._subscribers[key].forEach(cb => { try { cb(newValue); } catch (e) { console.error('[AppState] 通知错误:', key, e); } });
   },
 
-  // ===== 重置状态 =====
-  reset: function () {
+  reset() {
     this._state = {
-      isLoggedIn: false,
-      adminUsername: 'admin',
-      panelCollapsed: true,
-      panelRight: 20,
-      panelBottom: 20,
-      sidebarCollapsed: true,
-      sidebarLeft: 20,
-      sidebarTop: 80,
+      isLoggedIn: false, adminUsername: 'admin',
+      panelCollapsed: true, panelRight: 20, panelBottom: 20,
+      sidebarCollapsed: true, sidebarLeft: 20, sidebarTop: 80,
       decoEditing: false,
-      articles: [],
-      visibleArticles: [],
-      articleVisibility: {},
-      watermarkText: 'REVACHOL',
-      watermarkOpacity: 0.08,
-      textureDataUrl: null,
-      textureOpacity: 0.12,
-      bgColor: '#1a1612',
-      admin: null,
-      ui: null,
+      articles: [], visibleArticles: [], articleVisibility: {},
+      watermarkText: 'REVACHOL', watermarkOpacity: 0.08,
+      textureDataUrl: null, textureOpacity: 0.12,
+      bgColor: '#1a1612', admin: null, ui: null,
     };
     this._subscribers = {};
     return this;
   },
 
-  // ===== 导出状态（用于调试） =====
-  snapshot: function () {
-    return JSON.parse(JSON.stringify(this._state));
-  },
+  snapshot() { return JSON.parse(JSON.stringify(this._state)); },
 };
-
-console.log('✅ AppState 已加载 (ES Module)');

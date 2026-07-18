@@ -1,4 +1,3 @@
-// ========== 管理员主入口（聚合所有子模块，注册全局状态与事件） ==========
 import { AppState } from '../core/app-state.js';
 import { EventBus } from '../core/event-bus.js';
 import { Utils } from '../utils.js';
@@ -17,7 +16,6 @@ import { UIController } from '../ui/ui-controller.js';
 
 console.log('[Admin] 开始组装模块...');
 
-// ===== 1. 注册全局状态订阅 =====
 AppState.subscribe('isLoggedIn', function (_newValue) {
   // 参数改用下划线
   AdminUI.updateLoginUI(_newValue);
@@ -30,7 +28,6 @@ AppState.subscribe('isLoggedIn', function (_newValue) {
   AdminPosition.applyCollapsedState();
 });
 
-// ===== 2. 注册全局事件监听（EventBus） =====
 EventBus
   // --- 头像 ---
   .on('admin:avatar-upload', function () {
@@ -107,7 +104,6 @@ EventBus
     DecoShelf.cancelEditing();
   });
 
-// ===== 3. 定义并导出 Admin 主对象 =====
 export const Admin = {
   state: AppState,
 
@@ -142,4 +138,3 @@ export const Admin = {
   },
 };
 
-console.log('✅ Admin 模块已加载 (ES Module)');

@@ -1,6 +1,4 @@
-// @ts-check
 
-// ========== 文章服务（唯一数据源） ==========
 import { CONFIG } from '../config.js';
 import { EventBus } from '../core/event-bus.js';
 import { AppState } from '../core/app-state.js';
@@ -14,7 +12,6 @@ export const ArticleService = {
     _data: [],
     cache: { data: null, timestamp: null },
 
-    // ===== 分类管理（树形结构） =====
     _categories: [],
     _categoryCacheKey: 'categories',
     _initialCategoriesLoaded: false,
@@ -151,7 +148,6 @@ export const ArticleService = {
         return true;
     },
 
-    // ===== 文章数据方法 =====
     async fetchArticles(forceRefresh = false) {
         const now = Date.now();
         const cacheTTL = CONFIG.CACHE_TTL || 5 * 60 * 1000;
@@ -263,7 +259,6 @@ export const ArticleService = {
         }
     },
 
-    // ===== 内部处理可见性变化（原 Article.onVisibilityChanged） =====
     _onVisibilityChanged(data) {
         const { articleId, visible } = data;
         const all = this.getAllArticles();
@@ -281,7 +276,6 @@ export const ArticleService = {
         }
     },
 
-    // ===== 对外公开的 onVisibilityChanged（供 WebSocket 调用） =====
     onVisibilityChanged(data) {
         this._onVisibilityChanged(data);
     },
@@ -302,7 +296,6 @@ export const ArticleService = {
         };
     },
 
-    // ===== 新增：分类与目录树方法（原 Article 中的逻辑） =====
     getArticlesByCategory(categoryName) {
         const articles = this.getAllArticles();
         if (categoryName === 'all') return articles;
@@ -369,4 +362,3 @@ export const ArticleService = {
     },
 };
 
-console.log('✅ ArticleService 已加载 (ES Module)');

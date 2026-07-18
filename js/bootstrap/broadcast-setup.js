@@ -1,4 +1,3 @@
-// ========== BroadcastChannel 设置 ==========
 import { EventBus } from '../core/event-bus.js';
 import { EVENTS } from '../core/event-constants.js';
 import { ArticleService } from '../services/article-service.js';

@@ -1,4 +1,3 @@
-// ========== 编辑位置确认/取消处理器 ==========
 import { DecoShelf } from '../../../services/deco.js';
 import { Utils } from '../../../utils.js';
 

@@ -1,4 +1,3 @@
-// ========== 移动端触摸拖拽（纯 Touch 事件） ==========
 import { Utils } from '../utils.js';
 import { ArticleService } from '../services/article-service.js';
 import { EventBus } from '../core/event-bus.js';
@@ -200,7 +199,6 @@ export function enableTouchDrag(container, onDrop, updateTreeFn) {
             }
         }
 
-        // ===== 关键：调用外部回调执行实际移动逻辑 =====
         if (onDrop && typeof onDrop === 'function') {
             try {
                 await onDrop(touchDragData, {

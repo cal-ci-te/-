@@ -1,4 +1,3 @@
-// ========== 管理员面板拖拽 ==========
 import { DOMRefs } from '../core/dom-refs.js';
 import { AppState } from '../core/app-state.js';
 import { AdminState } from './state.js';
@@ -112,4 +111,3 @@ export const AdminDrag = {
   },
 };
 
-console.log('✅ AdminDrag 已加载 (ES Module)');

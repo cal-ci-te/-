@@ -1,6 +1,4 @@
-// ============================================================
 // 文章编辑器入口（组装各功能模块，动态注入 UI 文案）
-// ============================================================
 import { AppState } from '../core/app-state.js';
 import { MUTATIONS } from '../core/state-mutations.js';
 import { EventBus } from '../core/event-bus.js';
@@ -14,11 +12,9 @@ import { EditorCore } from '../editor/editor-core.js';
 import { HistoryUI } from '../editor/history-ui.js';
 import { AutoSave } from '../editor/auto-save.js';
 
-// ===== 1. 模拟登录 =====
 AppState.commit(MUTATIONS.SET_LOGGED_IN, true);
 Utils.storage.set('admin_logged_in', true);
 
-// ===== 2. DOM 引用 =====
 const sidebarEl = document.getElementById('editorSidebar');
 const treeContainer = document.getElementById('directoryTreeContainer');
 const toggleBtn = document.getElementById('toggleSidebarBtn');
@@ -46,7 +42,6 @@ const enterPosBtn = document.getElementById('editorEnterPosBtn');
 const savePosBtn = document.getElementById('editorSavePosBtn');
 const cancelPosBtn = document.getElementById('editorCancelPosBtn');
 
-// ===== 3. 动态设置 UI 文案 =====
 function injectUITexts() {
     document.title = UI.editor.pageTitle;
     if (brandText) brandText.textContent = UI.editor.toolbarTitle;
@@ -68,7 +63,6 @@ function injectUITexts() {
 }
 injectUITexts();
 
-// ===== 4. 侧边栏折叠 =====
 function toggleSidebar(show) {
     if (show === undefined) {
         sidebarEl.classList.toggle('collapsed');
@@ -85,7 +79,6 @@ collapseBtn.addEventListener('click', () => toggleSidebar(false));
 toggleBtn.addEventListener('click', () => toggleSidebar());
 toggleSidebar(true);
 
-// ===== 5. 初始化编辑器核心 =====
 EditorCore.init(titleInput, contentInput, emptyState, editorForm);
 EditorCore.onHistoryRefresh = (articleId) => {
     if (articleId) {
@@ -97,14 +90,12 @@ EditorCore.onHistoryRefresh = (articleId) => {
     }
 };
 
-// ===== 6. 初始化历史 UI =====
 HistoryUI.init(historyList);
 HistoryUI.onRestore = async (articleId) => {
     await EditorCore.loadArticle(articleId);
     await HistoryUI.load(articleId);
 };
 
-// ===== 7. 目录树初始化 =====
 UIDirectory.init(treeContainer);
 async function loadData() {
     // 安全兜底：5秒后无论如何清除加载指示器（独立于 fetch 超时）
@@ -134,7 +125,6 @@ loadData();
 EventBus.on(EVENTS.ARTICLE_VISIBILITY_CHANGED, () => UIDirectory.updateTree());
 EventBus.on(EVENTS.ARTICLE_DATA_LOADED, () => UIDirectory.updateTree());
 
-// ===== 8. 点击树节点加载文章 =====
 treeContainer.addEventListener('click', (e) => {
     if (e.target.closest('.visibility-toggle')) return;
     const content = e.target.closest('.tree-node-content');
@@ -151,7 +141,6 @@ treeContainer.addEventListener('click', (e) => {
     }
 }, true);
 
-// ===== 9. 右键菜单 =====
 treeContainer.addEventListener('contextmenu', (e) => {
     const content = e.target.closest('.tree-node-content');
     if (!content) return;
@@ -168,14 +157,12 @@ treeContainer.addEventListener('contextmenu', (e) => {
     );
 });
 
-// ===== 10. 绑定按钮事件 =====
 saveBtn1.addEventListener('click', () => EditorCore.saveArticle());
 saveBtn2.addEventListener('click', () => EditorCore.saveArticle());
 cancelBtn.addEventListener('click', () => EditorCore.cancelEdit());
 closeBtn.addEventListener('click', () => window.close());
 saveDraftBtn.addEventListener('click', () => EditorCore.saveDraft());
 
-// ===== 11. 历史面板切换 =====
 toggleHistoryBtn.addEventListener('click', () => {
     const isVisible = historyPanel.style.display !== 'none';
     historyPanel.style.display = isVisible ? 'none' : 'block';
@@ -185,7 +172,6 @@ toggleHistoryBtn.addEventListener('click', () => {
     }
 });
 
-// ===== 12. 键盘快捷键 =====
 document.addEventListener('keydown', (e) => {
     if ((e.ctrlKey || e.metaKey) && e.key === 's') {
         e.preventDefault();
@@ -196,7 +182,6 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
-// ===== 13. 搜索功能（防抖，实时过滤目录树） =====
 let searchTimeout = null;
 if (searchInput) {
     searchInput.addEventListener('input', (e) => {
@@ -224,7 +209,6 @@ if (searchInput) {
     });
 }
 
-// ===== 14. 位置管理功能 =====
 if (enterPosBtn && savePosBtn && cancelPosBtn) {
     function updatePositionControls(mode) {
         if (mode === 'enter') {
@@ -262,7 +246,6 @@ if (enterPosBtn && savePosBtn && cancelPosBtn) {
     cancelPosBtn.classList.add('hidden');
 }
 
-// ===== 15. 页面关闭/隐藏前自动保存草稿 =====
 function autoSaveOnUnload() {
     const articleId = EditorCore.currentId;
     if (!articleId) {
@@ -314,7 +297,6 @@ document.addEventListener('visibilitychange', () => {
     }
 });
 
-// ===== 16. URL 参数加载 =====
 const urlParams = new URLSearchParams(window.location.search);
 const initialId = parseInt(urlParams.get('articleId'));
 if (initialId) {
@@ -323,9 +305,7 @@ if (initialId) {
     });
 }
 
-console.log('✅ 文章编辑器已加载（固定搜索/位置管理 + 动态文案）');
 
-// ===== 17. BroadcastChannel 实时通信（跨标签页同步可见性等变更） =====
 try {
     const bc = new BroadcastChannel('revachol');
     bc.onmessage = (event) => {

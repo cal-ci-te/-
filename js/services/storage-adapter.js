@@ -1,4 +1,3 @@
-// ========== 本地存储适配器（带命名空间） ==========
 const PREFIX = 'rv_';
 
 export const StorageAdapter = {
@@ -69,4 +68,3 @@ export const StorageAdapter = {
   },
 };
 
-console.log('✅ StorageAdapter 已加载');

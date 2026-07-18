@@ -1,4 +1,3 @@
-// ========== 背景颜色控制处理器 ==========
 import { Texture } from '../../../services/texture.js';
 import { Utils } from '../../../utils.js';
 

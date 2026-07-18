@@ -1,4 +1,3 @@
-// ========== 目录树拖拽（位置管理模式） ==========
 import { Utils } from '../../../utils.js';
 import { Article } from '../../../models/article-model.js';
 import { ArticleService } from '../../../services/article-service.js';
@@ -172,7 +171,6 @@ export function enableDragDrop(container, updateTreeFn) {
             }
         }
 
-        // ----- 执行移动 -----
         if (sourceType === 'folder') {
             // 文件夹移动
             const finalParent = isSibling ? targetFolderId : targetFolderId;

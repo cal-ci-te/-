@@ -1,4 +1,3 @@
-// ========== 管理员认证模块 ==========
 import { Utils } from '../utils.js';
 import { CONFIG } from '../config.js';
 import { AdminAvatar } from './avatar.js';
@@ -102,4 +101,3 @@ export const AdminAuth = {
   },
 };
 
-console.log('✅ AdminAuth 已加载 (ES Module)');

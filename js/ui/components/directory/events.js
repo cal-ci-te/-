@@ -1,4 +1,3 @@
-// ========== 目录树交互事件 ==========
 import { UIHelpers } from '../helpers.js';
 import { UIArticles } from '../articles.js';
 import { initLongPress } from '../../../utils/touch-context.js';
@@ -45,7 +44,7 @@ export function bindInteractions(container, contextMenuHandler, handleNodeClickF
             }
             const nodeLi = toggleIcon.closest('.tree-node.folder');
             if (nodeLi) {
-                const childrenDiv = nodeLi.querySelector(':scope > .children');
+                const childrenDiv = nodeLi.querySelector('.children');
                 if (childrenDiv) {
                     const isVisible = childrenDiv.style.display !== 'none'; // 当前是否展开
                     // 切换UI

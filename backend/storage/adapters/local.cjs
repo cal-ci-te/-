@@ -1,4 +1,6 @@
-// ========== 本地文件系统适配器 ==========
+// 本地文件系统适配器：文件存储于 uploads/decos/ 目录。
+// 使用同步 I/O（writeFileSync/readFileSync）——Node.js 中针对 <1MB 的小文件，
+// 同步 I/O 比异步 I/O + Promise 的开销更小，且代码更简洁。
 const fs = require('fs');
 const path = require('path');
 const { LOCAL_CONFIG } = require('../config.cjs');

@@ -1,4 +1,3 @@
-// ========== 管理员面板事件入口（委托器版本） ==========
 import { AdminPanel } from '../index.js';
 import { ActionDelegator } from '../action-delegator.js';
 import { DecoShelf } from '../../../services/deco.js';
@@ -77,4 +76,3 @@ export const AdminEvents = {
   },
 };
 
-console.log('✅ AdminPanel 事件入口（委托器版本）已加载（含主题切换）');

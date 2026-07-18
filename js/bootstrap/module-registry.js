@@ -1,4 +1,3 @@
-// ========== 模块注册与依赖管理 ==========
 import { AppInitializer } from '../core/app-initializer.js';
 import { UIController } from '../ui/ui-controller.js';
 import { Watermark } from '../services/watermark.js';
@@ -10,7 +9,6 @@ import { WebSocketManager } from '../services/websocket-service.js';
 import { EventBus } from '../core/event-bus.js';
 import { EVENTS } from '../core/event-constants.js';
 
-// ===== 先导入 Admin 的扩展模块，确保方法被正确扩展 =====
 import { Admin } from '../admin/index.js';
 import '../admin/panel/render.js';      // 扩展 AdminPanel.renderContent
 import '../admin/panel/palette.js';     // 扩展 AdminPanel.renderPalettes

@@ -1,4 +1,3 @@
-// ========== 管理员UI更新模块 ==========
 import { DOMRefs } from '../core/dom-refs.js';
 import { AdminPosition } from './position.js';
 import { AdminDrag } from './drag.js';
@@ -11,6 +10,7 @@ export const AdminUI = {
   updateLoginUI: function (isLoggedIn) {
     const loginLabel = DOMRefs.get(DOMRefs.login.label);
     const welcomeText = DOMRefs.get(DOMRefs.login.welcomeText);
+    const loginAvatar = DOMRefs.get(DOMRefs.login.avatar);
 
     if (isLoggedIn) {
       if (loginLabel) loginLabel.textContent = '管理员';
@@ -18,6 +18,7 @@ export const AdminUI = {
     } else {
       if (loginLabel) loginLabel.textContent = '登录';
       if (welcomeText) welcomeText.textContent = '欢迎访客';
+      if (loginAvatar) loginAvatar.src = 'images/default-avatar.png';
     }
   },
 
@@ -125,4 +126,3 @@ export const AdminUI = {
   },
 };
 
-console.log('✅ AdminUI 已加载 (ES Module)');

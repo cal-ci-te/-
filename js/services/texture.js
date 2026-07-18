@@ -1,4 +1,3 @@
-// ========== 纹理与背景模块（支持渐变 + 主题模式兼容） ==========
 import { CONFIG } from '../config.js';
 import { Utils } from '../utils.js';
 import { UI } from '../utils/ui-strings.js';
@@ -19,10 +18,8 @@ export const Texture = {
   // 色卡库
   palettes: [],
 
-  // ===== 主题模式标志 =====
   _themeActive: false,
 
-  // ===== 初始化 =====
   loadConfig() {
     const savedBg = Utils.storage.get('bg_color');
     if (savedBg) this.bgColor = savedBg;
@@ -52,7 +49,6 @@ export const Texture = {
       this.savePalettes();
     }
 
-    // ===== 主题模式下不应用背景 =====
     if (!this._themeActive) {
       this.applyBackground();
     } else {
@@ -66,7 +62,6 @@ export const Texture = {
     }
   },
 
-  // ===== 设置主题模式 =====
   setThemeMode(active) {
     this._themeActive = active;
     if (active) {
@@ -83,7 +78,6 @@ export const Texture = {
     }
   },
 
-  // ===== 背景应用 =====
   applyBackground() {
     if (this._themeActive) {
       console.log('[Texture] 主题模式已激活，跳过背景应用');
@@ -98,7 +92,6 @@ export const Texture = {
     this.saveBgConfig();
   },
 
-  // ===== 构建渐变CSS =====
   buildGradientCSS() {
     const colors = this.gradientColors;
     if (colors.length < 2) {
@@ -144,7 +137,6 @@ export const Texture = {
     return `linear-gradient(${dir}, ${stops.join(', ')})`;
   },
 
-  // ===== 保存背景配置 =====
   saveBgConfig() {
     Utils.storage.set('bg_color', this.bgColor);
     Utils.storage.set('gradient_config', {
@@ -155,7 +147,6 @@ export const Texture = {
     });
   },
 
-  // ===== 设置纯色 =====
   setBgColor(color) {
     if (this._themeActive) {
       console.log('[Texture] 主题模式已激活，请先退出主题模式再设置背景');
@@ -178,7 +169,6 @@ export const Texture = {
     Utils.showToast(UI.toast.textureBgReset, false);
   },
 
-  // ===== 设置渐变 =====
   setGradient(colors, direction, feather) {
     if (this._themeActive) {
       console.log('[Texture] 主题模式已激活，请先退出主题模式再设置渐变');
@@ -196,7 +186,6 @@ export const Texture = {
     Utils.showToast(UI.toast.textureGradientApplied, false);
   },
 
-  // ===== 羽化值更新 =====
   setFeather(value) {
     this.gradientFeather = Math.max(0, Math.min(100, value));
     if (this.bgMode === 'gradient' && !this._themeActive) {
@@ -205,7 +194,6 @@ export const Texture = {
     this.saveBgConfig();
   },
 
-  // ===== 方向更新 =====
   setDirection(direction) {
     this.gradientDirection = direction;
     if (this.bgMode === 'gradient' && !this._themeActive) {
@@ -214,7 +202,6 @@ export const Texture = {
     this.saveBgConfig();
   },
 
-  // ===== 色卡管理 =====
   savePalettes() {
     Utils.storage.set('palettes', this.palettes);
   },
@@ -262,7 +249,6 @@ export const Texture = {
     Utils.showToast(`已应用色卡：${palette.name}`, false);
   },
 
-  // ===== 纹理 =====
   applyTexture() {
     const textureDiv = document.getElementById('customTexture');
     if (!textureDiv) return;
@@ -357,4 +343,3 @@ export const Texture = {
 // 我们将在 ThemeService 初始化时设置为 true
 Texture.loadConfig();
 
-console.log('✅ Texture 已加载 (ES Module)');

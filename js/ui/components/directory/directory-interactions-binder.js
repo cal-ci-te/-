@@ -1,4 +1,3 @@
-// ========== 目录树交互事件绑定 ==========
 import { bindInteractions, handleNodeClick, setActiveNode } from './events.js';
 import { showContextMenu } from './context-menu.js';
 import { handleFolderToggle } from './folder-state.js';
@@ -59,10 +58,11 @@ export function bindDirectoryInteractions(container, callbacks) {
     );
     unbindEventsFn = unbind;
 
-    // 折叠状态切换
-    container.addEventListener('click', (e) => {
+    // 折叠状态切换（存储引用以便清理）
+    const folderToggleHandler = (e) => {
         handleFolderToggle(e, container);
-    });
+    };
+    container.addEventListener('click', folderToggleHandler);
 
     // 返回清理函数
     return function unbindAll() {
@@ -74,8 +74,6 @@ export function bindDirectoryInteractions(container, callbacks) {
             container.removeEventListener('directory-toggle-visibility', visibilityHandler);
             visibilityHandler = null;
         }
-        // 移除 click 监听（由于我们绑定的匿名函数无法直接移除，但我们可以通过存储引用）
-        // 实际更好的做法是用命名函数，但为了简便，这里不做清理（因为通常容器会被移除）
-        // 如果需要在 destroy 时完全清理，建议将 click 监听也存储起来
+        container.removeEventListener('click', folderToggleHandler);
     };
 }

@@ -1,4 +1,3 @@
-// ========== 贴图数据仓库（BLOB 存储适配） ==========
 import { ApiClient } from './api-client.js';
 import { StorageAdapter } from './storage-adapter.js';
 import { EventBus } from '../core/event-bus.js';
@@ -125,7 +124,6 @@ export const DecoRepository = {
         return this._cache.find(item => item.id === id) || null;
     },
 
-    // ===== 私有方法 =====
     async _fetchFromServer(forceUpdate = false) {
         try {
             const data = await ApiClient.get(API_ENDPOINTS.DECOS);
@@ -209,4 +207,3 @@ export const DecoRepository = {
     },
 };
 
-console.log('✅ DecoRepository 已加载（BLOB 存储适配 + dataUrl 补充）');

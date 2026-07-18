@@ -1,4 +1,3 @@
-// ========== 全局事件常量 ==========
 export const EVENTS = {
   // 文章相关
   ARTICLE_VISIBILITY_CHANGED: 'article:visibility-changed',
@@ -38,4 +37,3 @@ export const EVENTS = {
   ARTICLES_LIST_UPDATED: 'articles:list-updated',
 };
 
-console.log('✅ EventConstants 已加载 (ES Module)');

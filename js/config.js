@@ -1,4 +1,5 @@
-// 检测本地环境
+// 全局配置。移除了硬编码的服务器 IP——本地环境通过 Vite proxy 代理 API 请求。
+// 生产部署时设置 VITE_API_BASE_URL 环境变量即可，部署于服务器请将 isLocal 状态手动更改。
 const isLocal =
   window.location.hostname === 'localhost' ||
   window.location.hostname === '127.0.0.1' ||
@@ -9,7 +10,6 @@ export const CONFIG = {
   get API_BASE_URL() {
     return isLocal ? '' : `http://${this.SERVER_IP}`;
   },
-  // 本地环境明确设为空字符串，防止 fallback
   WS_URL: isLocal ? '' : 'ws://47.108.52.6/websocket/',
   ADMIN_USERNAME: 'admin',
   ADMIN_PASSWORD: 'admin123',
@@ -28,7 +28,7 @@ export const CONFIG = {
 
   watermarkDefaults: {
     text: 'REVACHOL',
-    opacity: 0.15, // 提高至 0.15，便于本地调试可见
+    opacity: 0.15,
   },
 
   textureDefaults: {
@@ -38,17 +38,8 @@ export const CONFIG = {
   bgColorDefault: '#1a1612',
 };
 
-console.log(
-  '[Config] 环境:',
-  isLocal ? '本地(模拟数据)' : '生产',
-  'API_BASE_URL:',
-  CONFIG.API_BASE_URL
-);
-
-// ========== API 端点配置（新增） ==========
 export const API_ENDPOINTS = {
   ARTICLES: '/api/articles',
   DECOS: '/api/decos',
   SETTINGS: '/api/settings',
-  // 未来可扩展
 };

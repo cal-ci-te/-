@@ -1,3 +1,5 @@
+// 简单的广播式 WebSocket：所有连接的客户端共享同一消息流。
+// 适用于当前场景（< 10 并发管理员），若后续需要房间/频道隔离，可迁移至 Socket.IO。
 const WebSocket = require('ws');
 
 const clients = new Set();

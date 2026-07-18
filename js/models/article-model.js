@@ -1,4 +1,6 @@
-// ========== 文章模型（代理 ArticleService） ==========
+// 代理模式：Article 是 ArticleService 的只读视图。历史原因——早期代码直接使用 Article 对象，
+// 重构为 ArticleService 单一数据源后保留此代理层，避免修改 20+ 处引用。
+// [TODO] 后续可逐步替换所有 Article.xxx 为 ArticleService.xxx 后移除此文件。
 import { ArticleService } from '../services/article-service.js';
 
 export const Article = {
@@ -34,4 +36,3 @@ export const Article = {
     buildDirectoryTree: ArticleService.buildDirectoryTree.bind(ArticleService),
 };
 
-console.log('✅ article-model.js 已加载 (代理 ArticleService)');

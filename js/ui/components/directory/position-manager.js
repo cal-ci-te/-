@@ -1,4 +1,3 @@
-// ========== 目录树位置管理模式 ==========
 import { ArticleService } from '../../../services/article-service.js';
 import { ArticleListStore } from '../../../stores/article-list-store.js';
 import { EventBus } from '../../../core/event-bus.js';
@@ -38,7 +37,6 @@ export function createPositionManager(context) {
         onCancel, // 取消回调
     } = context;
 
-    // ----- 快照操作 -----
     function saveSnapshot() {
         snapshot = {
             articles: JSON.parse(JSON.stringify(ArticleService._data || [])),
@@ -61,7 +59,6 @@ export function createPositionManager(context) {
         snapshot = null;
     }
 
-    // ----- 拖拽控制 -----
     function disableAllDrag() {
         if (dragDisableFn) {
             dragDisableFn();
@@ -95,7 +92,6 @@ export function createPositionManager(context) {
         }
     }
 
-    // ----- 公共方法 -----
     function enter() {
         if (isActive) return;
         isActive = true;

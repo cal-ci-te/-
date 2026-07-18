@@ -1,11 +1,9 @@
-// ========== 应用启动管理器 ==========
 import { EventBus } from './event-bus.js';
 
 export const AppInitializer = {
   _modules: [],
   _initialized: false,
 
-  // ===== 注册模块初始化函数 =====
   register: function (name, initFn, dependencies) {
     this._modules.push({
       name: name,
@@ -16,7 +14,6 @@ export const AppInitializer = {
     return this;
   },
 
-  // ===== 执行启动 =====
   start: function () {
     if (this._initialized) {
       console.warn('[AppInitializer] 已经启动，跳过');
@@ -39,7 +36,6 @@ export const AppInitializer = {
     EventBus.emit('app:started');
   },
 
-  // ===== 拓扑排序（处理依赖） =====
   _topologicalSort: function () {
     const visited = {};
     const result = [];
@@ -70,7 +66,6 @@ export const AppInitializer = {
     return result;
   },
 
-  // ===== 获取模块状态 =====
   getStatus: function () {
     const status = {};
     this._modules.forEach(function (m) {
@@ -80,4 +75,3 @@ export const AppInitializer = {
   },
 };
 
-console.log('✅ AppInitializer 已加载 (ES Module)');

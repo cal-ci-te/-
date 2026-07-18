@@ -1,4 +1,3 @@
-// ========== 主题切换处理器 ==========
 import { ThemeService } from '../../../services/theme-service.js';
 
 export function themeSwitchHandler(event) {
