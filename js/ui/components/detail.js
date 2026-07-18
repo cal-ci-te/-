@@ -26,6 +26,8 @@ export const UIDetail = {
       return;
     }
 
+    // 构建浏览器式顶部栏：标签页在左，控件按钮在右
+    this._buildTopbar();
     this._createMinimizedBar();
 
     this.overlay.addEventListener(
@@ -67,7 +69,42 @@ export const UIDetail = {
       }.bind(this)
     );
 
-    console.log('[UIDetail] 初始化完成（标签页 + 左下角最小化栏 + 全屏 + 可见性监听）');
+    console.log('[UIDetail] 初始化完成（浏览器式顶部栏 + 最小化栏 + 全屏）');
+  },
+
+  _buildTopbar: function () {
+    const container = this.tabsContainer.parentElement;
+    // 用 detail-topbar 包裹 tabs + controls
+    const topbar = document.createElement('div');
+    topbar.className = 'detail-topbar';
+    // 把原 tabsContainer 移入 topbar
+    this.tabsContainer.parentElement.removeChild(this.tabsContainer);
+    this.tabsContainer.classList.add('detail-tabs');
+    topbar.appendChild(this.tabsContainer);
+
+    // 右侧控件按钮
+    const controls = document.createElement('div');
+    controls.className = 'detail-topbar-controls';
+    controls.innerHTML = `
+      <button class="tb-minimize" title="${UI.detail.minimizeTitle}">${UI.detail.paneMinimize}</button>
+      <button class="tb-fullscreen" title="${UI.detail.fullscreenTitle}">${UI.detail.paneFullscreen}</button>
+      <button class="tb-close" title="${UI.common.close}">${UI.detail.paneClose}</button>
+    `;
+    topbar.appendChild(controls);
+
+    // 插入回 detail-container 顶部
+    container.insertBefore(topbar, container.firstChild);
+
+    // 按钮事件绑定
+    controls.querySelector('.tb-minimize').addEventListener('click', () => {
+      if (this.activeId) this.minimizeTab(this.activeId);
+    });
+    controls.querySelector('.tb-fullscreen').addEventListener('click', () => {
+      this.toggleFullscreen();
+    });
+    controls.querySelector('.tb-close').addEventListener('click', () => {
+      if (this.activeId) this.closeTab(this.activeId);
+    });
   },
 
   _createMinimizedBar: function () {
@@ -116,11 +153,6 @@ export const UIDetail = {
     pane.className = 'detail-pane';
     pane.dataset.id = id;
     pane.innerHTML = `
-            <div class="pane-controls">
-                <button class="pane-minimize" data-id="${id}" title="${UI.detail.minimizeTitle}">${UI.detail.paneMinimize}</button>
-                <button class="pane-fullscreen" data-id="${id}" title="${UI.detail.fullscreenTitle}">${UI.detail.paneFullscreen}</button>
-                <button class="pane-close" data-id="${id}" title="${UI.common.close}">${UI.detail.paneClose}</button>
-            </div>
             <div class="detail-body">${html}</div>
         `;
     this.panesContainer.appendChild(pane);
@@ -153,36 +185,9 @@ export const UIDetail = {
       }.bind(this)
     );
 
-    const paneClose = pane.querySelector('.pane-close');
-    paneClose.addEventListener(
-      'click',
-      function (e) {
-        e.stopPropagation();
-        this.closeTab(id);
-      }.bind(this)
-    );
-
-    const minimizeBtn = pane.querySelector('.pane-minimize');
-    minimizeBtn.addEventListener(
-      'click',
-      function (e) {
-        e.stopPropagation();
-        this.minimizeTab(id);
-      }.bind(this)
-    );
-
-    const fullscreenBtn = pane.querySelector('.pane-fullscreen');
-    fullscreenBtn.addEventListener(
-      'click',
-      function (e) {
-        e.stopPropagation();
-        this.toggleFullscreen();
-      }.bind(this)
-    );
-
     this.activateTab(id);
     this.overlay.classList.add('active');
-    document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = "hidden"; document.body.style.overflow = "hidden";
   },
 
   renderContent: function (text) {
@@ -246,7 +251,7 @@ export const UIDetail = {
       this.activateTab(next.id);
     } else {
       this.overlay.classList.remove('active');
-      document.body.style.overflow = '';
+      document.documentElement.style.overflow = ''; document.body.style.overflow = '';
       this.activeId = null;
     }
   },
@@ -307,7 +312,7 @@ export const UIDetail = {
     entry.paneElement.classList.add('active');
     this.activateTab(id);
     this.overlay.classList.add('active');
-    document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = "hidden"; document.body.style.overflow = "hidden";
   },
 
   toggleFullscreen: function () {
@@ -377,12 +382,12 @@ export const UIDetail = {
         this.activateTab(next.id);
       } else {
         this.overlay.classList.remove('active');
-        document.body.style.overflow = '';
+        document.documentElement.style.overflow = ''; document.body.style.overflow = '';
         this.activeId = null;
       }
     } else {
       this.overlay.classList.remove('active');
-      document.body.style.overflow = '';
+      document.documentElement.style.overflow = ''; document.body.style.overflow = '';
       this.activeId = null;
       if (document.fullscreenElement) this._exitFullscreen();
     }
@@ -401,7 +406,7 @@ export const UIDetail = {
       this.minimizedContainer.style.display = 'none';
     }
     this.overlay.classList.remove('active');
-    document.body.style.overflow = '';
+    document.documentElement.style.overflow = ''; document.body.style.overflow = '';
     this.activeId = null;
     if (document.fullscreenElement) this._exitFullscreen();
   },

@@ -1,0 +1,95 @@
+/* ========== 亮色主题 · 布局与装饰 ========== */
+
+html body {
+    background-color: #f5f0e8 !important;
+    background-image: repeating-linear-gradient(45deg, rgba(0,0,0,0.03) 0px, rgba(0,0,0,0.03) 2px, transparent 2px, transparent 4px) !important;
+    background-blend-mode: normal !important;
+    background-repeat: repeat !important;
+}
+
+html body::before {
+    content: none !important;
+    display: none !important;
+}
+
+/* ===== 工具栏 ===== */
+.toolbar {
+  border-bottom: 1px solid var(--color-border) !important;
+}
+h1 {
+  color: var(--color-text-heading) !important;
+}
+.subtitle {
+  color: var(--color-text-muted) !important;
+}
+.copyright-bar {
+  color: var(--color-text-muted) !important;
+  border-bottom: 1px solid var(--color-border) !important;
+}
+.avatar {
+  background: var(--color-bg-tertiary) !important;
+  border-color: var(--color-border-highlight) !important;
+}
+
+/* ===== 首屏说明 ===== */
+.hero-content h2 {
+  color: var(--color-text-heading) !important;
+}
+.hero-description {
+  color: var(--color-text-secondary) !important;
+}
+.hero-description strong {
+  color: var(--color-text-heading) !important;
+}
+
+/* ===== 水印 ===== */
+.visible-watermark {
+  color: var(--color-text-muted) !important;
+}
+.tiled-watermark {
+  opacity: 0.05 !important;
+}
+
+/* ===== Toast ===== */
+.toast-message {
+  background: var(--color-bg-overlay) !important;
+  border: 1px solid var(--color-border-highlight) !important;
+  color: var(--color-text-primary) !important;
+}
+.toast-message.error {
+  border-color: var(--color-error) !important;
+  color: var(--color-error) !important;
+}
+.toast-message.success {
+  border-color: var(--color-success) !important;
+  color: var(--color-success) !important;
+}
+
+/* ===== 滚动条 ===== */
+::-webkit-scrollbar-track {
+  background: var(--color-bg-secondary) !important;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border) !important;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-accent) !important;
+}
+
+/* ===== 骨架屏 ===== */
+.skeleton-card .skeleton-line {
+  background: var(--color-bg-skeleton) !important;
+}
+
+/* ===== 加载状态 ===== */
+.loading-more {
+  color: var(--color-text-muted) !important;
+}
+.end-message {
+  color: var(--color-text-muted) !important;
+}
+
+/* ===== 视频背景 ===== */
+.fullscreen-bg {
+  background: var(--color-bg-primary) !important;
+}

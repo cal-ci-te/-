@@ -1,0 +1,212 @@
+/* ========== 亮色主题 · 内容展示 ========== */
+
+/* ===== 卡片 ===== */
+.card {
+  background: var(--color-bg-card) !important;
+  border: 1px solid var(--color-border) !important;
+  box-shadow: var(--shadow-md) !important;
+  padding: 22px !important;
+  transition: all 0.25s !important;
+  cursor: pointer !important;
+}
+.card:hover {
+  transform: rotate(0deg) translateY(-4px) !important;
+  border-color: var(--color-border-highlight) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+.card h3 {
+  color: var(--color-text-heading) !important;
+}
+.card-content {
+  color: var(--color-text-secondary) !important;
+}
+.card-meta {
+  color: var(--color-text-muted) !important;
+}
+.card .card-click-hint {
+  color: var(--color-text-muted) !important;
+}
+
+/* ===== 详情页 ===== */
+.detail-overlay {
+  background: var(--color-bg-overlay) !important;
+}
+.detail-container {
+  background: var(--color-bg-card) !important;
+  border: 1px solid var(--color-border) !important;
+}
+.detail-topbar {
+  background: var(--color-bg-secondary) !important;
+  border-bottom: 1px solid var(--color-border) !important;
+}
+.detail-tab {
+  background: var(--color-bg-tertiary) !important;
+  color: var(--color-text-muted) !important;
+  border-color: var(--color-border) !important;
+}
+.detail-tab:hover {
+  background: var(--color-hover) !important;
+  color: var(--color-text-primary) !important;
+}
+.detail-tab.active {
+  background: var(--color-bg-card) !important;
+  color: var(--color-text-heading) !important;
+  border-color: var(--color-border-highlight) !important;
+}
+.detail-tab .tab-close:hover {
+  color: var(--color-error) !important;
+}
+.detail-topbar-controls button {
+  color: var(--color-text-muted) !important;
+}
+.detail-topbar-controls button:hover {
+  background: var(--color-hover) !important;
+  color: var(--color-text-primary) !important;
+}
+.detail-topbar-controls .tb-close:hover {
+  color: var(--color-error) !important;
+  background: rgba(196, 68, 68, 0.2) !important;
+}
+.detail-body {
+  color: var(--color-text-primary) !important;
+}
+.detail-body h1, .detail-body h2, .detail-body h3 {
+  color: var(--color-text-heading) !important;
+}
+.detail-body blockquote {
+  border-left-color: var(--color-border-highlight) !important;
+  color: var(--color-text-secondary) !important;
+}
+.detail-body code {
+  background: var(--color-bg-secondary) !important;
+  color: var(--color-text-accent) !important;
+}
+.detail-body pre {
+  background: var(--color-bg-secondary) !important;
+  border: 1px solid var(--color-border) !important;
+}
+
+/* ===== 最小化栏 ===== */
+.minimized-bar {
+  background: var(--color-bg-secondary) !important;
+  border: 1px solid var(--color-border) !important;
+}
+.minimized-item {
+  background: var(--color-bg-tertiary) !important;
+  border: 1px solid var(--color-border) !important;
+}
+.minimized-item .minimized-title {
+  color: var(--color-text-primary) !important;
+}
+.minimized-item .minimized-restore:hover {
+  color: var(--color-text-heading) !important;
+}
+.minimized-item .minimized-close:hover {
+  color: var(--color-error) !important;
+}
+
+/* ===== 详情浮动窗 ===== */
+.floating-window {
+  background: var(--color-bg-card) !important;
+  border-color: var(--color-border) !important;
+}
+.floating-window .floating-title {
+  color: var(--color-text-heading) !important;
+}
+.floating-window .floating-header button {
+  color: var(--color-text-muted) !important;
+}
+.floating-window .floating-header button:hover {
+  color: var(--color-text-heading) !important;
+}
+.floating-window .floating-header .floating-close:hover {
+  color: var(--color-error) !important;
+}
+
+/* ===== 文章编辑器 ===== */
+.editor-toolbar {
+  background: var(--color-bg-secondary) !important;
+  border-bottom: 1px solid var(--color-border) !important;
+}
+.editor-toolbar .brand {
+  color: var(--color-text-heading) !important;
+}
+.editor-toolbar .toggle-btn {
+  color: var(--color-text-heading) !important;
+  border-color: var(--color-border) !important;
+}
+.editor-toolbar .toggle-btn:hover {
+  background: var(--color-bg-tertiary) !important;
+}
+.editor-toolbar .close-btn:hover {
+  background: var(--color-bg-tertiary) !important;
+  color: var(--color-text-heading) !important;
+}
+.editor-sidebar {
+  background: var(--color-bg-secondary) !important;
+  border-right: 1px solid var(--color-border) !important;
+}
+.editor-sidebar-header {
+  background: var(--color-bg-tertiary) !important;
+  border-bottom: 1px solid var(--color-border) !important;
+}
+.editor-sidebar-header h3 {
+  color: var(--color-text-heading) !important;
+}
+.editor-sidebar-header .collapse-btn {
+  color: var(--color-text-muted) !important;
+}
+.editor-sidebar-header .collapse-btn:hover {
+  color: var(--color-text-heading) !important;
+}
+.editor-content {
+  background: var(--color-bg-primary) !important;
+}
+.editor-content .empty-state {
+  color: var(--color-text-muted) !important;
+}
+.editor-form input[type="text"], .editor-form textarea {
+  background: var(--color-bg-card) !important;
+  border: 1px solid var(--color-border) !important;
+  color: var(--color-text-primary) !important;
+}
+.editor-form label {
+  color: var(--color-text-muted) !important;
+}
+.editor-form .form-actions .save-btn {
+  background: var(--color-success) !important;
+  color: #e8d5b5 !important;
+}
+.editor-form .form-actions .save-btn:hover {
+  background: var(--color-success-hover) !important;
+}
+.editor-form .form-actions .cancel-btn {
+  background: var(--color-bg-tertiary) !important;
+  color: var(--color-text-muted) !important;
+}
+.editor-form .form-actions .cancel-btn:hover {
+  background: var(--color-border) !important;
+  color: var(--color-text-primary) !important;
+}
+.history-panel {
+  background: var(--color-bg-secondary) !important;
+  border-top: 1px solid var(--color-border) !important;
+}
+.history-item {
+  border-bottom-color: var(--color-border) !important;
+}
+.history-item .history-preview-btn {
+  border-color: var(--color-border) !important;
+  color: var(--color-text-primary) !important;
+}
+.history-item .history-restore-btn {
+  background: var(--color-bg-tertiary) !important;
+  color: var(--color-text-primary) !important;
+}
+.history-item .history-restore-btn:hover {
+  background: var(--color-accent-dark) !important;
+  color: #e8d5b5 !important;
+}
+.history-item .history-delete-btn:hover {
+  color: var(--color-error) !important;
+}

@@ -1,0 +1,53 @@
+/* ========== 暗色主题 · 变量 ========== */
+:root {
+  --color-bg-primary: #1a1612;
+  --color-bg-secondary: #1e1a15;
+  --color-bg-tertiary: #2a231c;
+  --color-bg-card: #2a231c;
+  --color-bg-card-start: #332b22;
+  --color-bg-card-end: #231e18;
+  --color-bg-skeleton: #3a2a1a;
+  --color-bg-overlay: rgba(30, 26, 21, 0.95);
+
+  --color-border: #5a3e2b;
+  --color-border-light: rgba(90, 62, 43, 0.3);
+  --color-border-dashed: rgba(196, 122, 68, 0.2);
+  --color-border-highlight: #c47a44;
+
+  --color-text-primary: #d4c9b8;
+  --color-text-secondary: #c4b5a0;
+  --color-text-muted: #7a6a58;
+  --color-text-heading: #e8c88a;
+  --color-text-light: #b8a992;
+  --color-text-accent: #e8d5b5;
+
+  --color-accent: #c47a44;
+  --color-accent-dark: #5a3e2b;
+  --color-accent-light: #e8c88a;
+  --color-accent-gold: #ffd966;
+
+  --color-folder-1: #e8c88a;
+  --color-folder-2: #d4b88a;
+  --color-folder-3: #c4a87a;
+  --color-folder-4: #b8a080;
+
+  --color-hover: rgba(90, 62, 43, 0.4);
+  --color-active: rgba(196, 122, 68, 0.25);
+  --color-success: #3a5a2b;
+  --color-success-hover: #4a7a3a;
+  --color-danger: #3a2a1a;
+  --color-danger-hover: #5a3e2b;
+  --color-error: #c44a44;
+
+  --shadow-sm: 4px 4px 0 rgba(0, 0, 0, 0.35);
+  --shadow-md: 6px 6px 0 rgba(0, 0, 0, 0.35);
+  --shadow-lg: 8px 8px 0 rgba(0, 0, 0, 0.4);
+  --shadow-xl: 4px 4px 20px rgba(0, 0, 0, 0.6);
+  --shadow-focus: 0 0 12px rgba(196, 122, 68, 0.15);
+  --shadow-glow: 0 0 30px rgba(196, 122, 68, 0.2);
+
+  --font-family-serif: 'IM Fell English', 'Georgia', 'Times New Roman', serif;
+  --font-family-display: 'Special Elite', 'Courier New', monospace;
+  --font-family-mono: 'Courier New', monospace;
+  --font-family-base: var(--font-family-sans), var(--font-family-display), var(--font-family-serif), monospace;
+}

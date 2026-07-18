@@ -39,13 +39,8 @@ export const UIHelpers = {
     const element = document.getElementById(elementId);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      element.style.transition = 'all 0.2s';
-      element.style.borderColor = '#c47a44';
-      element.style.boxShadow = '0 0 0 2px #c47a44';
-      setTimeout(() => {
-        element.style.borderColor = '';
-        element.style.boxShadow = '';
-      }, 1000);
+      element.classList.add('card-highlight');
+      setTimeout(() => element.classList.remove('card-highlight'), 1600);
     }
   },
 

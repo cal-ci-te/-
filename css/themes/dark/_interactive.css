@@ -1,0 +1,83 @@
+/* ========== 暗色主题 · 交互控件 ========== */
+
+/* ===== 按钮 ===== */
+button, .btn, .theme-btn, .avatar-upload-btn, .login-submit-btn {
+  background: var(--color-bg-tertiary) !important;
+  color: var(--color-text-primary) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: 4px !important;
+  padding: 6px 12px !important;
+  cursor: pointer !important;
+  font-family: var(--font-family-base) !important;
+  transition: all 0.2s !important;
+}
+button:hover, .btn:hover, .theme-btn:hover {
+  background: var(--color-accent-dark) !important;
+  color: #e8d5b5 !important;
+}
+
+/* ===== 输入框 ===== */
+input[type="text"], input[type="password"], textarea {
+  background: var(--color-bg-card) !important;
+  border: 1px solid var(--color-border) !important;
+  color: var(--color-text-primary) !important;
+  border-radius: 4px !important;
+  padding: 6px 10px !important;
+  font-family: var(--font-family-base) !important;
+}
+
+/* ===== 管理员面板 ===== */
+.admin-panel {
+  background: var(--color-bg-secondary) !important;
+  border: 1px solid var(--color-border) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+.panel-header {
+  background: var(--color-bg-tertiary) !important;
+  border-bottom: 1px solid var(--color-border) !important;
+}
+.panel-header h4 {
+  color: var(--color-text-heading) !important;
+}
+.panel-content {
+  background: var(--color-bg-primary) !important;
+}
+.panel-content label {
+  color: var(--color-text-muted) !important;
+}
+
+/* ===== 登录弹窗 ===== */
+.login-modal {
+  background: var(--color-bg-card) !important;
+  border: 1px solid var(--color-border) !important;
+  box-shadow: var(--shadow-xl) !important;
+}
+.login-modal .modal-header {
+  background: var(--color-bg-tertiary) !important;
+  border-bottom: 1px solid var(--color-border) !important;
+}
+.login-modal .modal-header h3 {
+  color: var(--color-text-heading) !important;
+}
+.login-modal .input-group label {
+  color: var(--color-text-muted) !important;
+}
+.login-modal .input-group input {
+  background: var(--color-bg-card) !important;
+  border: 1px solid var(--color-border) !important;
+  color: var(--color-text-primary) !important;
+}
+
+/* ===== 工具栏 ===== */
+.side-toolbar {
+  background: var(--color-bg-card) !important;
+  border-color: var(--color-border) !important;
+}
+.toolbar-toggle { border-right-color: var(--color-border) !important; }
+.toolbar-toggle:hover { background: var(--color-hover) !important; }
+.toolbar-tools { border-right-color: var(--color-border) !important; }
+.tool-item { color: var(--color-text-muted) !important; }
+.tool-item:hover { background: var(--color-hover) !important; color: var(--color-text-primary) !important; }
+.tool-item.active { background: var(--color-active) !important; color: var(--color-text-heading) !important; }
+.toolbar-content { color: var(--color-text-secondary) !important; }
+.toolbar-content h3, .toolbar-content strong { color: var(--color-text-heading) !important; }

@@ -284,4 +284,31 @@ window.UIDirectory = UIDirectory;
 window.ThemeService = ThemeService;
 window.Texture = Texture;
 
+// ===== 左上角工具栏 =====
+setTimeout(() => {
+    const toolbar = document.getElementById('sideToolbar');
+    const toggle = document.getElementById('toolbarToggle');
+    if (toolbar && toggle) {
+        toggle.addEventListener('click', () => {
+            const isCollapsed = toolbar.classList.contains('collapsed');
+            toolbar.classList.toggle('collapsed', !isCollapsed);
+            toolbar.classList.toggle('expanded', isCollapsed);
+        });
+        // 说明组件：点击在详情页中打开使用说明
+        const helpBtn = toolbar.querySelector('[data-tool="help"]');
+        if (helpBtn) {
+            helpBtn.addEventListener('click', () => {
+                const helpArticle = {
+                    id: -1,
+                    title: '📖 使用说明',
+                    content: `## 欢迎来到 REVACHOL\n\n原创角色档案馆\n\n### 浏览角色\n\n点击左侧目录树中的文章或文件夹，跳转到对应卡片。\n\n### 阅读详情\n\n点击卡片打开标签页式阅读界面，支持多篇同时打开、最小化、全屏。\n\n### 主题切换\n\n管理员面板中可在 **暗色 / 亮色 / 低保真** 三种主题间切换。\n\n### 搜索\n\n侧边栏搜索框支持按关键字过滤目录树。\n\n### 管理员功能\n\n登录后可管理文章可见性、上传贴纸、自定义水印与背景。`
+                };
+                if (window.UIController && window.UIController.detail) {
+                    window.UIController.detail.createTab(helpArticle);
+                }
+            });
+        }
+    }
+}, 300);
+
 console.log('✅ app.js 已加载 (轻量化版本)');

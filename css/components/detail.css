@@ -1,16 +1,16 @@
-/* ========== 文章详情子页面（标签页模式） ========== */
+/* ========== 文章详情子页面（浏览器式标签页） ========== */
 .detail-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(26, 22, 18, 0.92);
+  background: var(--color-bg-overlay);
   backdrop-filter: blur(12px);
   z-index: 3000;
   display: none;
   flex-direction: column;
-  padding: 20px;
+  padding: 0;
   box-sizing: border-box;
 }
 
@@ -23,68 +23,81 @@
   flex-direction: column;
   width: 100%;
   height: 100%;
-  max-width: 1200px;
+  
   margin: 0 auto;
-  background: #2a231c;
-  border: 1px solid #5a3e2b;
-  border-radius: 12px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: 0;
   overflow: hidden;
-  box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.4);
+  box-shadow: none;
 }
 
-/* 标签页栏 */
+/* ===== 浏览器式顶部栏（标签页左 + 控件右，单行） ===== */
+.detail-topbar {
+  display: flex;
+  align-items: center;
+  height: 36px;
+  background: var(--color-bg-secondary);
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
 .detail-tabs {
   display: flex;
-  background: #1e1a15;
-  border-bottom: 1px solid #5a3e2b;
-  padding: 0 8px;
+  flex: 1;
   overflow-x: auto;
-  flex-shrink: 0;
-  min-height: 40px;
-  gap: 4px;
+  overflow-y: hidden;
+  height: 100%;
   align-items: center;
+  padding: 0 4px;
+  gap: 2px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) transparent;
 }
 
 .detail-tab {
   display: flex;
   align-items: center;
-  padding: 8px 16px;
-  background: transparent;
-  color: #c4b5a0;
+  padding: 4px 12px;
+  height: 28px;
+  background: var(--color-bg-tertiary);
+  color: var(--color-text-secondary);
   font-family: 'Courier New', monospace;
-  font-size: 13px;
+  font-size: 12px;
   cursor: pointer;
-  border: none;
-  border-bottom: 2px solid transparent;
-  transition: all 0.2s;
+  border: 1px solid var(--color-border);
+  border-bottom: none;
+  border-radius: 6px 6px 0 0;
+  transition: background 0.15s;
   white-space: nowrap;
-  gap: 8px;
+  gap: 6px;
   flex-shrink: 0;
 }
 
 .detail-tab:hover {
-  background: rgba(90, 62, 43, 0.3);
-  color: #e8d5b5;
+  background: var(--color-hover);
+  color: var(--color-text-primary);
 }
 
 .detail-tab.active {
-  color: #e8c88a;
-  border-bottom-color: #c47a44;
-  background: rgba(196, 122, 68, 0.1);
+  background: var(--color-bg-card);
+  color: var(--color-text-heading);
+  border-color: var(--color-border-highlight);
 }
 
 .detail-tab .tab-close {
   background: none;
   border: none;
-  color: #7a6a58;
+  color: var(--color-text-muted);
   cursor: pointer;
   font-size: 14px;
-  padding: 0 4px;
+  padding: 0 2px;
   line-height: 1;
 }
 
 .detail-tab .tab-close:hover {
-  color: #c44a44;
+  color: var(--color-error);
 }
 
 .detail-tab .tab-title {
@@ -93,7 +106,40 @@
   text-overflow: ellipsis;
 }
 
-/* 内容面板区域 */
+/* 右侧控件按钮 */
+.detail-topbar-controls {
+  display: flex;
+  flex-shrink: 0;
+  padding: 0 6px;
+  gap: 2px;
+}
+
+.detail-topbar-controls button {
+  width: 28px;
+  height: 28px;
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+}
+
+.detail-topbar-controls button:hover {
+  background: var(--color-hover);
+  color: var(--color-text-primary);
+}
+
+.detail-topbar-controls .tb-close:hover {
+  background: rgba(196, 68, 68, 0.2);
+  color: var(--color-error);
+}
+
+/* ===== 内容面板区域 ===== */
 .detail-panes {
   flex: 1;
   overflow: hidden;
@@ -102,8 +148,9 @@
 
 .detail-pane {
   display: none;
-  padding: 30px 40px;
+  padding: 24px 32px;
   overflow-y: auto;
+  overscroll-behavior: contain;
   height: 100%;
   box-sizing: border-box;
 }
@@ -112,33 +159,33 @@
   display: block;
 }
 
-/* ----- 文章正文样式（增强） ----- */
+/* 正文样式 */
 .detail-body {
-  color: #d4c9b8;
+  color: var(--color-text-primary);
   line-height: 1.8;
   font-size: 1rem;
-  font-family: 'IM Fell English', 'Georgia', serif;
+  font-family: var(--font-family-serif);
 }
 
 .detail-body h1 {
   font-size: 2rem;
-  color: #e8c88a;
-  border-bottom: 1px solid #5a3e2b;
+  color: var(--color-text-heading);
+  border-bottom: 1px solid var(--color-border);
   padding-bottom: 10px;
   margin: 24px 0 16px;
 }
 
 .detail-body h2 {
   font-size: 1.6rem;
-  color: #e8c88a;
+  color: var(--color-text-heading);
   margin: 24px 0 12px;
-  border-left: 4px solid #c47a44;
+  border-left: 4px solid var(--color-border-highlight);
   padding-left: 12px;
 }
 
 .detail-body h3 {
   font-size: 1.3rem;
-  color: #d4b88a;
+  color: var(--color-accent-light);
   margin: 20px 0 10px;
   padding-left: 8px;
 }
@@ -148,11 +195,11 @@
 }
 
 .detail-body strong {
-  color: #e8c88a;
+  color: var(--color-text-heading);
 }
 
 .detail-body em {
-  color: #c4b5a0;
+  color: var(--color-text-secondary);
   font-style: italic;
 }
 
@@ -166,32 +213,31 @@
 }
 
 .detail-body blockquote {
-  border-left: 3px solid #c47a44;
-  padding-left: 16px;
-  margin: 12px 0;
-  color: #b8a992;
-  font-style: italic;
-  background: rgba(196, 122, 68, 0.05);
+  border-left: 3px solid var(--color-border-highlight);
   padding: 8px 16px;
+  margin: 12px 0;
+  color: var(--color-text-secondary);
+  font-style: italic;
+  background: var(--color-active);
   border-radius: 4px;
 }
 
 .detail-body code {
-  background: #1e1a15;
+  background: var(--color-bg-secondary);
   padding: 2px 8px;
   border-radius: 4px;
-  font-family: 'Courier New', monospace;
+  font-family: var(--font-family-mono);
   font-size: 0.9rem;
-  color: #e8c88a;
+  color: var(--color-text-heading);
 }
 
 .detail-body pre {
-  background: #1e1a15;
+  background: var(--color-bg-secondary);
   padding: 16px;
   border-radius: 8px;
   overflow-x: auto;
   margin: 12px 0;
-  border: 1px solid #5a3e2b;
+  border: 1px solid var(--color-border);
 }
 
 .detail-body pre code {
@@ -203,57 +249,18 @@
 /* 移动端 */
 @media (max-width: 768px) {
   .detail-overlay {
-    padding: 10px;
+    padding: 8px;
   }
   .detail-pane {
-    padding: 20px;
+    padding: 16px;
   }
   .detail-tab .tab-title {
     max-width: 100px;
   }
-  .detail-body h1 {
-    font-size: 1.6rem;
-  }
-  .detail-body h2 {
-    font-size: 1.3rem;
-  }
-  .detail-body h3 {
-    font-size: 1.1rem;
-  }
+  .detail-body h1 { font-size: 1.6rem; }
+  .detail-body h2 { font-size: 1.3rem; }
+  .detail-body h3 { font-size: 1.1rem; }
 }
-
-/* ========== 面板控制栏（浏览器风格） ========== */
-.pane-controls {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-bottom: 16px;
-  border-bottom: 1px solid #5a3e2b;
-  padding-bottom: 10px;
-}
-
-.pane-controls button {
-  background: none;
-  border: none;
-  color: #c4b5a0;
-  font-size: 16px;
-  cursor: pointer;
-  padding: 2px 8px;
-  border-radius: 4px;
-  transition: all 0.2s;
-}
-
-.pane-controls button:hover {
-  background: rgba(90, 62, 43, 0.3);
-  color: #e8d5b5;
-}
-
-.pane-controls .pane-close:hover {
-  color: #c44a44;
-  background: rgba(196, 68, 68, 0.2);
-}
-
-/* ========== 悬浮窗样式 ========== */
 .floating-window {
   position: fixed;
   z-index: 3100;
@@ -355,7 +362,7 @@
 .minimized-bar {
   position: fixed;
   left: 20px;
-  top: 10px;
+  top: 0;
   max-width: calc(100vw - 40px);
   height: 40px;
   background: #1e1a15;

@@ -69,3 +69,17 @@
   border-color: var(--color-success);
   color: var(--color-text-success);
 }
+
+/* ===== 卡片滚动定位高亮 ===== */
+@keyframes cardGlowPulse {
+  0%   { transform: scale(1); }
+  30%  { transform: scale(1.02); }
+  100% { transform: scale(1); }
+}
+
+.card.card-highlight {
+  animation: cardGlowPulse 1.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+  box-shadow: 0 0 0 4px var(--color-accent),
+              0 0 24px var(--color-accent-light) !important;
+  border-color: var(--color-accent) !important;
+}

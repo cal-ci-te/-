@@ -1,0 +1,248 @@
+/* ========== 低保真主题 · 交互控件 ========== */
+html[data-theme="lofi"] button,
+html[data-theme="lofi"] .btn,
+html[data-theme="lofi"] .theme-btn,
+html[data-theme="lofi"] .avatar-upload-btn,
+html[data-theme="lofi"] .login-submit-btn {
+  font-family: var(--font-family-display);
+  font-size: 10px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  border: 1px solid var(--color-border);
+  border-radius: 2px;
+  background: var(--color-bg-card);
+  color: var(--color-text-muted);
+  box-shadow: 2px 2px 0 rgba(0,0,0,0.03), -1px -1px 0 rgba(255,255,255,0.05);
+  padding: 8px 16px;
+  transition: all 0.15s ease;
+  cursor: pointer;
+  text-align: center;
+  min-height: 32px;
+  touch-action: manipulation;
+}
+html[data-theme="lofi"] button:hover,
+html[data-theme="lofi"] .btn:hover,
+html[data-theme="lofi"] .theme-btn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 4px 4px 0 rgba(0,0,0,0.03), -2px -2px 0 rgba(255,255,255,0.02);
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+}
+html[data-theme="lofi"] button:active,
+html[data-theme="lofi"] .btn:active,
+html[data-theme="lofi"] .theme-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 0 0 0 rgba(0,0,0,0);
+}
+
+html[data-theme="lofi"] .admin-panel button,
+html[data-theme="lofi"] .admin-panel .btn,
+html[data-theme="lofi"] .admin-panel .theme-btn {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+  opacity: 1 !important;
+}
+
+html[data-theme="lofi"] input[type="text"],
+html[data-theme="lofi"] input[type="password"],
+html[data-theme="lofi"] textarea {
+  font-family: var(--font-family-mono);
+  font-size: 13px;
+  letter-spacing: 2px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: 2px;
+  box-shadow: inset 2px 2px 0 rgba(0, 0, 0, 0.02);
+  padding: 8px 12px;
+  color: var(--color-text-secondary);
+  line-height: 1.8;
+}
+
+html[data-theme="lofi"] .admin-panel {
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-secondary);
+  box-shadow: var(--shadow-lg);
+  border-radius: 2px;
+  max-height: 70vh;
+  overflow: hidden;
+}
+html[data-theme="lofi"] .panel-header {
+  background: var(--color-bg-tertiary);
+  border-bottom: 1px solid var(--color-border);
+  padding: 8px 12px;
+}
+html[data-theme="lofi"] .panel-header h4 {
+  font-size: 1rem;
+  letter-spacing: 6px;
+  text-align: left;
+  transform: rotate(0deg);
+}
+html[data-theme="lofi"] .panel-content {
+  padding: 12px 16px;
+  max-height: calc(70vh - 50px);
+  overflow-y: auto;
+  background: var(--color-bg-primary);
+}
+html[data-theme="lofi"] .panel-content .control-group {
+  margin-bottom: 16px;
+}
+html[data-theme="lofi"] .panel-content label {
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--color-text-muted);
+  display: block;
+  margin-bottom: 4px;
+}
+html[data-theme="lofi"] .panel-content input[type="range"] {
+  width: 100%;
+  height: 6px;
+  background: var(--color-border-light);
+  border: none;
+  border-radius: 2px;
+  appearance: none;
+}
+html[data-theme="lofi"] .panel-content input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  background: var(--color-border);
+  border-radius: 0;
+  cursor: pointer;
+}
+html[data-theme="lofi"] .panel-content .theme-btn {
+  margin: 4px 0;
+  flex: 1;
+  min-width: 60px;
+}
+
+html[data-theme="lofi"] .login-modal {
+  border: 1px solid var(--color-border);
+  border-radius: 2px;
+  background: var(--color-bg-card);
+  box-shadow: var(--shadow-xl);
+}
+html[data-theme="lofi"] .login-modal .modal-header {
+  background: var(--color-bg-tertiary);
+  border-bottom: 1px solid var(--color-border);
+}
+html[data-theme="lofi"] .login-modal .modal-body {
+  padding: 20px;
+}
+html[data-theme="lofi"] .login-submit-btn {
+  width: 100%;
+  margin-top: 8px;
+}
+/* ===== 低保真按钮全覆盖（编辑器、管理面板等遗漏按钮） ===== */
+html[data-theme="lofi"] .save-btn,
+html[data-theme="lofi"] .cancel-btn,
+html[data-theme="lofi"] .close-btn,
+html[data-theme="lofi"] .toggle-btn,
+html[data-theme="lofi"] .collapse-btn,
+html[data-theme="lofi"] .sidebar-collapse-btn,
+html[data-theme="lofi"] .history-preview-btn,
+html[data-theme="lofi"] .history-restore-btn,
+html[data-theme="lofi"] .history-delete-btn,
+html[data-theme="lofi"] .history-toggle-btn,
+html[data-theme="lofi"] .modal-close,
+html[data-theme="lofi"] .crop-cancel-btn,
+html[data-theme="lofi"] .crop-confirm-btn,
+html[data-theme="lofi"] .visibility-toggle {
+  font-family: var(--font-family-display);
+  font-size: 10px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  border: 1px solid var(--color-border);
+  border-radius: 2px;
+  background: var(--color-bg-card);
+  color: var(--color-text-muted);
+  box-shadow: 2px 2px 0 rgba(0,0,0,0.03), -1px -1px 0 rgba(255,255,255,0.05);
+  padding: 8px 16px;
+  transition: all 0.15s ease;
+  cursor: pointer;
+  text-align: center;
+  min-height: 32px;
+}
+
+/* 管理面板中带内联样式的按钮强制覆盖 */
+html[data-theme="lofi"] .admin-panel button[style] {
+  font-family: var(--font-family-display) !important;
+  font-size: 10px !important;
+  letter-spacing: 4px !important;
+  text-transform: uppercase !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: 2px !important;
+  background: var(--color-bg-card) !important;
+  color: var(--color-text-muted) !important;
+  box-shadow: 2px 2px 0 rgba(0,0,0,0.03), -1px -1px 0 rgba(255,255,255,0.05) !important;
+  padding: 8px 16px !important;
+}
+
+/* ===== 低保真主页面标题居中 ===== */
+html[data-theme="lofi"] .toolbar h1 {
+  text-align: center !important;
+  transform: none !important;
+}
+
+/* ===== 低保真登录入口适配 ===== */
+html[data-theme="lofi"] .login-trigger {
+  background: var(--color-bg-secondary) !important;
+  border-color: var(--color-border) !important;
+  padding: 8px 18px 8px 12px !important;
+}
+html[data-theme="lofi"] .login-avatar {
+  width: 44px !important;
+  height: 44px !important;
+  border-color: var(--color-border) !important;
+  background: var(--color-bg-tertiary) !important;
+}
+html[data-theme="lofi"] .login-label {
+  font-family: var(--font-family-display) !important;
+  font-size: 10px !important;
+  letter-spacing: 3px !important;
+  color: var(--color-text-heading) !important;
+}
+html[data-theme="lofi"] .welcome-text {
+  font-family: var(--font-family-display) !important;
+  font-size: 8px !important;
+  letter-spacing: 2px !important;
+  color: var(--color-text-muted) !important;
+}
+/* ===== 管理面板文件上传控件 ===== */
+html[data-theme="lofi"] .admin-panel input[type="file"] {
+  font-family: var(--font-family-display) !important;
+  font-size: 10px !important;
+  letter-spacing: 2px !important;
+  color: var(--color-text-muted) !important;
+  background: var(--color-bg-card) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: 2px !important;
+  padding: 6px 10px !important;
+}
+
+/* ===== 工具栏 ===== */
+html[data-theme="lofi"] .side-toolbar {
+  background: var(--color-bg-secondary) !important;
+  border-color: var(--color-border) !important;
+  border-radius: 4px !important;
+}
+html[data-theme="lofi"] .toolbar-toggle { border-right-color: var(--color-border) !important; }
+html[data-theme="lofi"] .toolbar-toggle:hover { background: var(--color-hover) !important; }
+html[data-theme="lofi"] .toolbar-tools { border-right-color: var(--color-border) !important; }
+html[data-theme="lofi"] .tool-item {
+  font-family: var(--font-family-display) !important;
+  font-size: 14px !important;
+  color: var(--color-text-muted) !important;
+}
+html[data-theme="lofi"] .tool-item:hover { background: var(--color-hover) !important; color: var(--color-text-primary) !important; }
+html[data-theme="lofi"] .tool-item.active { background: var(--color-active) !important; color: var(--color-text-heading) !important; }
+html[data-theme="lofi"] .toolbar-content {
+  font-family: var(--font-family-serif) !important;
+  color: var(--color-text-secondary) !important;
+  line-height: 2 !important;
+}
+html[data-theme="lofi"] .toolbar-content h3,
+html[data-theme="lofi"] .toolbar-content strong {
+  font-family: var(--font-family-display) !important;
+  letter-spacing: 2px !important;
+  color: var(--color-text-heading) !important;
+}

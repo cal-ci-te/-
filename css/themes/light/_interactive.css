@@ -1,0 +1,189 @@
+/* ========== 亮色主题 · 交互控件 ========== */
+
+/* ===== 按钮 ===== */
+button, .btn, .theme-btn, .avatar-upload-btn, .login-submit-btn {
+  background: var(--color-bg-tertiary) !important;
+  color: var(--color-text-primary) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: 4px !important;
+  padding: 6px 12px !important;
+  cursor: pointer !important;
+  font-family: var(--font-family-base) !important;
+  transition: all 0.2s !important;
+}
+button:hover, .btn:hover, .theme-btn:hover {
+  background: var(--color-accent-dark) !important;
+  color: #e8d5b5 !important;
+}
+button:active, .btn:active, .theme-btn:active {
+  transform: scale(0.97) !important;
+}
+
+/* ===== 输入框 ===== */
+input[type="text"], input[type="password"], textarea, select {
+  background: var(--color-bg-card) !important;
+  border: 1px solid var(--color-border) !important;
+  color: var(--color-text-primary) !important;
+  border-radius: 4px !important;
+  padding: 6px 10px !important;
+  font-family: var(--font-family-base) !important;
+}
+input:focus, textarea:focus, select:focus {
+  border-color: var(--color-border-highlight) !important;
+  box-shadow: var(--shadow-focus) !important;
+}
+
+/* ===== 管理员面板 ===== */
+.admin-panel {
+  background: var(--color-bg-secondary) !important;
+  border: 1px solid var(--color-border) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+.panel-header {
+  background: var(--color-bg-tertiary) !important;
+  border-bottom: 1px solid var(--color-border) !important;
+}
+.panel-header h4 {
+  color: var(--color-text-heading) !important;
+}
+.panel-header .toggle-icon {
+  color: var(--color-text-muted) !important;
+}
+.panel-content {
+  background: var(--color-bg-primary) !important;
+}
+.panel-content label {
+  color: var(--color-text-muted) !important;
+}
+.panel-content input, .panel-content select {
+  background: var(--color-bg-card) !important;
+  border: 1px solid var(--color-border) !important;
+  color: var(--color-text-primary) !important;
+}
+.panel-content input[type="range"] {
+  background: var(--color-border-light) !important;
+}
+.panel-content input[type="range"]::-webkit-slider-thumb {
+  background: var(--color-border) !important;
+}
+.panel-content .theme-btn {
+  background: var(--color-bg-tertiary) !important;
+  color: var(--color-text-primary) !important;
+  border-color: var(--color-border) !important;
+}
+.panel-content .theme-btn:hover {
+  background: var(--color-accent-dark) !important;
+  color: #e8d5b5 !important;
+}
+
+/* ===== 登录弹窗 ===== */
+.login-modal {
+  background: var(--color-bg-card) !important;
+  border: 1px solid var(--color-border) !important;
+  box-shadow: var(--shadow-xl) !important;
+}
+.login-modal .modal-header {
+  background: var(--color-bg-tertiary) !important;
+  border-bottom: 1px solid var(--color-border) !important;
+}
+.login-modal .modal-header h3 {
+  color: var(--color-text-heading) !important;
+}
+.login-modal .modal-close {
+  color: var(--color-text-muted) !important;
+}
+.login-modal .modal-close:hover {
+  color: var(--color-text-heading) !important;
+}
+.login-modal .input-group label {
+  color: var(--color-text-muted) !important;
+}
+.login-modal .input-group input {
+  background: var(--color-bg-card) !important;
+  border: 1px solid var(--color-border) !important;
+  color: var(--color-text-primary) !important;
+}
+.login-modal .login-hint {
+  color: var(--color-text-muted) !important;
+}
+
+/* ===== 裁剪弹窗 ===== */
+.crop-modal {
+  background: var(--color-bg-card) !important;
+  border: 1px solid var(--color-border) !important;
+  box-shadow: var(--shadow-xl) !important;
+}
+.crop-modal .modal-header {
+  background: var(--color-bg-tertiary) !important;
+  border-bottom: 1px solid var(--color-border) !important;
+}
+.crop-modal .modal-header h3 {
+  color: var(--color-text-heading) !important;
+}
+.crop-modal .crop-preview p {
+  color: var(--color-text-muted) !important;
+}
+.crop-modal .crop-cancel-btn {
+  background: var(--color-bg-tertiary) !important;
+  color: var(--color-text-primary) !important;
+  border: 1px solid var(--color-border) !important;
+}
+.crop-modal .crop-confirm-btn {
+  background: var(--color-accent) !important;
+  color: #e8d5b5 !important;
+  border: 1px solid var(--color-border) !important;
+}
+
+/* ===== 登录Widget ===== */
+.login-trigger {
+  background: var(--color-bg-secondary) !important;
+  border-color: var(--color-border) !important;
+}
+.login-trigger:hover {
+  border-color: var(--color-border-highlight) !important;
+}
+.login-label {
+  color: var(--color-text-heading) !important;
+}
+.welcome-text {
+  color: var(--color-text-muted) !important;
+}
+
+/* ===== 贴纸相关 ===== */
+.deco-logo, .deco-stamp, .deco-raven {
+  opacity: 0.5 !important;
+}
+.asset-item {
+  border-bottom-color: var(--color-border) !important;
+}
+.asset-item .asset-style-btn,
+.asset-item .asset-duplicate-btn,
+.asset-item .asset-rename-btn,
+.asset-item .asset-edit-pos-btn,
+.asset-item .asset-download-btn {
+  color: var(--color-text-muted) !important;
+}
+.asset-item .asset-style-btn:hover,
+.asset-item .asset-duplicate-btn:hover,
+.asset-item .asset-rename-btn:hover,
+.asset-item .asset-edit-pos-btn:hover,
+.asset-item .asset-download-btn:hover {
+  color: var(--color-text-heading) !important;
+}
+.asset-item .asset-delete-btn:hover {
+  color: var(--color-error) !important;
+}
+
+/* ===== 工具栏 ===== */
+.side-toolbar {
+  background: var(--color-bg-card) !important;
+  border-color: var(--color-border) !important;
+}
+.toolbar-toggle { border-right-color: var(--color-border) !important; }
+.toolbar-toggle:hover { background: var(--color-hover) !important; }
+.toolbar-tools { border-right-color: var(--color-border) !important; }
+.tool-item { color: var(--color-text-muted) !important; }
+.tool-item:hover { background: var(--color-hover) !important; color: var(--color-text-primary) !important; }
+.tool-item.active { background: var(--color-active) !important; color: var(--color-text-heading) !important; }
+.toolbar-content { color: var(--color-text-secondary) !important; }
+.toolbar-content h3, .toolbar-content strong { color: var(--color-text-heading) !important; }

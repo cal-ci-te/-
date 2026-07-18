@@ -1,0 +1,113 @@
+/* ========== 暗色主题 · 内容展示 ========== */
+
+/* ===== 卡片 ===== */
+.card {
+  background: var(--color-bg-card) !important;
+  border: 1px solid var(--color-border) !important;
+  box-shadow: var(--shadow-md) !important;
+  padding: 22px !important;
+  transition: all 0.25s !important;
+  cursor: pointer !important;
+}
+.card:hover {
+  transform: rotate(0deg) translateY(-4px) !important;
+  border-color: var(--color-border-highlight) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+.card h3 {
+  color: var(--color-text-heading) !important;
+}
+.card-content {
+  color: var(--color-text-secondary) !important;
+}
+.card-meta {
+  color: var(--color-text-muted) !important;
+}
+
+/* ===== 详情页 ===== */
+.detail-overlay {
+  background: var(--color-bg-overlay) !important;
+}
+.detail-container {
+  background: var(--color-bg-card) !important;
+  border: 1px solid var(--color-border) !important;
+}
+.detail-topbar {
+  background: var(--color-bg-secondary) !important;
+  border-bottom: 1px solid var(--color-border) !important;
+}
+.detail-tab {
+  background: var(--color-bg-tertiary) !important;
+  color: var(--color-text-muted) !important;
+  border-color: var(--color-border) !important;
+}
+.detail-tab:hover {
+  background: var(--color-hover) !important;
+  color: var(--color-text-primary) !important;
+}
+.detail-tab.active {
+  background: var(--color-bg-card) !important;
+  color: var(--color-text-heading) !important;
+  border-color: var(--color-border-highlight) !important;
+}
+.detail-topbar-controls button {
+  color: var(--color-text-muted) !important;
+}
+.detail-topbar-controls button:hover {
+  background: var(--color-hover) !important;
+  color: var(--color-text-primary) !important;
+}
+.detail-body {
+  color: var(--color-text-primary) !important;
+}
+.detail-body h1, .detail-body h2, .detail-body h3 {
+  color: var(--color-text-heading) !important;
+}
+.detail-body blockquote {
+  border-left-color: var(--color-border-highlight) !important;
+  color: var(--color-text-secondary) !important;
+}
+
+/* ===== 最小化栏 ===== */
+.minimized-bar {
+  background: var(--color-bg-secondary) !important;
+  border: 1px solid var(--color-border) !important;
+}
+.minimized-item {
+  background: var(--color-bg-tertiary) !important;
+  border: 1px solid var(--color-border) !important;
+}
+.minimized-item .minimized-title {
+  color: var(--color-text-primary) !important;
+}
+
+/* ===== 文章编辑器 ===== */
+.editor-toolbar {
+  background: var(--color-bg-secondary) !important;
+  border-bottom: 1px solid var(--color-border) !important;
+}
+.editor-toolbar .brand {
+  color: var(--color-text-heading) !important;
+}
+.editor-sidebar {
+  background: var(--color-bg-secondary) !important;
+  border-right: 1px solid var(--color-border) !important;
+}
+.editor-sidebar-header {
+  background: var(--color-bg-tertiary) !important;
+  border-bottom: 1px solid var(--color-border) !important;
+}
+.editor-sidebar-header h3 {
+  color: var(--color-text-heading) !important;
+}
+.editor-content {
+  background: var(--color-bg-primary) !important;
+}
+.editor-form input[type="text"], .editor-form textarea {
+  background: var(--color-bg-card) !important;
+  border: 1px solid var(--color-border) !important;
+  color: var(--color-text-primary) !important;
+}
+.editor-form label {
+  color: var(--color-text-muted) !important;
+}

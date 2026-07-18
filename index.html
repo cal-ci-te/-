@@ -21,6 +21,19 @@
 <div class="custom-texture" id="customTexture"></div>
 <div class="visible-watermark" id="visibleWatermark"></div>
 
+<!-- ========== 左上角工具栏 ========== -->
+<div class="side-toolbar collapsed" id="sideToolbar">
+    <div class="toolbar-toggle" id="toolbarToggle" title="工具栏">
+        <div class="toolbar-toggle-icon"></div>
+    </div>
+    <div class="toolbar-panel" id="toolbarPanel">
+        <div class="toolbar-tools">
+            <button class="tool-item active" data-tool="help" title="使用说明">?</button>
+        </div>
+        <div class="toolbar-content" id="toolbarContent"></div>
+    </div>
+</div>
+
 <!-- ========== 全屏视频背景 ========== -->
 <div class="fullscreen-bg" id="fullscreenBg">
     <video id="heroVideo" autoplay muted loop playsinline preload="auto">
@@ -125,11 +138,11 @@
             </div>
             <div id="positionModeControls" style="display:none; padding: 8px 12px; border-bottom:1px solid #3a2a1a;">
                 <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
-                    <button id="enterPositionModeBtn" style="width:auto;background:#5a3e2b;padding:4px 12px;font-size:11px;border:none;color:#e8d5b5;border-radius:4px;cursor:pointer;">📌 进入位置管理</button>
-                    <button id="savePositionChangesBtn" style="width:auto;background:#3a5a2b;padding:4px 12px;font-size:11px;border:none;color:#e8d5b5;border-radius:4px;cursor:pointer;display:none;">💾 保存更改</button>
-                    <button id="cancelPositionChangesBtn" style="width:auto;background:#3a2a1a;padding:4px 12px;font-size:11px;border:none;color:#e8d5b5;border-radius:4px;cursor:pointer;display:none;">❌ 取消</button>
+                    <button id="enterPositionModeBtn" class="pos-mode-btn pos-mode-enter">📌 进入位置管理</button>
+                    <button id="savePositionChangesBtn" class="pos-mode-btn pos-mode-save" style="display:none;">💾 保存更改</button>
+                    <button id="cancelPositionChangesBtn" class="pos-mode-btn pos-mode-cancel" style="display:none;">❌ 取消</button>
                 </div>
-                <div style="font-size:9px;color:#7a6a58;margin-top:4px;" id="positionModeHint"></div>
+                <div class="pos-mode-hint" id="positionModeHint"></div>
             </div>
             <div class="directory-tree" id="directoryTree">
                 <div style="padding: 20px; text-align: center; color: #7a6a58;" id="directoryLoading"></div>

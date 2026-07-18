@@ -183,20 +183,7 @@ export function renderTree(nodes, level = 0, filterKeyword = null, parentPath = 
     let dropzoneHtml = '';
     if (AppState.get('isLoggedIn')) {
         dropzoneHtml = `
-            <div class="dropzone-background" data-dropzone="background" style="
-                margin: 12px 0 8px 0;
-                padding: 20px 16px;
-                border: 2px dashed #5a3e2b;
-                border-radius: 6px;
-                color: #7a6a58;
-                text-align: center;
-                font-size: 12px;
-                font-family: 'Courier New', monospace;
-                transition: background 0.2s, border-color 0.2s;
-                background: rgba(26, 22, 18, 0.3);
-                cursor: default;
-                user-select: none;
-            ">
+            <div class="dropzone-background" data-dropzone="background">
                 ${UI.directory.dragDropHint}
             </div>
         `;

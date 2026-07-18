@@ -1,0 +1,53 @@
+/* ========== 低保真主题 · 变量 ========== */
+
+/* 字体已在 index.html 中全局加载，此处不再重复 @import */
+
+:root {
+  /* 变量定义 */
+  --color-bg-primary: #f0ebe0;
+  --color-bg-secondary: #e8dfd0;
+  --color-bg-tertiary: #dacfc0;
+  --color-bg-card: #fff9f0;
+  --color-bg-card-start: #fffaf2;
+  --color-bg-card-end: #f5ede0;
+  --color-bg-overlay: rgba(240, 235, 224, 0.92);
+
+  --color-border: #c0b0a0;
+  --color-border-light: rgba(160, 140, 120, 0.2);
+  --color-border-dashed: rgba(180, 120, 80, 0.15);
+  --color-border-highlight: #b08050;
+
+  --color-text-primary: #8a7a6a;
+  --color-text-secondary: #9a8a7a;
+  --color-text-muted: #b0a090;
+  --color-text-heading: #7a6a5a;
+  --color-text-light: #c0b0a0;
+  --color-text-accent: #6a5a4a;
+
+  --color-accent: #b09070;
+  --color-accent-dark: #8a7a60;
+  --color-accent-light: #d0c0a8;
+  --color-accent-gold: #c8b898;
+
+  --color-folder-1: #b8a88a;
+  --color-folder-2: #c8b898;
+  --color-folder-3: #d8c8a8;
+  --color-folder-4: #e8d8b8;
+
+  --color-hover: rgba(180, 120, 80, 0.1);
+  --color-active: rgba(200, 100, 50, 0.08);
+  --color-success: #6a8a4a;
+  --color-error: #b04030;
+
+  --shadow-sm: 6px 6px 0 rgba(0, 0, 0, 0.04);
+  --shadow-md: 8px 8px 0 rgba(0, 0, 0, 0.04);
+  --shadow-lg: 12px 12px 0 rgba(0, 0, 0, 0.03);
+  --shadow-xl: 0 0 40px rgba(0, 0, 0, 0.02);
+  --shadow-focus: 0 0 20px rgba(180, 120, 80, 0.08);
+  --shadow-glow: 0 0 40px rgba(200, 160, 120, 0.05);
+
+  --font-family-serif: 'Patrick Hand', 'Comic Sans MS', cursive;
+  --font-family-display: 'Press Start 2P', 'Courier New', monospace;
+  --font-family-mono: 'Press Start 2P', 'Courier New', monospace;
+  --font-family-base: 'Patrick Hand', 'Comic Sans MS', cursive;
+}

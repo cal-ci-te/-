@@ -1,0 +1,104 @@
+/* ========== 低保真主题 · 侧边栏与目录树 ========== */
+html[data-theme="lofi"] .sidebar {
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-secondary);
+  box-shadow: var(--shadow-lg);
+  backdrop-filter: blur(2px);
+  border-radius: 2px;
+}
+html[data-theme="lofi"] .sidebar-header {
+  background: var(--color-bg-tertiary);
+  border-bottom: 1px solid var(--color-border);
+  padding: 10px 12px;
+}
+html[data-theme="lofi"] .sidebar-header h3 {
+  font-size: 1.2rem;
+  letter-spacing: 6px;
+  text-align: right;
+  transform: rotate(0deg);
+}
+html[data-theme="lofi"] .tree-node-content {
+  padding: 6px 10px;
+  border-left: 1px solid transparent;
+}
+html[data-theme="lofi"] .tree-node-content:hover {
+  background: var(--color-hover);
+  border-left-color: var(--color-border-highlight);
+  transform: translateX(4px);
+}
+html[data-theme="lofi"] .tree-node-content.active {
+  background: var(--color-active);
+  border-left: 3px solid var(--color-border-highlight);
+}
+html[data-theme="lofi"] .node-title {
+  font-family: var(--font-family-display);
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--color-text-secondary);
+}
+html[data-theme="lofi"] .tree-node.dragging {
+  opacity: 0.4;
+}
+html[data-theme="lofi"] .tree-node.drag-over {
+  border-left: 3px solid var(--color-border-highlight) !important;
+  background: var(--color-hover) !important;
+}
+html[data-theme="lofi"] .tree-node.dropzone-sibling-highlight {
+  border-bottom: 2px dashed var(--color-border-highlight) !important;
+  background: var(--color-active) !important;
+}
+/* ===== 右键菜单（目录树 + 贴纸） ===== */
+html[data-theme="lofi"] #directory-context-menu,
+html[data-theme="lofi"] #deco-context-menu {
+  background: var(--color-bg-secondary) !important;
+  border-color: var(--color-border) !important;
+  border-radius: 2px !important;
+}
+html[data-theme="lofi"] #directory-context-menu .ctx-item,
+html[data-theme="lofi"] #deco-context-menu .ctx-item {
+  font-family: var(--font-family-display) !important;
+  font-size: 10px !important;
+  letter-spacing: 3px !important;
+  color: var(--color-text-primary) !important;
+}
+html[data-theme="lofi"] #directory-context-menu .ctx-item:hover,
+html[data-theme="lofi"] #deco-context-menu .ctx-item:hover {
+  background: var(--color-hover) !important;
+}
+
+/* ===== 位置管理模式按钮 ===== */
+html[data-theme="lofi"] .pos-mode-btn {
+  font-family: var(--font-family-display) !important;
+  font-size: 10px !important;
+  letter-spacing: 3px !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: 2px !important;
+  color: var(--color-text-muted) !important;
+  padding: 6px 14px !important;
+}
+html[data-theme="lofi"] .pos-mode-enter { background: var(--color-bg-card) !important; }
+html[data-theme="lofi"] .pos-mode-save   { background: var(--color-bg-card) !important; }
+html[data-theme="lofi"] .pos-mode-cancel { background: var(--color-bg-card) !important; }
+html[data-theme="lofi"] .pos-mode-btn:hover {
+  background: var(--color-bg-secondary) !important;
+  color: var(--color-text-primary) !important;
+  filter: none !important;
+}
+
+html[data-theme="lofi"] .pos-mode-hint,
+html[data-theme="lofi"] .pos-hint {
+  font-family: var(--font-family-display) !important;
+  font-size: 8px !important;
+  color: var(--color-text-muted) !important;
+  letter-spacing: 2px !important;
+}
+
+/* ===== 拖拽空白放置区 ===== */
+html[data-theme="lofi"] .dropzone-background {
+  border-color: var(--color-border) !important;
+  color: var(--color-text-muted) !important;
+  background: rgba(200, 180, 160, 0.08) !important;
+  font-family: var(--font-family-display) !important;
+  font-size: 10px !important;
+  letter-spacing: 3px !important;
+}
