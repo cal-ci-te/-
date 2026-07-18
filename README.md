@@ -45,6 +45,8 @@
 ---
 
 ## 项目结构
+
+```bash
 revachol/
 ├── js/                        # 前端
 │ ├── core/                    # 状态、事件、引用
@@ -58,7 +60,7 @@ revachol/
 │ ├── storage/                 # 存储适配器
 │ └── uploads/decos/           # 贴纸文件
 └── tests/                     # 单元测试
-
+```
 
 ---
 
