@@ -22,7 +22,7 @@ function broadcastChange(type, payload) {
 
 export function showContextMenu(x, y, type, name, articleId, nodeLi, updateTreeFn) {
     // 移除旧菜单
-    const oldMenu = document.getElementById('custom-context-menu');
+    const oldMenu = document.getElementById('directory-context-menu');
     if (oldMenu) oldMenu.remove();
 
     let folderForNew = name;
@@ -34,7 +34,7 @@ export function showContextMenu(x, y, type, name, articleId, nodeLi, updateTreeF
     }
 
     const menu = document.createElement('div');
-    menu.id = 'custom-context-menu';
+    menu.id = 'directory-context-menu';
     menu.style.cssText =
         'position:fixed;left:' + x + 'px;top:' + y + 'px;background:#2a231c;border:1px solid #5a3e2b;border-radius:4px;padding:4px 0;z-index:99999;min-width:180px;box-shadow:0 4px 20px rgba(0,0,0,0.5);';
 
@@ -337,8 +337,16 @@ async function handleContextAction(action, data, nodeLi, updateTreeFn) {
             await ArticleService.fetchArticles(true);
             if (updateTreeFn) updateTreeFn();
         } catch (err) {
-            Utils.showToast(UI.toast.folderDeleteFailed, true);
+        Utils.showToast(UI.toast.folderDeleteFailed, true);
         }
         return;
     }
 }
+
+// 监听登出：关闭所有打开的右键菜单
+EventBus.on(EVENTS.AUTH_LOGGED_OUT, () => {
+    const dirMenu = document.getElementById('directory-context-menu');
+    if (dirMenu) dirMenu.remove();
+    const decoMenu = document.getElementById('deco-context-menu');
+    if (decoMenu) decoMenu.remove();
+});

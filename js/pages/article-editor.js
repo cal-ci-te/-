@@ -13,7 +13,6 @@ import { UI } from '../utils/ui-strings.js';
 import { EditorCore } from '../editor/editor-core.js';
 import { HistoryUI } from '../editor/history-ui.js';
 import { AutoSave } from '../editor/auto-save.js';
-import { UI } from '../utils/ui-strings.js';
 
 // ===== 1. 模拟登录 =====
 AppState.commit(MUTATIONS.SET_LOGGED_IN, true);
@@ -108,8 +107,28 @@ HistoryUI.onRestore = async (articleId) => {
 // ===== 7. 目录树初始化 =====
 UIDirectory.init(treeContainer);
 async function loadData() {
-    await ArticleService.fetchArticles(true);
-    UIDirectory.updateTree();
+    // 安全兜底：5秒后无论如何清除加载指示器（独立于 fetch 超时）
+    const safetyTimer = setTimeout(() => {
+        console.warn('[article-editor] 安全超时触发，强制渲染目录树');
+        try { UIDirectory.updateTree(); } catch (e) { /* 静默 */ }
+    }, 5000);
+
+    try {
+        await ArticleService.fetchArticles(true);
+    } catch (e) {
+        console.error('[article-editor] 加载文章数据失败:', e);
+    }
+    clearTimeout(safetyTimer);
+
+    try {
+        UIDirectory.updateTree();
+    } catch (e) {
+        console.error('[article-editor] 更新目录树失败:', e);
+        if (treeContainer) {
+            treeContainer.innerHTML =
+                '<div style="padding:20px;text-align:center;color:#c44a44;">加载失败，请刷新页面重试</div>';
+        }
+    }
 }
 loadData();
 EventBus.on(EVENTS.ARTICLE_VISIBILITY_CHANGED, () => UIDirectory.updateTree());
@@ -305,3 +324,22 @@ if (initialId) {
 }
 
 console.log('✅ 文章编辑器已加载（固定搜索/位置管理 + 动态文案）');
+
+// ===== 17. BroadcastChannel 实时通信（跨标签页同步可见性等变更） =====
+try {
+    const bc = new BroadcastChannel('revachol');
+    bc.onmessage = (event) => {
+        const { type } = event.data;
+        if (type === 'visibility_changed' || type === 'article_updated' ||
+            type === 'article_created' || type === 'article_deleted') {
+            console.log('[article-editor] BroadcastChannel 收到:', type);
+            ArticleService.fetchArticles(true)
+                .then(() => UIDirectory.updateTree())
+                .catch(err => console.error('[article-editor] BroadcastChannel 刷新失败:', err));
+        }
+    };
+    window.addEventListener('beforeunload', () => bc.close());
+    console.log('[article-editor] BroadcastChannel 已建立');
+} catch (e) {
+    console.warn('[article-editor] BroadcastChannel 不支持:', e);
+}

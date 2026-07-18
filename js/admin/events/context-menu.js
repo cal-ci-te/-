@@ -13,7 +13,7 @@ export const ContextMenu = {
     if (this._menu) return;
 
     const menu = document.createElement('div');
-    menu.id = 'custom-context-menu';
+    menu.id = 'deco-context-menu';
     menu.style.cssText =
       'position:fixed;display:none;background:#2a231c;border:1px solid #5a3e2b;border-radius:4px;padding:4px 0;z-index:99999;min-width:150px;box-shadow:0 4px 20px rgba(0,0,0,0.5);';
     menu.innerHTML = `
@@ -37,7 +37,7 @@ export const ContextMenu = {
     });
 
     document.addEventListener('click', function (e) {
-      if (ContextMenu._visible && !e.target.closest('#custom-context-menu')) {
+      if (ContextMenu._visible && !e.target.closest('#deco-context-menu')) {
         ContextMenu.hide();
       }
     });

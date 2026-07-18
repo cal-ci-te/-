@@ -120,34 +120,107 @@ html[data-theme="lofi"] .folder-title {
   transform: rotate(-0.2deg);
 }
 
+/* ===== 卡片 ===== */
 html[data-theme="lofi"] .card {
-  background: var(--color-bg-card);
-  border: 1px solid var(--color-border);
-  border-radius: 2px;
-  box-shadow: var(--shadow-lg);
-  transform: rotate(0.5deg) scale(1.01);
-  transition: all 0.2s ease;
-  padding: 22px 24px;
-  margin-bottom: 32px;
+  position: relative;
+  background: transparent;
+  backdrop-filter: blur(1px);
+  border: 1px solid rgba(180, 150, 120, 0.25);
+  border-radius: 0;
+  padding: 2rem 2rem 3.5rem 2rem;
+  margin-bottom: 88px;
   max-width: 100%;
-  background-image: repeating-linear-gradient(45deg, rgba(0,0,0,0.01) 0px, rgba(0,0,0,0.01) 1px, transparent 1px, transparent 3px);
+  overflow: visible;
+  transition: transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 1.2s ease;
+  box-shadow:
+    0 10px 30px -10px rgba(0, 0, 0, 0.08),
+    0 1px 3px rgba(0, 0, 0, 0.04),
+    inset 0 0 50px rgba(160, 130, 100, 0.12);
 }
-html[data-theme="lofi"] .card:nth-child(even) {
-  transform: rotate(-0.3deg) translateY(-2px);
+
+/* 背景层：纸张底色 + SVG 撕纸边缘 */
+html[data-theme="lofi"] .card::before {
+  content: '';
+  position: absolute;
+  top: -6px; left: -6px;
+  width: calc(100% + 12px);
+  height: calc(100% + 12px);
+  z-index: -1;
+  background-color: rgba(252, 248, 242, 0.58);
+  border-radius: 0;
+  pointer-events: none;
 }
-html[data-theme="lofi"] .card:nth-child(odd) {
-  transform: rotate(0.8deg) translateY(2px);
+
+/* 浏览器支持滤镜时：启用 SVG 位移滤镜撕纸边缘 + 取消回退边框 */
+@supports (backdrop-filter: blur(1px)) {
+  html[data-theme="lofi"] .card {
+    border: none;
+    padding: 2.5rem 2.5rem 4rem 2.5rem;
+  }
+  html[data-theme="lofi"] .card::before {
+    filter: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='tear' x='-10%25' y='-10%25' width='120%25' height='120%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.035' numOctaves='4' result='noise'/%3E%3CfeDisplacementMap in='SourceGraphic' in2='noise' scale='4' xChannelSelector='R' yChannelSelector='G'/%3E%3C/filter%3E%3C/svg%3E#tear");
+  }
 }
+
+/* 纸质纹理叠加层 */
+html[data-theme="lofi"] .card::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(139, 119, 90, 0.025) 2px, rgba(139, 119, 90, 0.025) 4px),
+    radial-gradient(ellipse at 30% 70%, rgba(180, 150, 120, 0.06) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(200, 170, 140, 0.04) 0%, transparent 50%);
+}
+
+html[data-theme="lofi"] .card > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* 6 种不规则裁剪 + 独立旋转角度 */
+html[data-theme="lofi"] .card:nth-child(6n+1) {
+  clip-path: polygon(0% 0%, 95% 0%, 100% 5%, 100% 90%, 94% 100%, 0% 100%);
+  transform: perspective(600px) rotateX(1.2deg) rotateY(-1.8deg);
+}
+html[data-theme="lofi"] .card:nth-child(6n+2) {
+  clip-path: polygon(0% 3%, 97% 0%, 100% 2%, 98% 97%, 100% 100%, 2% 100%, 0% 94%);
+  transform: perspective(600px) rotateX(-0.8deg) rotateY(1.6deg);
+}
+html[data-theme="lofi"] .card:nth-child(6n+3) {
+  clip-path: polygon(3% 0%, 100% 0%, 100% 93%, 96% 100%, 0% 100%, 0% 5%);
+  transform: perspective(600px) rotateX(1.8deg) rotateY(0.8deg);
+}
+html[data-theme="lofi"] .card:nth-child(6n+4) {
+  clip-path: polygon(0% 0%, 98% 2%, 100% 0%, 100% 98%, 94% 100%, 0% 96%);
+  transform: perspective(600px) rotateX(-1.4deg) rotateY(-1.2deg);
+}
+html[data-theme="lofi"] .card:nth-child(6n+5) {
+  clip-path: polygon(2% 0%, 96% 0%, 100% 6%, 100% 95%, 97% 100%, 0% 98%, 0% 3%);
+  transform: perspective(600px) rotateX(0.4deg) rotateY(-2.2deg);
+}
+html[data-theme="lofi"] .card:nth-child(6n+6) {
+  clip-path: polygon(0% 2%, 99% 0%, 100% 0%, 100% 96%, 93% 100%, 2% 100%, 0% 94%);
+  transform: perspective(600px) rotateX(-1.8deg) rotateY(0.4deg);
+}
+
+/* 悬停：轻微抚平，但保留不规则裁剪 */
 html[data-theme="lofi"] .card:hover {
-  transform: rotate(0deg) scale(1.02);
-  filter: saturate(0.8);
-  box-shadow: var(--shadow-xl);
+  transform: perspective(600px) rotateX(0.3deg) rotateY(-0.3deg) scale(1.015) !important;
+  box-shadow:
+    0 18px 40px -12px rgba(0, 0, 0, 0.14),
+    0 2px 6px rgba(0, 0, 0, 0.06),
+    inset 0 0 60px rgba(160, 130, 100, 0.18);
 }
+
 html[data-theme="lofi"] .card h3 {
   font-size: 1.4rem;
   letter-spacing: 6px;
   text-align: right;
-  border-bottom: 1px dashed var(--color-border);
+  border-bottom: 1px dashed rgba(180, 150, 120, 0.4);
   padding-bottom: 8px;
   margin-bottom: 12px;
   color: var(--color-text-heading);
@@ -164,7 +237,7 @@ html[data-theme="lofi"] .card-meta {
   color: var(--color-text-muted);
   letter-spacing: 3px;
   text-align: right;
-  border-top: 1px dotted var(--color-border-light);
+  border-top: 1px dotted rgba(180, 150, 120, 0.3);
   padding-top: 12px;
   margin-top: 16px;
 }
@@ -392,5 +465,100 @@ html[data-theme="lofi"] ::-webkit-scrollbar-thumb {
 }
 html[data-theme="lofi"] ::-webkit-scrollbar-thumb:hover {
   background: var(--color-accent-dark);
+}
+
+/* ===== 低保真按钮全覆盖（编辑器、管理面板等遗漏按钮） ===== */
+html[data-theme="lofi"] .save-btn,
+html[data-theme="lofi"] .cancel-btn,
+html[data-theme="lofi"] .close-btn,
+html[data-theme="lofi"] .toggle-btn,
+html[data-theme="lofi"] .collapse-btn,
+html[data-theme="lofi"] .sidebar-collapse-btn,
+html[data-theme="lofi"] .history-preview-btn,
+html[data-theme="lofi"] .history-restore-btn,
+html[data-theme="lofi"] .history-delete-btn,
+html[data-theme="lofi"] .history-toggle-btn,
+html[data-theme="lofi"] .modal-close,
+html[data-theme="lofi"] .crop-cancel-btn,
+html[data-theme="lofi"] .crop-confirm-btn,
+html[data-theme="lofi"] .visibility-toggle {
+  font-family: var(--font-family-display);
+  font-size: 10px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  border: 1px solid var(--color-border);
+  border-radius: 2px;
+  background: var(--color-bg-card);
+  color: var(--color-text-muted);
+  box-shadow: 2px 2px 0 rgba(0,0,0,0.03), -1px -1px 0 rgba(255,255,255,0.05);
+  padding: 8px 16px;
+  transition: all 0.15s ease;
+  cursor: pointer;
+  text-align: center;
+  min-height: 32px;
+}
+
+/* 管理面板中带内联样式的按钮强制覆盖 */
+html[data-theme="lofi"] .admin-panel button[style] {
+  font-family: var(--font-family-display) !important;
+  font-size: 10px !important;
+  letter-spacing: 4px !important;
+  text-transform: uppercase !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: 2px !important;
+  background: var(--color-bg-card) !important;
+  color: var(--color-text-muted) !important;
+  box-shadow: 2px 2px 0 rgba(0,0,0,0.03), -1px -1px 0 rgba(255,255,255,0.05) !important;
+  padding: 8px 16px !important;
+}
+
+/* ===== 低保真主页面标题居中 ===== */
+html[data-theme="lofi"] .toolbar h1 {
+  text-align: center !important;
+  transform: none !important;
+}
+
+/* ===== 低保真登录入口适配 ===== */
+html[data-theme="lofi"] .login-trigger {
+  background: var(--color-bg-secondary) !important;
+  border-color: var(--color-border) !important;
+  padding: 8px 18px 8px 12px !important;
+}
+html[data-theme="lofi"] .login-avatar {
+  width: 44px !important;
+  height: 44px !important;
+  border-color: var(--color-border) !important;
+  background: var(--color-bg-tertiary) !important;
+}
+html[data-theme="lofi"] .login-label {
+  font-family: var(--font-family-display) !important;
+  font-size: 10px !important;
+  letter-spacing: 3px !important;
+  color: var(--color-text-heading) !important;
+}
+html[data-theme="lofi"] .welcome-text {
+  font-family: var(--font-family-display) !important;
+  font-size: 8px !important;
+  letter-spacing: 2px !important;
+  color: var(--color-text-muted) !important;
+}
+
+/* ===== 右键菜单（目录树 + 贴纸） ===== */
+html[data-theme="lofi"] #directory-context-menu,
+html[data-theme="lofi"] #deco-context-menu {
+  background: var(--color-bg-secondary) !important;
+  border-color: var(--color-border) !important;
+  border-radius: 2px !important;
+}
+html[data-theme="lofi"] #directory-context-menu .ctx-item,
+html[data-theme="lofi"] #deco-context-menu .ctx-item {
+  font-family: var(--font-family-display) !important;
+  font-size: 10px !important;
+  letter-spacing: 3px !important;
+  color: var(--color-text-primary) !important;
+}
+html[data-theme="lofi"] #directory-context-menu .ctx-item:hover,
+html[data-theme="lofi"] #deco-context-menu .ctx-item:hover {
+  background: var(--color-hover) !important;
 }
 

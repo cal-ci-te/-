@@ -65,10 +65,16 @@ export const UIDirectory = {
         EventBus.on('admin:position-mode-enter', () => this._positionManager.enter());
         EventBus.on('admin:position-mode-exit', () => this._positionManager.exit(true));
         EventBus.on('admin:position-mode-cancel', () => this._positionManager.exit(false));
+        EventBus.on(EVENTS.AUTH_LOGGED_IN, () => {
+            // 登录后刷新目录树，显示管理员控件（可见性按钮、拖拽区等）
+            this.updateTree(this.filterKeyword);
+        });
         EventBus.on(EVENTS.AUTH_LOGGED_OUT, () => {
             if (this._positionManager.isActiveMode()) {
                 this._positionManager.exit(true);
             }
+            // 登出后刷新目录树，隐藏管理员控件（可见性按钮、拖拽区等）
+            this.updateTree(this.filterKeyword);
         });
 
         // 移动端长按支持

@@ -32,6 +32,20 @@ export const ArticleListStore = {
             this._notify();
         });
 
+        // 监听登出：重置分页并重新过滤（隐藏文章将对访客不可见）
+        EventBus.on(EVENTS.AUTH_LOGGED_OUT, () => {
+            console.log('[ArticleListStore] 收到登出事件，重新过滤文章列表');
+            this._resetPagination();
+            this._notify();
+        });
+
+        // 监听登录：重置分页并显示全部文章（含隐藏文章）
+        EventBus.on(EVENTS.AUTH_LOGGED_IN, () => {
+            console.log('[ArticleListStore] 收到登录事件，显示全部文章');
+            this._resetPagination();
+            this._notify();
+        });
+
         // 初始加载：如果已有数据，立即通知
         if (ArticleService.getAllArticles().length > 0) {
             this._resetPagination();
