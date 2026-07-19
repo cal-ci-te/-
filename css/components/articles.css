@@ -78,14 +78,14 @@
   margin-bottom: 40px; /* 卡片之间的大间距 */
 }
 
-/* 奇数卡片靠左，偶数卡片靠右 */
-.card:nth-child(odd) {
+/* 卡片交替靠左/靠右（由 JS 设置 card-left/card-right class，不受文件夹边界影响） */
+.card-left {
   align-self: flex-start;
   margin-right: auto;
   transform: rotate(-0.3deg);
 }
 
-.card:nth-child(even) {
+.card-right {
   align-self: flex-end;
   margin-left: auto;
   transform: rotate(0.4deg);

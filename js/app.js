@@ -27,6 +27,28 @@ import { Texture } from './services/texture.js';
 
 console.log('🚀 [app] ES Module 入口已加载');
 
+const APP_START_TIME = Date.now();
+const MIN_LOADER_DISPLAY = 300;
+
+// 加载期间锁定页面滚动（与详情页一致：html + body 双重锁定）
+document.documentElement.style.overflow = 'hidden';
+document.body.style.overflow = 'hidden';
+
+function hideLoader() {
+    const loader = document.getElementById('heartbeat-loader');
+    if (!loader) return;
+    loader.style.opacity = '0';
+    document.documentElement.style.overflow = '';
+    document.body.style.overflow = '';
+    setTimeout(() => { loader.style.display = 'none'; }, 600);
+}
+
+// 兜底：10 秒后强制隐藏（加载失败场景）
+setTimeout(() => {
+    const loader = document.getElementById('heartbeat-loader');
+    if (loader && loader.style.display !== 'none') hideLoader();
+}, 10000);
+
 injectUITexts();
 
 // ApiClient 响应拦截器：自动注入 Auth Token，401 时通知所有模块刷新 UI
@@ -274,3 +296,6 @@ setTimeout(() => {
     }
 }, 300);
 
+// [REVIEW] 心跳加载动画隐藏——保证至少显示 400ms，配合 10s 超时兜底
+const elapsed = Date.now() - APP_START_TIME;
+setTimeout(hideLoader, Math.max(0, MIN_LOADER_DISPLAY - elapsed));

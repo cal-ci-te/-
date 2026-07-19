@@ -60,6 +60,7 @@ export const UIArticles = {
 
         const groups = this._groupArticles(articles);
         let html = '';
+        let cardIndex = 0;
         let groupIndex = 0;
 
         for (const category in groups) {
@@ -92,6 +93,8 @@ export const UIArticles = {
                             cardDiv.id = UIHelpers.generateCardId(article.id);
                             cardDiv.dataset.articleId = article.id;
                             cardDiv.dataset.category = category;
+                            cardDiv.classList.add(cardIndex % 2 === 0 ? 'card-left' : 'card-right');
+                            cardIndex++;
                             const titleEl = cardDiv.querySelector('h3');
                             if (titleEl) titleEl.textContent = article.title || UI.articles.defaultTitle;
                             const contentEl = cardDiv.querySelector('.card-content');
@@ -115,7 +118,8 @@ export const UIArticles = {
                         tempDiv2.appendChild(cardClone);
                         html += tempDiv2.innerHTML;
                     } else {
-                        html += this._fallbackCard(article, category);
+                        html += this._fallbackCard(article, category, cardIndex);
+                        cardIndex++;
                     }
                 }
                 groupIndex++;
@@ -165,8 +169,9 @@ export const UIArticles = {
         );
     },
 
-    _fallbackCard: function (article, category) {
+    _fallbackCard: function (article, category, cardIndex) {
         const cardId = UIHelpers.generateCardId(article.id);
+        const side = cardIndex % 2 === 0 ? 'card-left' : 'card-right';
         const title = article.title || UI.articles.defaultTitle;
         let content = article.content || UI.articles.defaultContent;
         content = content
@@ -175,7 +180,7 @@ export const UIArticles = {
         const displayContent = content.length > 350 ? content.substring(0, 350) + '…' : content;
         const updateTime = article.updateTime || article.createTime || UI.articles.unknownTime;
         return (
-            '<div class="card" id="' +
+            '<div class="card ' + side + '" id="' +
             cardId +
             '" data-article-id="' +
             article.id +

@@ -61,6 +61,7 @@ export const ThemeService = {
 
         currentTheme = themeId;
         const theme = THEMES[themeId];
+        this._switchFavicon(themeId);
 
         // 移除旧的主题样式
         this._loadStylesheet(theme.cssFile);
@@ -122,6 +123,23 @@ export const ThemeService = {
             return;
         }
         this.applyTheme(themeId, false);
+    },
+
+    _switchFavicon(themeId) {
+        // 移除旧 favicon
+        document.querySelectorAll('link[rel="icon"]').forEach(el => el.remove());
+        const ts = Date.now();
+        const base = `/themes/${themeId}`;
+        [ { href: `${base}/favicon.ico`, type: 'image/x-icon', sizes: '' },
+          { href: `${base}/favicon-32x32.png`, type: 'image/png', sizes: '32x32' } ]
+            .forEach(cfg => {
+                const link = document.createElement('link');
+                link.rel = 'icon';
+                link.type = cfg.type;
+                link.href = `${cfg.href}?t=${ts}`;
+                if (cfg.sizes) link.sizes = cfg.sizes;
+                document.head.appendChild(link);
+            });
     },
 
     _loadStylesheet(href) {
