@@ -105,7 +105,7 @@ export const UIArticles = {
                                     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
                                 if (displayContent.length > 350)
                                     displayContent = displayContent.substring(0, 350) + '…';
-                                contentEl.innerHTML = displayContent.replace(/\n/g, '<br>');
+                                contentEl.innerHTML = displayContent;
                             }
                             const metaEl = cardDiv.querySelector('.card-meta');
                             if (metaEl) {
@@ -191,7 +191,7 @@ export const UIArticles = {
             Utils.escapeHtml(title) +
             '</h3>' +
             '<div class="card-content">' +
-            Utils.escapeHtml(displayContent).replace(/\n/g, '<br>') +
+            Utils.escapeHtml(displayContent) +
             '</div>' +
             '<div class="card-meta">' +
             UI.articles.cardMetaPrefix +

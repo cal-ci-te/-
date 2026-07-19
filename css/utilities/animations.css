@@ -108,3 +108,29 @@
   height: auto;
 }
 
+
+/* 加载完成后渐入动画 */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+body.loaded .hero-section h1,
+body.loaded .hero-section .subtitle,
+body.loaded .hero-section .brand-text {
+  animation: fadeInUp 0.5s ease-out both;
+}
+body.loaded .hero-section h1       { animation-delay: 0.05s; }
+body.loaded .hero-section .subtitle { animation-delay: 0.12s; }
+
+body.loaded .side-toolbar,
+body.loaded .sidebar,
+body.loaded .directory-tree,
+body.loaded .login-trigger {
+  animation: fadeInUp 0.5s ease-out both;
+  animation-delay: 0.25s;
+}
+
+body.loaded [id^="deco-"]:not(#deco-context-menu) {
+  animation: fadeInUp 0.6s ease-out both;
+  animation-delay: 0.45s;
+}

@@ -44,6 +44,20 @@ function loadEditorTheme(themeId) {
 
   if (id === 'lofi') document.documentElement.setAttribute('data-theme', 'lofi');
   else document.documentElement.removeAttribute('data-theme');
+
+  // 同步 favicon
+  document.querySelectorAll('link[rel="icon"]').forEach(el => el.remove());
+  const ts = Date.now();
+  const base = `/themes/${id}`;
+  [{ href: `${base}/favicon.ico`, type: 'image/x-icon', sizes: '' },
+   { href: `${base}/favicon-32x32.png`, type: 'image/png', sizes: '32x32' }]
+    .forEach(cfg => {
+      const l = document.createElement('link');
+      l.rel = 'icon'; l.type = cfg.type;
+      l.href = `${cfg.href}?t=${ts}`;
+      if (cfg.sizes) l.sizes = cfg.sizes;
+      document.head.appendChild(l);
+    });
 }
 
 loadEditorTheme(Utils.storage.get('selected_theme'));

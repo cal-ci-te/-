@@ -149,6 +149,7 @@
   line-height: 1.65;
   font-size: 0.9rem;
   font-family: 'IM Fell English', 'Georgia', serif;
+  white-space: pre-wrap;
   overflow: hidden;
   display: -webkit-box;
   -webkit-line-clamp: 4;

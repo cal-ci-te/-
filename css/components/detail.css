@@ -165,6 +165,7 @@
   line-height: 1.8;
   font-size: 1rem;
   font-family: var(--font-family-serif);
+  white-space: pre-wrap;
 }
 
 .detail-body h1 {

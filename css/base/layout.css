@@ -52,6 +52,60 @@
   border-radius: var(--radius-md);
 }
 
+/* 自定义站点图标 — 昆虫标本悬挂样式 */
+.avatar#siteAvatar {
+  width: 70px; height: 70px;
+  overflow: visible;
+  background: var(--color-bg-tertiary);
+  border: 2px solid var(--color-border-highlight);
+  position: relative;
+}
+.avatar#siteAvatar::before {
+  content: '';
+  position: absolute;
+  top: -10px; left: 50%;
+  width: 2px; height: 10px;
+  background: var(--color-text-muted);
+  transform: translateX(-50%);
+}
+.avatar#siteAvatar img {
+  width: 100px; height: 100px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4));
+}
+.avatar#siteAvatar span {
+  font-size: 40px;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.35));
+}
+/* 自定义图标激活时隐藏 emoji */
+.avatar.has-custom span { display: none; }
+.avatar.has-custom img { display: block !important; }
+
+/* 一次性入场动画 */
+@keyframes swingBox {
+  0%   { transform: rotate(0deg); }
+  20%  { transform: rotate(4deg); }
+  40%  { transform: rotate(-4deg); }
+  60%  { transform: rotate(3deg); }
+  80%  { transform: rotate(-2deg); }
+  100% { transform: rotate(0deg); }
+}
+@keyframes swingIcon {
+  0%   { transform: rotate(0deg); }
+  20%  { transform: rotate(15deg); }
+  40%  { transform: rotate(-15deg); }
+  60%  { transform: rotate(10deg); }
+  80%  { transform: rotate(-8deg); }
+  100% { transform: rotate(0deg); }
+}
+.avatar.animate {
+  animation: swingBox 1.2s ease-in-out forwards;
+}
+.avatar.animate img,
+.avatar.animate span {
+  animation: swingIcon 1.2s ease-in-out forwards;
+}
+
 h1 {
   font-family: var(--font-family-display);
   color: var(--color-text-heading);

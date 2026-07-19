@@ -69,6 +69,7 @@ export const UIDetail = {
     );
 
     console.log('[UIDetail] 初始化完成（浏览器式顶部栏 + 最小化栏 + 全屏）');
+    setTimeout(() => { this._restoreMinimizedState(); }, 100);
   },
 
   _buildTopbar: function () {
@@ -135,6 +136,18 @@ export const UIDetail = {
 
   createTab: function (article) {
     const id = article.id;
+
+    // 去重：已存在激活则 focus，已最小化则恢复，都不存在才新建
+    var existing = this.openArticles.find(function (e) { return e.id === id; });
+    if (existing) {
+      if (existing.isMinimized) {
+        this.restoreFromMinimize(id);
+      } else {
+        this.activateTab(id);
+      }
+      return;
+    }
+
     const title = article.title || UI.detail.defaultTitle;
     const rawContent = article.content || UI.detail.defaultContent;
     const html = this.renderContent(rawContent);
@@ -164,7 +177,12 @@ export const UIDetail = {
       isMinimized: false,
       minimizedItem: null,
     };
-    this.openArticles.push(entry);
+    if (existing) {
+      existing.tabElement = tab;
+      existing.paneElement = pane;
+    } else {
+      this.openArticles.push(entry);
+    }
 
     tab.addEventListener(
       'click',
@@ -220,19 +238,25 @@ export const UIDetail = {
 
   activateTab: function (id) {
     this.activeId = id;
+    var isActiveNonMinimized = false;
     this.openArticles.forEach(function (item) {
       if (item.id === id) {
-        item.tabElement.classList.add('active');
+        if (item.tabElement) item.tabElement.classList.add('active');
         if (!item.isMinimized) {
-          item.paneElement.classList.add('active');
+          isActiveNonMinimized = true;
+          if (item.paneElement) item.paneElement.classList.add('active');
         } else {
-          item.paneElement.classList.remove('active');
+          if (item.paneElement) item.paneElement.classList.remove('active');
         }
       } else {
-        item.tabElement.classList.remove('active');
-        item.paneElement.classList.remove('active');
+        if (item.tabElement) item.tabElement.classList.remove('active');
+        if (item.paneElement) item.paneElement.classList.remove('active');
       }
     });
+    // 详情页激活时隐藏最小化栏，关闭/全最小化时恢复
+    if (this.minimizedContainer) {
+      this.minimizedContainer.style.display = isActiveNonMinimized ? 'none' : '';
+    }
   },
 
   minimizeTab: function (id) {
@@ -243,6 +267,7 @@ export const UIDetail = {
     entry.paneElement.classList.remove('active');
 
     this._addToMinimizedBar(entry);
+    this._saveMinimizedState();
     Utils.showToast(UI.detail.minimizeToast, false);
 
     const next = this.openArticles.find((item) => !item.isMinimized && item.id !== id);
@@ -256,43 +281,71 @@ export const UIDetail = {
   },
 
   _addToMinimizedBar: function (entry) {
+    this._renderMinimizedBar();
+  },
+
+  _renderMinimizedBar: function () {
     const bar = this.minimizedContainer;
     if (!bar) return;
-    bar.style.display = 'flex';
+    // 清空并全量重渲染（保证顺序与 openArticles 一致）
+    bar.innerHTML = '';
+    const minimized = this.openArticles.filter(function (e) { return e.isMinimized; });
+    if (minimized.length === 0) {
+      bar.style.display = 'none';
+      return;
+    }
+    // 有激活的非最小化标签页时隐藏，避免覆盖在详情页上方
+    var hasActive = this.openArticles.some(function (e) { return !e.isMinimized; });
+    bar.style.display = hasActive ? 'none' : 'flex';
+    var self = this;
+    minimized.forEach(function (entry) {
+      const item = document.createElement('div');
+      item.className = 'minimized-item';
+      item.dataset.id = entry.id;
+      item.innerHTML = '' +
+        '<span class="minimized-title">' + Utils.escapeHtml(entry.title) + '</span>' +
+        '<span class="minimized-restore" data-id="' + entry.id + '">' + UI.detail.restoreFromMinimize + '</span>' +
+        '<span class="minimized-close" data-id="' + entry.id + '">' + UI.detail.paneClose + '</span>';
+      bar.appendChild(item);
+      entry.minimizedItem = item;
 
-    const item = document.createElement('div');
-    item.className = 'minimized-item';
-    item.dataset.id = entry.id;
-    item.innerHTML = `
-            <span class="minimized-title">${Utils.escapeHtml(entry.title)}</span>
-            <span class="minimized-restore" data-id="${entry.id}">${UI.detail.restoreFromMinimize}</span>
-            <span class="minimized-close" data-id="${entry.id}">${UI.detail.paneClose}</span>
-        `;
-    bar.appendChild(item);
-    entry.minimizedItem = item;
-
-    item.querySelector('.minimized-title').addEventListener(
-      'click',
-      function () {
-        this.restoreFromMinimize(entry.id);
-      }.bind(this)
-    );
-    item.querySelector('.minimized-restore').addEventListener(
-      'click',
-      function (e) {
+      item.querySelector('.minimized-title').addEventListener('click', function () {
+        self.restoreFromMinimize(entry.id);
+      });
+      item.querySelector('.minimized-restore').addEventListener('click', function (e) {
         e.stopPropagation();
-        this.restoreFromMinimize(entry.id);
-      }.bind(this)
-    );
-    item.querySelector('.minimized-close').addEventListener(
-      'click',
-      function (e) {
+        self.restoreFromMinimize(entry.id);
+      });
+      item.querySelector('.minimized-close').addEventListener('click', function (e) {
         e.stopPropagation();
-        this.closeTab(entry.id);
-      }.bind(this)
-    );
-
+        self.closeTab(entry.id);
+      });
+    });
     bar.scrollLeft = bar.scrollWidth;
+  },
+
+  _saveMinimizedState: function () {
+    var data = this.openArticles
+      .filter(function (e) { return e.isMinimized; })
+      .map(function (e) { return { id: e.id, title: e.title }; });
+    Utils.storage.set('minimized_articles', data);
+  },
+
+  _restoreMinimizedState: function () {
+    var self = this;
+    var data = Utils.storage.get('minimized_articles');
+    if (!data || !Array.isArray(data) || data.length === 0) return;
+    data.forEach(function (item) {
+      self.openArticles.push({
+        id: item.id,
+        title: item.title,
+        tabElement: null,
+        paneElement: null,
+        isMinimized: true,
+        minimizedItem: null,
+      });
+    });
+    this._renderMinimizedBar();
   },
 
   restoreFromMinimize: function (id) {
@@ -300,18 +353,28 @@ export const UIDetail = {
     if (!entry || !entry.isMinimized) return;
 
     entry.isMinimized = false;
-    if (entry.minimizedItem) {
-      entry.minimizedItem.remove();
-      entry.minimizedItem = null;
-    }
-    if (this.minimizedContainer && this.minimizedContainer.children.length === 0) {
-      this.minimizedContainer.style.display = 'none';
+    if (entry.minimizedItem) { entry.minimizedItem = null; }
+    this._renderMinimizedBar();
+
+    // 持久化条目（无 paneElement）：获取文章数据后通过 createTab 渲染
+    if (!entry.paneElement) {
+      this.openArticles = this.openArticles.filter(function (e) { return e.id !== id; });
+      this._renderMinimizedBar();
+      var article = null;
+      if (window.ArticleService) {
+        var all = window.ArticleService.getAllArticles();
+        article = all.find(function (a) { return a.id === id; });
+      }
+      if (article) { this.createTab(article); }
+      else { Utils.showToast(UI.detail.defaultContent, true); }
+      return;
     }
 
     entry.paneElement.classList.add('active');
     this.activateTab(id);
     this.overlay.classList.add('active');
     document.documentElement.style.overflow = "hidden"; document.body.style.overflow = "hidden";
+    this._saveMinimizedState();
   },
 
   toggleFullscreen: function () {
@@ -371,9 +434,7 @@ export const UIDetail = {
     entry.paneElement.remove();
     this.openArticles.splice(index, 1);
 
-    if (this.minimizedContainer && this.minimizedContainer.children.length === 0) {
-      this.minimizedContainer.style.display = 'none';
-    }
+    this._renderMinimizedBar();
 
     if (this.openArticles.length > 0) {
       const next = this.openArticles.find((item) => !item.isMinimized);
@@ -390,6 +451,7 @@ export const UIDetail = {
       this.activeId = null;
       if (document.fullscreenElement) this._exitFullscreen();
     }
+    this._saveMinimizedState();
   },
 
   closeAll: function () {
