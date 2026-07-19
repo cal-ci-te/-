@@ -1,0 +1,23 @@
+/* 编辑器暗色主题覆盖 — 默认即暗色，此处仅确保 CSS 变量引用一致 */
+.editor-toolbar   { background: var(--color-bg-secondary); border-color: var(--color-border); }
+.editor-toolbar .brand { color: var(--color-text-heading); }
+.editor-toolbar button { background: var(--color-accent-dark); color: var(--color-text-accent); }
+.editor-toolbar button:hover { background: var(--color-accent); color: var(--color-bg-primary); }
+.editor-toolbar .close-btn { background: transparent; color: var(--color-text-muted); }
+.editor-toolbar .close-btn:hover { background: var(--color-bg-tertiary); color: var(--color-text-accent); }
+.toggle-btn { border-color: var(--color-border); color: var(--color-text-heading); }
+.toggle-btn:hover { background: var(--color-accent-dark); }
+
+.editor-content { background: var(--color-bg-primary); }
+.editor-content .empty-state { color: var(--color-text-muted); }
+.editor-form label { color: var(--color-text-secondary); }
+.editor-form input[type="text"],
+.editor-form textarea { background: var(--color-bg-card); border-color: var(--color-border); color: var(--color-text-accent); }
+.editor-form input[type="text"]:focus,
+.editor-form textarea:focus { border-color: var(--color-accent); }
+.editor-form .form-actions .save-btn { background: #3a5a2b; }
+.editor-form .form-actions .cancel-btn { background: var(--color-bg-tertiary); color: var(--color-text-secondary); }
+
+.editor-sidebar { background: var(--color-bg-secondary); border-color: var(--color-border); }
+.editor-sidebar-header { border-color: var(--color-border); }
+.search-box { background: var(--color-bg-tertiary); border-color: var(--color-border); color: var(--color-text-accent); }

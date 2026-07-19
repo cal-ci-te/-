@@ -74,16 +74,20 @@ export const DecoShelfUI = {
       const escapedId = Utils.escapeHtml(item.id);
 
       html += `
-                <div class="asset-item" data-id="${escapedId}" style="display:flex;align-items:center;padding:6px 8px;border-bottom:1px solid #3a2a1a;">
-                    <div style="width:40px;height:40px;background-image:${preview};background-size:contain;background-repeat:no-repeat;background-position:center;margin-right:10px;flex-shrink:0;border:1px solid #5a3e2b;border-radius:4px;background-color:#1a1612;"></div>
-                    <span style="flex:1;font-size:11px;color:#e8d5b5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:'Courier New',monospace;" title="${escapedName}">${escapedName}</span>
-                    <span style="font-size:9px;color:#7a6a58;margin-right:8px;font-family:'Courier New',monospace;flex-shrink:0;">${isPlaced ? UI.admin.decoItemPlaced : UI.admin.decoItemUnplaced}</span>
-                    <button class="asset-style-btn" data-id="${escapedId}" style="background:none;border:none;color:#c4b5a0;cursor:pointer;font-size:11px;padding:0 4px;" title="${UI.admin.decoStyleLabel}（当前：${styleLabel}）">🔄 ${styleLabel}</button>
-                    <button class="asset-duplicate-btn" data-id="${escapedId}" style="background:none;border:none;color:#c4b5a0;cursor:pointer;font-size:14px;padding:0 4px;" title="${UI.admin.decoDuplicate}">📋</button>
-                    <button class="asset-rename-btn" data-id="${escapedId}" style="background:none;border:none;color:#c4b5a0;cursor:pointer;font-size:14px;padding:0 4px;" title="${UI.admin.decoRename}">✏️</button>
-                    <button class="asset-edit-pos-btn" data-id="${escapedId}" style="background:none;border:none;color:#c4b5a0;cursor:pointer;font-size:14px;padding:0 4px;" title="${UI.admin.decoEditPos}">📍</button>
-                    <button class="asset-download-btn" data-id="${escapedId}" style="background:none;border:none;color:#c4b5a0;cursor:pointer;font-size:14px;padding:0 4px;" title="${UI.admin.decoDownload}">⬇️</button>
-                    <button class="asset-delete-btn" data-id="${escapedId}" style="background:none;border:none;color:#c44a44;cursor:pointer;font-size:14px;padding:0 4px;" title="${UI.admin.decoDelete}">🗑️</button>
+                <div class="asset-item" data-id="${escapedId}" style="padding:5px 8px;border-bottom:1px solid #3a2a1a;">
+                    <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
+                        <div style="width:28px;height:28px;background-image:${preview};background-size:contain;background-repeat:no-repeat;background-position:center;flex-shrink:0;border:1px solid #5a3e2b;border-radius:3px;background-color:#1a1612;"></div>
+                        <span style="flex:1;min-width:0;font-size:11px;color:#e8d5b5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:'Courier New',monospace;" title="${escapedName}">${escapedName}</span>
+                        <span style="font-size:8px;color:${isPlaced ? '#8ab47a' : '#7a6a58'};font-family:'Courier New',monospace;flex-shrink:0;">${isPlaced ? '●已放置' : '○未放置'}</span>
+                        <button class="asset-style-btn" data-id="${escapedId}" style="background:none;border:1px solid #3a2a1a;color:#c4b5a0;cursor:pointer;font-size:10px;padding:1px 4px;border-radius:2px;flex-shrink:0;" title="切换样式（${styleLabel}）">🔄</button>
+                    </div>
+                    <div style="display:flex;gap:1px;">
+                        <button class="asset-duplicate-btn" data-id="${escapedId}" style="background:none;border:1px solid #3a2a1a;color:#c4b5a0;cursor:pointer;font-size:10px;padding:1px 5px;border-radius:2px;" title="${UI.admin.decoDuplicate}">📋</button>
+                        <button class="asset-rename-btn" data-id="${escapedId}" style="background:none;border:1px solid #3a2a1a;color:#c4b5a0;cursor:pointer;font-size:10px;padding:1px 5px;border-radius:2px;" title="${UI.admin.decoRename}">✏️</button>
+                        <button class="asset-edit-pos-btn" data-id="${escapedId}" style="background:none;border:1px solid #3a2a1a;color:#c4b5a0;cursor:pointer;font-size:10px;padding:1px 5px;border-radius:2px;" title="${UI.admin.decoEditPos}">📍</button>
+                        <button class="asset-download-btn" data-id="${escapedId}" style="background:none;border:1px solid #3a2a1a;color:#c4b5a0;cursor:pointer;font-size:10px;padding:1px 5px;border-radius:2px;" title="${UI.admin.decoDownload}">⬇️</button>
+                        <button class="asset-delete-btn" data-id="${escapedId}" style="background:none;border:1px solid #3a2a1a;color:#c44a44;cursor:pointer;font-size:10px;padding:1px 5px;border-radius:2px;" title="${UI.admin.decoDelete}">🗑️</button>
+                    </div>
                 </div>
             `;
     });
@@ -105,8 +109,7 @@ export const DecoShelfUI = {
         if (!item) return;
         const newStyle = item.style === 'fixed' ? 'absolute' : 'fixed';
         DecoShelf.setStyle(id, newStyle);
-        // 提示信息由 DecoShelf.setStyle 内部处理，但我们也显示一条
-        Utils.showToast(UI.deco.styleSwitched(newStyle === 'fixed' ? '悬浮窗' : '贴纸'), false);
+        Utils.showToast(UI.deco.styleSwitched, false);
       });
     });
 

@@ -89,6 +89,13 @@ export const ThemeService = {
         // 通知主题变更
         EventBus.emit('theme:changed', { themeId, theme, isRestore });
 
+        // 跨页面同步：通知文章编辑器等其它标签页
+        try {
+          const channel = new BroadcastChannel('revachol');
+          channel.postMessage({ type: 'theme_changed', payload: { themeId } });
+          channel.close();
+        } catch (e) { /* BroadcastChannel 不支持 */ }
+
         // 更新管理面板中的按钮状态
         this._updateThemeButtons(themeId);
 

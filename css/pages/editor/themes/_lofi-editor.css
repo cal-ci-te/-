@@ -1,0 +1,39 @@
+/* 编辑器低保真主题覆盖 */
+.editor-toolbar   { background: var(--color-bg-secondary); border-color: var(--color-border); }
+.editor-toolbar .brand { color: var(--color-text-heading); font-family: var(--font-family-display); letter-spacing: 2px; }
+.editor-toolbar button { background: none; border: 1px solid var(--color-border); color: var(--color-text-primary); font-family: var(--font-family-display); font-size: 11px; letter-spacing: 1px; border-radius: 0; }
+.editor-toolbar button:hover { background: var(--color-hover); }
+.editor-toolbar .close-btn { border: none; color: var(--color-text-muted); }
+.toggle-btn { border: 1px solid var(--color-border); border-radius: 0; color: var(--color-text-heading); font-family: var(--font-family-display); }
+
+.editor-content { background: var(--color-bg-primary); }
+.editor-content .empty-state { color: var(--color-text-muted); font-family: var(--font-family-serif); line-height: 2; }
+.editor-form label { color: var(--color-text-secondary); font-family: var(--font-family-display); letter-spacing: 2px; font-size: 11px; }
+.editor-form input[type="text"],
+.editor-form textarea { background: var(--color-bg-card); border: 1px solid var(--color-border); border-radius: 0; color: var(--color-text-primary); font-family: var(--font-family-serif); font-size: 14px; line-height: 2; }
+.editor-form input[type="text"]:focus,
+.editor-form textarea:focus { border-color: var(--color-text-heading); box-shadow: none; }
+.editor-form .form-actions .save-btn { background: none; border: 1px solid var(--color-border); color: var(--color-text-primary); font-family: var(--font-family-display); letter-spacing: 2px; border-radius: 0; }
+.editor-form .form-actions .cancel-btn { background: none; border: 1px solid var(--color-border); color: var(--color-text-muted); border-radius: 0; }
+
+.editor-sidebar { background: var(--color-bg-secondary); border-color: var(--color-border); }
+.editor-sidebar-header { background: var(--color-bg-card); border-color: var(--color-border); }
+.editor-sidebar-header h3 { color: var(--color-text-heading); font-family: var(--font-family-display); letter-spacing: 2px; }
+.editor-sidebar-header .collapse-btn { color: var(--color-text-secondary); }
+.history-panel { background: var(--color-bg-secondary); border-color: var(--color-border); }
+.history-item { border-color: var(--color-border-light); }
+.history-preview-btn { background: none; border: 1px solid var(--color-border); color: var(--color-text-primary); font-family: var(--font-family-display); font-size: 9px; letter-spacing: 1px; }
+.history-restore-btn { background: none; border: 1px solid var(--color-border); color: var(--color-text-primary); font-family: var(--font-family-display); font-size: 9px; letter-spacing: 1px; }
+.history-restore-btn:hover { background: var(--color-hover); }
+.editor-sidebar-toolbar { background: var(--color-bg-secondary); border-color: var(--color-border); }
+.editor-sidebar-toolbar .search-box { background: var(--color-bg-primary); border: 1px solid var(--color-border); border-radius: 0; color: var(--color-text-primary); font-family: var(--font-family-serif); }
+.editor-sidebar-toolbar .pos-controls button { background: none; border: 1px solid var(--color-border); color: var(--color-text-primary); font-family: var(--font-family-display); font-size: 10px; letter-spacing: 1px; border-radius: 0; }
+
+.folder > .tree-node-content .node-title { color: var(--color-text-heading); font-family: var(--font-family-display); }
+.article > .tree-node-content .node-title { color: var(--color-text-secondary); font-family: var(--font-family-serif); }
+.tree-node-content:hover { background: var(--color-hover); }
+.tree-node-content.active { background: var(--color-active); border-left-color: var(--color-text-heading); }
+.children { border-color: var(--color-border); }
+.toggle-icon { color: var(--color-text-muted); }
+.dropzone-background { border: 1px solid var(--color-border); border-radius: 0; color: var(--color-text-muted); background: var(--color-bg-card); }
+.visibility-toggle { color: var(--color-text-primary); }

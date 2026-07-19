@@ -1,7 +1,18 @@
 // 文章 CRUD + 可见性控制。每次写操作后通过 WebSocket broadcast 通知所有客户端刷新。
+// 所有写操作前通过 validate.cjs 做输入长度校验，防止超长字符串导致数据库性能问题。
 const { send, json } = require('../enhance.cjs');
 const dbModule = require('../db.cjs');
 const { broadcast } = require('../websocket.cjs');
+const { validate } = require('../validate.cjs');
+
+function validateFields(res, fields) {
+    const err = validate(fields);
+    if (err) {
+        send(res, { error: err.error }, 400);
+        return true; // 表示已处理
+    }
+    return false;
+}
 
 function registerArticleRoutes(GET, POST, PUT, DELETE) {
 
@@ -12,6 +23,7 @@ function registerArticleRoutes(GET, POST, PUT, DELETE) {
 
     POST('/api/articles', async (req, res) => {
         const { title, content, category } = await json(req);
+        if (validateFields(res, { title, content, category })) return;
         const now = new Date().toISOString();
         dbModule.run(
             'INSERT INTO articles (title, content, category, updateTime, visible) VALUES (?, ?, ?, ?, 1)',
@@ -33,6 +45,7 @@ function registerArticleRoutes(GET, POST, PUT, DELETE) {
     PUT('/api/articles/:id', async (req, res) => {
         const id = parseInt(req.params.id);
         const { title, content, category } = await json(req);
+        if (validateFields(res, { title, content, category })) return;
         const existing = dbModule.query('SELECT id FROM articles WHERE id = ?', [id]);
         if (!existing) {
             send(res, { error: 'Article not found' }, 404);

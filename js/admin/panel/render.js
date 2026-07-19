@@ -177,10 +177,6 @@ AdminPanel.renderContent = function () {
             <div id="assetListContainer" class="admin-asset-list">
                 <div style="color:#7a6a58;text-align:center;padding:10px;">${UI.admin.decoLoading}</div>
             </div>
-            <div class="admin-button-group" style="margin-top:10px;">
-                <button id="confirmEditPosBtn" data-action="confirm-edit-pos" style="background:#3a5a2b;">${UI.admin.confirmPosButton}</button>
-                <button id="cancelEditPosBtn" data-action="cancel-edit-pos" style="background:#3a2a1a;">${UI.admin.cancelPosButton}</button>
-            </div>
         </div>
 
         <!-- 文章管理 -->

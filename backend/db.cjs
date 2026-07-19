@@ -48,6 +48,14 @@ async function initDb() {
         saveDb();
         dbInitialized = true;
         console.log('✅ SQLite 数据库初始化完成');
+        try {
+          const count = db.exec('SELECT COUNT(*) as c FROM article_drafts');
+          if (count && count[0] && count[0].values) {
+            console.log('[DB] article_drafts 表行数:', count[0].values[0][0]);
+          }
+        } catch (e) {
+          console.warn('[DB] article_drafts 表检查失败:', e.message);
+        }
         return db;
     } catch (err) {
         console.error('[DB] 初始化失败:', err);
@@ -69,11 +77,16 @@ function saveDb() {
 
 function run(sql, params = []) {
     if (!db) throw new Error('数据库未初始化');
-    const stmt = db.prepare(sql);
-    const result = stmt.run(params);
-    stmt.free();
+    // 绕过 sql.js 参数绑定兼容性问题：手动替换 ? 为转义后的值后交给 db.exec()
+    let idx = 0;
+    const escapedSql = sql.replace(/\?/g, () => {
+        const val = params[idx++];
+        if (val === null || val === undefined) return 'NULL';
+        if (typeof val === 'number') return String(val);
+        return "'" + String(val).replace(/'/g, "''") + "'";
+    });
+    db.exec(escapedSql);
     saveDb();
-    // sql.js 的 lastInsertRowid 在不同版本中 API 不一致，优先取 exec 方式，失败再 fallback
     let lastId = 0;
     try {
         const rows = db.exec('SELECT last_insert_rowid()');
@@ -81,8 +94,7 @@ function run(sql, params = []) {
             lastId = rows[0].values[0][0];
         }
     } catch (e) {
-        if (result && typeof result.lastInsertRowid !== 'undefined') lastId = result.lastInsertRowid;
-        else if (result && typeof result.lastID !== 'undefined') lastId = result.lastID;
+        /* fallback */
     }
     return { lastInsertRowid: lastId };
 }

@@ -17,7 +17,7 @@ export const HistoryUI = {
     async load(articleId) {
         this.currentArticleId = articleId;
         if (!articleId) {
-            this.renderEmpty(UI.history.empty);
+            this.renderEmpty(UI.draft.noHistory || '暂无历史');
             return;
         }
         try {
@@ -26,13 +26,13 @@ export const HistoryUI = {
             this.drafts = drafts || [];
             console.log('[HistoryUI] 获取到草稿列表:', this.drafts.length, '条');
             if (this.drafts.length === 0) {
-                this.renderEmpty(UI.history.empty);
+                this.renderEmpty(UI.draft.noHistory || '暂无历史');
                 return;
             }
             this.renderList();
         } catch (err) {
             console.error('[HistoryUI] 加载历史失败:', err);
-            this.renderEmpty(UI.history.loadError || '加载失败', true);
+            this.renderEmpty(UI.draft.loadFailed || '加载失败', true);
         }
     },
 
@@ -46,6 +46,7 @@ export const HistoryUI = {
     },
 
     renderList() {
+        try {
         const article = ArticleService.getAllArticles().find(a => a.id === this.currentArticleId);
         const path = article ? this.getArticlePath(article) : '未知路径';
 
@@ -66,9 +67,9 @@ export const HistoryUI = {
                     </div>
                     <div style="font-size:11px;color:#c4b5a0;margin:2px 0;">${Utils.escapeHtml(preview)}</div>
                     <div style="display:flex;gap:8px;margin-top:4px;flex-wrap:wrap;">
-                        <button class="history-preview-btn" data-draft-id="${draft.id}" style="background:none;border:1px solid #5a3e2b;color:#e8d5b5;padding:2px 8px;border-radius:4px;cursor:pointer;font-size:10px;">👁️ ${UI.history.previewBtn || '查看'}</button>
-                        <button class="history-restore-btn" data-draft-id="${draft.id}" style="background:#5a3e2b;border:none;color:#e8d5b5;padding:2px 8px;border-radius:4px;cursor:pointer;font-size:10px;">↩️ ${UI.history.restoreBtn || '恢复'}</button>
-                        <button class="history-delete-btn" data-draft-id="${draft.id}" style="background:none;border:none;color:#c44a44;cursor:pointer;font-size:10px;">🗑️ ${UI.history.deleteBtn || '删除'}</button>
+                        <button class="history-preview-btn" data-draft-id="${draft.id}" style="background:none;border:1px solid #5a3e2b;color:#e8d5b5;padding:2px 8px;border-radius:4px;cursor:pointer;font-size:10px;">👁️ ${UI.draft.previewBtn || '查看'}</button>
+                        <button class="history-restore-btn" data-draft-id="${draft.id}" style="background:#5a3e2b;border:none;color:#e8d5b5;padding:2px 8px;border-radius:4px;cursor:pointer;font-size:10px;">↩️ ${UI.draft.restoreBtn || '恢复'}</button>
+                        <button class="history-delete-btn" data-draft-id="${draft.id}" style="background:none;border:none;color:#c44a44;cursor:pointer;font-size:10px;">🗑️ ${UI.draft.deleteBtn || '删除'}</button>
                     </div>
                 </div>
             `;
@@ -76,6 +77,10 @@ export const HistoryUI = {
 
         this.container.innerHTML = html;
         this.bindEvents();
+        } catch (e) {
+          console.error('[HistoryUI] renderList 渲染失败:', e);
+          this.renderEmpty(UI.draft.loadFailed || '加载失败', true);
+        }
     },
 
     bindEvents() {
@@ -136,14 +141,14 @@ export const HistoryUI = {
         `;
         modal.innerHTML = `
             <div style="background:#2a231c;border:1px solid #5a3e2b;border-radius:12px;padding:24px;max-width:600px;width:90%;max-height:80vh;overflow-y:auto;">
-                <h3 style="color:#e8c88a;margin-bottom:8px;">${UI.history.previewTitle}</h3>
+                <h3 style="color:#e8c88a;margin-bottom:8px;">${UI.draft.previewTitle}</h3>
                 <p style="color:#c4b5a0;font-size:12px;border-bottom:1px solid #5a3e2b;padding-bottom:6px;">
-                    ${UI.history.savedAtPrefix} ${new Date(draft.saved_at).toLocaleString('zh-CN')}
+                    ${'保存于: '} ${new Date(draft.saved_at).toLocaleString('zh-CN')}
                 </p>
                 <div style="color:#e8d5b5;line-height:1.6;font-size:14px;margin-top:10px;white-space:pre-wrap;">
-                    ${Utils.escapeHtml(draft.content || UI.history.emptyContent || '（空内容）')}
+                    ${Utils.escapeHtml(draft.content || UI.draft.emptyContent || '（空内容）')}
                 </div>
-                <button id="closePreviewBtn" style="margin-top:16px;background:#5a3e2b;border:none;color:#e8d5b5;padding:6px 20px;border-radius:4px;cursor:pointer;">${UI.history.previewClose}</button>
+                <button id="closePreviewBtn" style="margin-top:16px;background:#5a3e2b;border:none;color:#e8d5b5;padding:6px 20px;border-radius:4px;cursor:pointer;">${UI.draft.previewClose}</button>
             </div>
         `;
         document.body.appendChild(modal);
@@ -153,7 +158,7 @@ export const HistoryUI = {
 
     confirmRestore(draft) {
         const timeStr = new Date(draft.saved_at).toLocaleString('zh-CN');
-        if (!confirm(UI.history.restoreConfirm(timeStr))) {
+        if (!confirm(UI.draft.restoreConfirm(timeStr))) {
             console.log('[HistoryUI] 用户取消恢复');
             return;
         }
@@ -169,24 +174,24 @@ export const HistoryUI = {
                 category: draft.category || '未分类'
             });
             await ArticleService.fetchArticles(true);
-            Utils.showToast(UI.history.restoreSuccess, false);
+            Utils.showToast(UI.draft.restoreSuccess, false);
             if (this.onRestore) {
                 this.onRestore(draft.article_id);
             }
         } catch (err) {
             console.error('[HistoryUI] 恢复草稿失败:', err);
-            Utils.showToast(UI.history.restoreFailed + err.message, true);
+            Utils.showToast(UI.draft.restoreFailed + err.message, true);
         }
     },
 
     confirmDelete(draft) {
         if (!draft.article_id || isNaN(draft.article_id)) {
-            Utils.showToast(UI.history.deleteError || '草稿数据异常，无法删除', true);
+            Utils.showToast(UI.draft.deleteError || '草稿数据异常，无法删除', true);
             console.error('[HistoryUI] 草稿缺少有效的 article_id:', draft);
             return;
         }
         const timeStr = new Date(draft.saved_at).toLocaleString('zh-CN');
-        if (!confirm(UI.history.deleteConfirm(timeStr))) {
+        if (!confirm(UI.draft.deleteConfirm(timeStr))) {
             console.log('[HistoryUI] 用户取消删除');
             return;
         }
@@ -197,11 +202,11 @@ export const HistoryUI = {
         try {
             console.log('[HistoryUI] 删除草稿:', draftId, '文章ID:', articleId);
             await ApiClient.delete(`/api/articles/${articleId}/drafts/${draftId}`);
-            Utils.showToast(UI.history.deleteSuccess, false);
+            Utils.showToast(UI.draft.deleteSuccess, false);
             await this.load(articleId);
         } catch (err) {
             console.error('[HistoryUI] 删除草稿失败:', err);
-            Utils.showToast(UI.history.deleteFailed + err.message, true);
+            Utils.showToast(UI.draft.deleteFailed + err.message, true);
         }
     },
 

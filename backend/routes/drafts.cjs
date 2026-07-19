@@ -17,15 +17,26 @@ function registerDraftsRoutes(GET, POST, PUT, DELETE) {
 
     POST('/api/articles/:id/drafts', async (req, res) => {
         const articleId = parseInt(req.params.id);
-        const { title, content, category } = await json(req);
-        const now = new Date().toISOString();
-        dbModule.run(
-            'INSERT INTO article_drafts (article_id, title, content, category, saved_at) VALUES (?, ?, ?, ?, ?)',
-            [articleId, title, content, category, now]
-        );
-        const row = dbModule.query('SELECT last_insert_rowid() as id');
-        broadcast({ type: 'draft_saved', payload: { articleId, savedAt: now } });
-        send(res, { success: true, savedAt: now, id: row.id });
+        try {
+            const body = await json(req);
+            const { title, content, category } = body;
+            console.log('[Drafts] POST articleId:', articleId, 'title:', title, 'content length:', content ? content.length : 0);
+            if (!title) {
+                send(res, { error: '标题不能为空' }, 400);
+                return;
+            }
+            const now = new Date().toISOString();
+            const result = dbModule.run(
+                'INSERT INTO article_drafts (article_id, title, content, category, saved_at) VALUES (?, ?, ?, ?, ?)',
+                [articleId, title, content, category || '未分类', now]
+            );
+            console.log('[Drafts] INSERT result lastInsertRowid:', result.lastInsertRowid);
+            broadcast({ type: 'draft_saved', payload: { articleId, savedAt: now } });
+            send(res, { success: true, savedAt: now, id: result.lastInsertRowid });
+        } catch (err) {
+            console.error('[Drafts] POST 失败:', err.message);
+            send(res, { error: '服务器错误' }, 500);
+        }
     });
 
     DELETE('/api/articles/:id/drafts/:draftId', async (req, res) => {

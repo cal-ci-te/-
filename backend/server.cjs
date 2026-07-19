@@ -1,5 +1,4 @@
 const http = require('http');
-const url = require('url');
 const dbModule = require('./db.cjs');
 const { initWebSocket } = require('./websocket.cjs');
 const { ensureUploadDir } = require('./utils.cjs');
@@ -34,7 +33,7 @@ console.log('[Server] 已注册路由 — GET:', Object.keys(routes.GET || {}),
 ensureUploadDir();
 
 const server = http.createServer(async (req, res) => {
-    const parsedUrl = url.parse(req.url, true);
+    const parsedUrl = new URL(req.url, 'http://localhost');
     const pathname = parsedUrl.pathname;
     const method = req.method;
 

@@ -12,6 +12,42 @@ import { EditorCore } from '../editor/editor-core.js';
 import { HistoryUI } from '../editor/history-ui.js';
 import { AutoSave } from '../editor/auto-save.js';
 
+const THEME_CSS = { dark: '/css/themes/dark.css', light: '/css/themes/light.css', lofi: '/css/themes/lofi.css' };
+const EDITOR_THEME_CSS = { dark: '/css/pages/editor/themes/_dark-editor.css', light: '/css/pages/editor/themes/_light-editor.css', lofi: '/css/pages/editor/themes/_lofi-editor.css' };
+
+function loadEditorTheme(themeId) {
+  const id = themeId && THEME_CSS[themeId] ? themeId : 'dark';
+
+  // 主主题 CSS（定义变量）加载完后，再加载编辑器覆盖 CSS
+  const applyOverride = () => {
+    let editorLink = document.getElementById('editor-theme-override');
+    if (!editorLink) {
+      editorLink = document.createElement('link');
+      editorLink.id = 'editor-theme-override';
+      editorLink.rel = 'stylesheet';
+      document.head.appendChild(editorLink);
+    }
+    editorLink.href = EDITOR_THEME_CSS[id];
+  };
+
+  let link = document.getElementById('editor-theme');
+  if (!link) {
+    link = document.createElement('link');
+    link.id = 'editor-theme';
+    link.rel = 'stylesheet';
+    link.onload = applyOverride;
+    document.head.appendChild(link);
+  } else {
+    link.onload = applyOverride;
+  }
+  link.href = THEME_CSS[id];
+
+  if (id === 'lofi') document.documentElement.setAttribute('data-theme', 'lofi');
+  else document.documentElement.removeAttribute('data-theme');
+}
+
+loadEditorTheme(Utils.storage.get('selected_theme'));
+
 AppState.commit(MUTATIONS.SET_LOGGED_IN, true);
 Utils.storage.set('admin_logged_in', true);
 
@@ -168,7 +204,7 @@ toggleHistoryBtn.addEventListener('click', () => {
     historyPanel.style.display = isVisible ? 'none' : 'block';
     toggleHistoryBtn.textContent = isVisible ? '📜 ' + (UI.editor.historyLabel || '历史') : '📜 ' + (UI.editor.hideHistory || '隐藏历史');
     if (!isVisible && EditorCore.currentId) {
-        HistoryUI.load(EditorCore.currentId);
+        HistoryUI.load(EditorCore.currentId).catch(err => console.error('[Editor] 历史加载失败:', err));
     }
 });
 
@@ -316,6 +352,9 @@ try {
             ArticleService.fetchArticles(true)
                 .then(() => UIDirectory.updateTree())
                 .catch(err => console.error('[article-editor] BroadcastChannel 刷新失败:', err));
+        }
+        if (type === 'theme_changed') {
+          loadEditorTheme(event.data.payload && event.data.payload.themeId);
         }
     };
     window.addEventListener('beforeunload', () => bc.close());

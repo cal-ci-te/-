@@ -150,8 +150,7 @@ export const ContextMenu = {
         const newStyle = item.style === 'fixed' ? 'absolute' : 'fixed';
         const success = DecoShelf.setStyle(id, newStyle);
         if (success) {
-          const styleLabel = newStyle === 'fixed' ? '悬浮窗' : '贴纸';
-          Utils.showToast(UI.deco.styleSwitched(styleLabel), false);
+          Utils.showToast(UI.deco.styleSwitched, false);
         }
         break;
       }

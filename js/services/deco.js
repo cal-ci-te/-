@@ -45,11 +45,38 @@ export const DecoShelf = {
    * 加载贴图库：从仓库加载
    */
   async loadLibrary() {
-    console.log('[DecoShelf] 加载贴图库...');
     const items = await DecoRepository.load();
     this._library = this._normalizeItems(items);
     this._renderAllDecos();
+
+    if (!this._resizeHandler) {
+      let resizeTimer;
+      this._resizeHandler = () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => this._handleResize(), 200);
+      };
+      window.addEventListener('resize', this._resizeHandler);
+    }
     return this._library;
+  },
+
+  // 窗口 resize 时重新钳制所有已放置贴纸的位置，变化时自动保存。
+  _handleResize() {
+    this._library.forEach(item => {
+      if (!item.position) return;
+      const el = document.getElementById('deco-' + item.id);
+      if (!el) return;
+      const oldPos = item.position;
+      const clamped = this.clampPositionToViewport(oldPos, el);
+      if (clamped.top !== oldPos.top || clamped.left !== oldPos.left) {
+        item.position = clamped;
+        el.style.top = clamped.top;
+        el.style.left = clamped.left;
+        DecoRepository.save(item).then(() => {
+          this._library = this._normalizeItems(DecoRepository.getAll());
+        });
+      }
+    });
   },
 
   /**
@@ -77,6 +104,48 @@ export const DecoShelf = {
 
   _generateId() {
     return 'deco_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+  },
+
+  // 贴纸位置钳制到视口内，确保任何部分都不超出屏幕。
+  // 使用 element.offsetWidth/offsetHeight 获取实际尺寸（未渲染时返回 null 则跳过）。
+  // 如贴纸尺寸大于视口，则至少保留 10px 边缘间距。
+  clampPositionToViewport(position, element) {
+    if (!position || !element) return position;
+    const w = element.offsetWidth || 0;
+    const h = element.offsetHeight || 0;
+    if (w === 0 && h === 0) return position; // 元素未渲染，跳过
+    const MARGIN = 10;
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const maxW = Math.min(w, vw - MARGIN * 2);
+    const maxH = Math.min(h, vh - MARGIN * 2);
+
+    let top = null, left = null;
+    if (position.top !== undefined && position.top !== null) {
+      top = parseFloat(position.top);
+    }
+    if (position.left !== undefined && position.left !== null) {
+      left = parseFloat(position.left);
+    }
+
+    // right/bottom → left/top 统一
+    if ((top === null || isNaN(top)) && position.bottom !== undefined && position.bottom !== null) {
+      top = vh - parseFloat(position.bottom) - h;
+    }
+    if ((left === null || isNaN(left)) && position.right !== undefined && position.right !== null) {
+      left = vw - parseFloat(position.right) - w;
+    }
+
+    if (top === null || isNaN(top)) top = MARGIN;
+    if (left === null || isNaN(left)) left = MARGIN;
+
+    top = Math.max(MARGIN, Math.min(top, vh - h - MARGIN));
+    left = Math.max(MARGIN, Math.min(left, vw - w - MARGIN));
+
+    const clamped = { top: top + 'px', left: left + 'px' };
+    if (position.width) clamped.width = position.width;
+    if (position.height) clamped.height = position.height;
+    return clamped;
   },
 
   /**
@@ -217,6 +286,14 @@ export const DecoShelf = {
   setPosition(id, pos) {
     const item = this.get(id);
     if (!item) return false;
+    if (pos) {
+      const el = document.getElementById('deco-' + id);
+      const clamped = this.clampPositionToViewport(pos, el);
+      if (clamped.top !== pos.top || clamped.left !== pos.left) {
+        console.log('[DecoShelf] 位置已钳制:', id, '原:', pos.top, pos.left, '→', clamped.top, clamped.left);
+      }
+      pos = clamped;
+    }
     item.position = pos;
     DecoRepository.save(item).then(() => {
       this._library = this._normalizeItems(DecoRepository.getAll());
@@ -230,7 +307,7 @@ export const DecoShelf = {
     const item = this.get(id);
     if (!item) return false;
     if (item.style === newStyle) {
-      Utils.showToast(UI.deco.alreadyStyle(newStyle === 'fixed' ? '悬浮窗' : '贴纸'), false);
+      Utils.showToast(UI.deco.alreadyStyle(newStyle === 'fixed' ? '贴纸' : '悬浮窗'), false);
       return true;
     }
     const el = document.getElementById('deco-' + id);
@@ -305,7 +382,7 @@ export const DecoShelf = {
       }
     }
     this._enableDragging(el);
-    this._showResetButton(id);
+    this._showEditingControls(id);
     EventBus.emit(EVENTS.DECO_EDITING_STARTED, { id: id });
   },
 
@@ -324,6 +401,8 @@ export const DecoShelf = {
         }
         const resetBtn = document.getElementById('deco-reset-btn-' + id);
         if (resetBtn) resetBtn.remove();
+        const editControls = document.querySelectorAll('.deco-edit-control');
+        editControls.forEach(el => el.remove());
         this._editingId = null;
         EventBus.emit(EVENTS.DECO_EDITING_STOPPED, { id: id, saved: false });
       }
@@ -341,6 +420,7 @@ export const DecoShelf = {
     }
     const resetBtn = document.getElementById('deco-reset-btn-' + id);
     if (resetBtn) resetBtn.remove();
+    document.querySelectorAll('.deco-edit-control').forEach(el => el.remove());
     if (save && el) {
       const rect = el.getBoundingClientRect();
       const pos = {
@@ -388,9 +468,8 @@ export const DecoShelf = {
   },
 
   _renderAllDecos: function () {
-    // 清理所有旧贴纸
     document.querySelectorAll('[id^="deco-"]').forEach(function (el) {
-      if (el.id.startsWith('deco-') && !el.id.startsWith('deco-reset-btn-')) {
+      if (el.id.startsWith('deco-') && !el.id.startsWith('deco-reset-btn-') && el.id !== 'deco-context-menu') {
         if (el._longPressCleanup) {
           el._longPressCleanup();
           delete el._longPressCleanup;
@@ -479,8 +558,15 @@ export const DecoShelf = {
       el.style.cursor = 'grabbing';
       const onMouseMove = (ev) => {
         ev.preventDefault();
-        el.style.left = ev.clientX - offsetX + 'px';
-        el.style.top = ev.clientY - offsetY + 'px';
+        const MARGIN = 10;
+        let newLeft = ev.clientX - offsetX;
+        let newTop = ev.clientY - offsetY;
+        const maxLeft = window.innerWidth - el.offsetWidth - MARGIN;
+        const maxTop = window.innerHeight - el.offsetHeight - MARGIN;
+        newLeft = Math.max(MARGIN, Math.min(newLeft, maxLeft));
+        newTop = Math.max(MARGIN, Math.min(newTop, maxTop));
+        el.style.left = newLeft + 'px';
+        el.style.top = newTop + 'px';
         el.style.right = 'auto';
         el.style.bottom = 'auto';
       };
@@ -504,30 +590,41 @@ export const DecoShelf = {
     el.style.cursor = '';
   },
 
-  _showResetButton: function (id) {
-    // 移动端禁用重置按钮
+  _showEditingControls: function (id) {
     if (this._isMobile()) return;
 
-    const existing = document.getElementById('deco-reset-btn-' + id);
-    if (existing) existing.remove();
-    const btn = document.createElement('div');
-    btn.id = 'deco-reset-btn-' + id;
-    btn.textContent = '↺ 重置位置';
-    btn.style.cssText =
-      'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#2a231c;border:1px solid #c47a44;color:#e8d5b5;padding:6px 16px;border-radius:4px;z-index:10000;cursor:pointer;font-family:Courier New,monospace;font-size:12px;';
-    btn.addEventListener('click', function (e) {
-      e.stopPropagation();
-      const el = document.getElementById('deco-' + id);
-      if (el) {
-        const winW = window.innerWidth,
-          winH = window.innerHeight;
-        el.style.top = winH / 2 - 50 + 'px';
-        el.style.left = winW / 2 - 50 + 'px';
-        el.style.bottom = 'auto';
-        el.style.right = 'auto';
-      }
+    const existing = document.querySelectorAll('.deco-edit-control');
+    existing.forEach(el => el.remove());
+
+    const container = document.createElement('div');
+    container.className = 'deco-edit-control';
+    container.style.cssText =
+      'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);display:flex;gap:8px;z-index:10000;';
+
+    const btns = [
+      { text: '↺ 重置位置', cls: 'reset', action: () => {
+        const el = document.getElementById('deco-' + id);
+        if (el) {
+          const winW = window.innerWidth, winH = window.innerHeight;
+          el.style.top = Math.max(10, winH / 2 - 50) + 'px';
+          el.style.left = Math.max(10, winW / 2 - 50) + 'px';
+          el.style.bottom = 'auto';
+          el.style.right = 'auto';
+        }
+      }},
+      { text: '✅ 确认位置', cls: 'confirm', action: () => { DecoShelf.confirmEditing(); }},
+      { text: '❌ 取消编辑', cls: 'cancel', action: () => { DecoShelf.cancelEditing(); }},
+    ];
+    btns.forEach(b => {
+      const btn = document.createElement('button');
+      btn.textContent = b.text;
+      btn.style.cssText =
+        'background:#2a231c;border:1px solid #c47a44;color:#e8d5b5;padding:6px 14px;border-radius:4px;cursor:pointer;font-family:Courier New,monospace;font-size:12px;white-space:nowrap;';
+      if (b.cls === 'confirm') btn.style.background = '#2a3a1a';
+      btn.addEventListener('click', (e) => { e.stopPropagation(); b.action(); });
+      container.appendChild(btn);
     });
-    document.body.appendChild(btn);
+    document.body.appendChild(container);
   },
 
   download: function (id) {
