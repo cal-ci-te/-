@@ -3,7 +3,7 @@
 const { send, json } = require('../enhance.cjs');
 const dbModule = require('../db.cjs');
 const { broadcast } = require('../websocket.cjs');
-const { cleanExpiredDrafts } = require('../cleanup-drafts.cjs');
+const { cleanExpiredDrafts, enforceDraftLimit } = require('../cleanup-drafts.cjs');
 
 function registerDraftsRoutes(GET, POST, PUT, DELETE) {
 
@@ -43,7 +43,7 @@ function registerDraftsRoutes(GET, POST, PUT, DELETE) {
             if (total > MAX) {
                 const excess = total - MAX;
                 dbModule.exec(
-                    'DELETE FROM article_drafts WHERE article_id = ? ORDER BY saved_at ASC LIMIT ?',
+                    'DELETE FROM article_drafts WHERE id IN (SELECT id FROM article_drafts WHERE article_id = ? ORDER BY saved_at ASC LIMIT ?)',
                     [articleId, excess]
                 );
                 console.log('[Drafts] 清理了', excess, '条旧草稿（文章', articleId, '）');
@@ -51,8 +51,8 @@ function registerDraftsRoutes(GET, POST, PUT, DELETE) {
 
             broadcast({ type: 'draft_saved', payload: { articleId, savedAt: now } });
 
-            // 增量过期清理（不阻断响应）
-            try { cleanExpiredDrafts(articleId); } catch (e) {}
+            // 增量清理（过期 + 数量限制），不阻断响应
+            try { cleanExpiredDrafts(articleId); enforceDraftLimit(articleId); } catch (e) {}
 
             send(res, { success: true, savedAt: now, id: result.lastInsertRowid });
         } catch (err) {

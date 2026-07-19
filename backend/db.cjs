@@ -132,14 +132,14 @@ function run(sql, params = []) {
 
 function query(sql, params = []) {
     if (!db) throw new Error('数据库未初始化');
-    const stmt = db.prepare(sql);
-    const columnNames = stmt.getColumnNames();
-    const values = stmt.get(params);
-    stmt.free();
-    if (!values) return null;
+    const escapedSql = escapeSql(sql, params);
+    const resultSet = db.exec(escapedSql);
+    if (!resultSet || resultSet.length === 0) return null;
+    const rows = resultSet[0];
+    if (!rows.values || rows.values.length === 0) return null;
     const row = {};
-    columnNames.forEach((col, i) => {
-        const val = values[i];
+    rows.columns.forEach((col, i) => {
+        const val = rows.values[0][i];
         row[col] = val instanceof Uint8Array ? Buffer.from(val) : val;
     });
     return row;
@@ -165,9 +165,8 @@ function queryAll(sql, params = []) {
 
 function exec(sql, params = []) {
     if (!db) throw new Error('数据库未初始化');
-    const stmt = db.prepare(sql);
-    stmt.run(params);
-    stmt.free();
+    const escapedSql = escapeSql(sql, params);
+    db.exec(escapedSql);
     scheduleSave();
     let changes = 0;
     try {

@@ -106,6 +106,13 @@ RUSTFS_BUCKET=revachol
 
 ## 更新日志
 
+### v1.5.1
+
+**草稿管理补丁**：
+- 修复 `cleanup-drafts.cjs` 语法错误（多余 `}` 导致模块加载失败，后端静默退出）
+- 修复 `query()` 和 `exec()` 仍使用原始绑参 API 导致 COUNT 查询和 DELETE 失效（db.cjs 四个函数全部统一为 `escapeSql` + `db.exec`）
+- 修复 `DELETE ... ORDER BY ... LIMIT` 在 sql.js 中不兼容 → 改为子查询
+
 ### v1.5.0
 
 **草稿系统全面修复**：
