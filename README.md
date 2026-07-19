@@ -106,6 +106,21 @@ RUSTFS_BUCKET=revachol
 
 ## 更新日志
 
+### v1.5.0
+
+**草稿系统全面修复**：
+
+sql.js 参数绑定 Bug 排查（历时最长修复）：
+- 发现 `stmt.run(params)` 返回 `lastInsertRowid: 0`——sql.js CDN 版本绑参不执行 INSERT
+- 切到 `db.exec(手动转义SQL)` 后 `lastInsertRowid` 递增但 `db.export()` 文件大小不变——INSERT 在内存生效但未被子系统追踪
+- 定位到 `queryAll()` 从未调用 `stmt.bind(params)`——`WHERE article_id = ?` 始终为空结果集
+- 最终方案：统一 `escapeSql()` 工具函数手动转义 + `BEGIN/COMMIT` 显式事务 + `db.exec()` 执行
+
+**草稿管理策略**：
+- 数量限制：每文章最多 20 条草稿，超出自动删除最旧
+- 过期清理：30 天前草稿自动清理（启动全量 + 每次保存增量双保险）
+- 保存节流：多写入合并为单次 `db.export()`（5s 间隔可配），消除并发冲突
+
 ### v1.4.0
 
 **安全加固**：贴图上传后端增加 magic number 校验（PNG/JPEG/WebP），防止非图片文件绕过前端上传；文章/贴图标题、内容、分类增加业务层长度校验。

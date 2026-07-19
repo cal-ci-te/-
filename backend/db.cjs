@@ -10,6 +10,27 @@ const DB_PATH = path.join(__dirname, 'revachol.db');
 let db = null;
 let dbInitialized = false;
 
+// 保存节流：多个并发写入合并为单次 db.export()，避免 "no transaction is active" 冲突。
+// 默认 5000ms，可通过环境变量 DB_SAVE_INTERVAL 调整。
+const SAVE_INTERVAL = parseInt(process.env.DB_SAVE_INTERVAL) || 5000;
+let pendingSave = false;
+let saveTimer = null;
+
+function scheduleSave() {
+  pendingSave = true;
+  if (saveTimer) clearTimeout(saveTimer);
+  saveTimer = setTimeout(flushSave, SAVE_INTERVAL);
+}
+
+function flushSave() {
+  if (saveTimer) { clearTimeout(saveTimer); saveTimer = null; }
+  if (!pendingSave) return;
+  const start = Date.now();
+  saveDb();
+  pendingSave = false;
+  console.log('[DB] 批量保存完成，耗时:', Date.now() - start, 'ms');
+}
+
 async function initDb() {
     if (dbInitialized) return db;
 
@@ -37,7 +58,6 @@ async function initDb() {
         db.run('CREATE INDEX IF NOT EXISTS idx_drafts_article ON article_drafts(article_id)');
         db.run('CREATE INDEX IF NOT EXISTS idx_drafts_saved_at ON article_drafts(saved_at)');
 
-        // 从 BLOB 迁移到文件系统存储的兼容列（旧表无此列）
         try {
             db.run(`ALTER TABLE decos ADD COLUMN image_path TEXT`);
             console.log('✅ 已添加 image_path 列');
@@ -63,30 +83,40 @@ async function initDb() {
     }
 }
 
-// sql.js 在内存中操作，必须手动持久化到磁盘——每次写操作后立即 saveDb()
 function saveDb() {
     if (!db) { console.warn('[DB] saveDb 被调用但 db 为空'); return; }
     try {
         const data = db.export();
+        console.log('[DB] 导出数据大小:', data.length, 'bytes, 写入:', path.resolve(DB_PATH));
         fs.writeFileSync(DB_PATH, Buffer.from(data));
+        const stat = fs.statSync(DB_PATH);
+        console.log('[DB] 写入后文件大小:', stat.size, 'bytes',
+          stat.size === data.length ? '✓' : '✗ 大小不匹配');
     } catch (err) {
         console.error('[DB] 保存失败:', err);
         throw err;
     }
 }
-
-function run(sql, params = []) {
-    if (!db) throw new Error('数据库未初始化');
-    // 绕过 sql.js 参数绑定兼容性问题：手动替换 ? 为转义后的值后交给 db.exec()
+function escapeSql(sql, params) {
     let idx = 0;
-    const escapedSql = sql.replace(/\?/g, () => {
+    return sql.replace(/\?/g, () => {
         const val = params[idx++];
         if (val === null || val === undefined) return 'NULL';
         if (typeof val === 'number') return String(val);
         return "'" + String(val).replace(/'/g, "''") + "'";
     });
+}
+
+function run(sql, params = []) {
+    if (!db) throw new Error('数据库未初始化');
+    const escapedSql = escapeSql(sql, params);
+    // 显式事务确保 sql.js export 能捕获变更（绕过 WASM 层变更追踪 bug）
+    db.exec('BEGIN');
     db.exec(escapedSql);
-    saveDb();
+    db.exec('COMMIT');
+    console.log('[DB] INSERT committed, 当前总行数:',
+      db.exec('SELECT COUNT(*) as c FROM article_drafts')[0]?.values?.[0]?.[0]);
+    scheduleSave();
     let lastId = 0;
     try {
         const rows = db.exec('SELECT last_insert_rowid()');
@@ -96,6 +126,7 @@ function run(sql, params = []) {
     } catch (e) {
         /* fallback */
     }
+    console.log('[DB] lastInsertRowid:', lastId);
     return { lastInsertRowid: lastId };
 }
 
@@ -116,19 +147,19 @@ function query(sql, params = []) {
 
 function queryAll(sql, params = []) {
     if (!db) throw new Error('数据库未初始化');
-    const stmt = db.prepare(sql);
+    const escapedSql = escapeSql(sql, params);
+    const resultSet = db.exec(escapedSql);
+    if (!resultSet || resultSet.length === 0) return [];
+    const rows = resultSet[0];
     const results = [];
-    while (stmt.step()) {
+    for (let i = 0; i < rows.values.length; i++) {
         const row = {};
-        const columns = stmt.getColumnNames();
-        const values = stmt.get();
-        columns.forEach((col, i) => {
-            const val = values[i];
+        rows.columns.forEach((col, j) => {
+            const val = rows.values[i][j];
             row[col] = val instanceof Uint8Array ? Buffer.from(val) : val;
         });
         results.push(row);
     }
-    stmt.free();
     return results;
 }
 
@@ -137,7 +168,7 @@ function exec(sql, params = []) {
     const stmt = db.prepare(sql);
     stmt.run(params);
     stmt.free();
-    saveDb();
+    scheduleSave();
     let changes = 0;
     try {
         const rows = db.exec('SELECT changes()');
@@ -155,7 +186,19 @@ function closeDb() {
     }
 }
 
+// 进程退出前强制刷盘，防止 5 秒窗口内的写入丢失
+process.on('beforeExit', () => flushSave());
 process.on('exit', () => closeDb());
-process.on('SIGINT', () => { closeDb(); process.exit(0); });
+process.on('SIGINT', () => { flushSave(); closeDb(); process.exit(0); });
 
-module.exports = { initDb, getDb: () => db, saveDb, run, query, queryAll, exec, closeDb };
+module.exports = {
+    initDb,
+    getDb: () => db,
+    save: flushSave,  // 手动立即保存
+    saveDb,
+    run,
+    query,
+    queryAll,
+    exec,
+    closeDb,
+};

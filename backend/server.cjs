@@ -32,6 +32,9 @@ console.log('[Server] 已注册路由 — GET:', Object.keys(routes.GET || {}),
 
 ensureUploadDir();
 
+const { cleanExpiredDrafts } = require('./cleanup-drafts.cjs');
+setTimeout(() => { cleanExpiredDrafts(); }, 3000);
+
 const server = http.createServer(async (req, res) => {
     const parsedUrl = new URL(req.url, 'http://localhost');
     const pathname = parsedUrl.pathname;
