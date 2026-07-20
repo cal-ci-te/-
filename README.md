@@ -2,7 +2,7 @@
 
 原创角色档案馆，一个带内容管理、贴纸装饰、水印保护、多主题切换的 Web 应用。
 
-当前版本：v1.0.0
+当前版本：v1.8.0
 
 ---
 
@@ -37,7 +37,8 @@
 ## 技术栈
 
 前端：原生 ES Module、Vite、自研状态管理（AppState + EventBus）
-后端：Node.js + 原生 http、SQLite、WebSocket
+后端：Node.js 22 + 原生 http、sql.js（SQLite）、WebSocket
+部署：Docker Compose（镜像加速、非 root 运行、端口安全绑定）
 存储：本地文件系统 / S3 兼容对象存储（适配器模式切换）
 监控：ErrPulse
 测试：Vitest + jsdom
@@ -66,6 +67,8 @@ revachol/
 
 ## 快速开始
 
+### 本地开发
+
 环境：Node.js 18+
 
 ```bash
@@ -74,10 +77,17 @@ npm install
 npm run dev
 
 # 后端
-cd backend
 npm install
-node server.cjs
+node backend/server.cjs
 ```
+
+### Docker 部署
+
+```bash
+docker compose up -d --build
+```
+
+详见 [`docs/deployment/docker-setup.md`](docs/deployment/docker-setup.md)
 
 管理员账号：admin / admin123
 
@@ -98,6 +108,8 @@ RUSTFS_BUCKET=revachol
 
 存储层适配器模式：本地文件系统与 S3 兼容存储无缝切换，业务代码零感知。
 
+Docker 安全部署：进程降权（非 root）、端口默认仅绑定 localhost、环境变量驱动的灵活配置。
+
 目录树模块化：从 400+ 行拆分为 12 个职责单一的模块。
 
 单向数据流：ArticleService 为唯一数据源，ArticleListStore 派生数据无副本。
@@ -105,6 +117,27 @@ RUSTFS_BUCKET=revachol
 多主题系统：CSS 变量驱动，三套主题动态加载。
 
 ## 更新日志
+
+### v1.8.0
+
+**Docker 化部署与安全加固**：
+
+- **Docker 部署方案**：`docker compose up -d --build` 一键启动前后端双容器，SQLite + 贴纸通过命名卷持久化。含完整操作文档（`docs/deployment/docker-setup.md`）
+- **Node.js 22 升级**：基础镜像 `node:18-alpine` → `node:22-alpine`，经全量依赖兼容性审查（`docs/node-22-upgrade-review.md`），确认 0 个原生模块风险
+- **进程降权运行**：容器内以 `node` 用户（非 root）启动后端，限制潜在攻击面
+- **端口安全绑定**：默认仅监听 `127.0.0.1`，云服务器通过 `BIND_ADDR=0.0.0.0` 一键切换
+- **镜像加速**：配置轩辕镜像 `docker.xuanyuan.me` 解决 Docker Hub 拉取超时
+
+**运行时适配**：
+
+- 后端监听地址改为 `HOST` 环境变量控制
+- Vite Proxy 三项目标统一由 `VITE_BACKEND_URL` 控制，本地开发行为不变
+- `watch.usePolling` 增加 `interval: 2000` 降低 WSL2 跨文件系统 I/O
+
+**Bug 修复**：
+
+- 修复 `storage/config.cjs` 中 `uploadDir` 路径解析错误（`../../uploads/decos` → `../uploads/decos`），原被 root 权限掩盖
+- 修复贴纸切换样式（fixed ↔ absolute）后位置丢失与入场动画重播：`setStyle()` 改为原地更新 DOM 属性，跳过 `_renderSingleDeco` 的 remove + createElement 触发 CSS `fadeInUp` 重播
 
 ### v1.7.0
 
@@ -215,7 +248,5 @@ sql.js 参数绑定 Bug 排查（历时最长修复）：
 补充 UI 自动化测试
 
 文章全文搜索
-
-Docker 部署
 
 多语言支持
