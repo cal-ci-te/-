@@ -2,7 +2,7 @@
 
 原创角色档案馆，一个带内容管理、贴纸装饰、水印保护、多主题切换的 Web 应用。
 
-当前版本：v1.8.0
+当前版本：v1.8.1
 
 ---
 
@@ -117,6 +117,16 @@ Docker 安全部署：进程降权（非 root）、端口默认仅绑定 localho
 多主题系统：CSS 变量驱动，三套主题动态加载。
 
 ## 更新日志
+
+### v1.8.1
+
+**贴纸动画修复**：
+
+- `_renderSingleDeco` 改为"原地更新"策略：元素已存在时直接修改 CSS 属性（position/top/left/width/height），不再 remove + createElement 重建
+- `_renderAllDecos` 同理：遍历贴纸调用 `_renderSingleDeco` 原地更新，末尾清理孤儿元素（已在库中删除或无位置的贴纸 DOM）
+- `setStyle`（v1.8.0 已部分修复）继续使用直接 DOM 更新，不经过 render 方法
+
+效果：贴纸仅在网页首次加载时播放 `fadeInUp` 入场动画，移动位置、切换样式（fixed ↔ absolute）均为即时 CSS 更新，无动画重播。
 
 ### v1.8.0
 

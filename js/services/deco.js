@@ -476,20 +476,24 @@ export const DecoShelf = {
   },
 
   _renderAllDecos: function () {
+    // 遍历贴纸，原地更新已有位置的元素，不需删除重建
+    this._library.forEach((item) => {
+      this._renderSingleDeco(item.id);
+    });
+    // 清理孤儿元素：库中已不存在或已无位置的贴纸 DOM
+    const validIds = new Set(
+      this._library
+        .filter(function (item) { return item.position; })
+        .map(function (item) { return 'deco-' + item.id; })
+    );
     document.querySelectorAll('[id^="deco-"]').forEach(function (el) {
-      if (el.id.startsWith('deco-') && !el.id.startsWith('deco-reset-btn-') && el.id !== 'deco-context-menu') {
+      if (el.id.startsWith('deco-reset-btn-') || el.id === 'deco-context-menu') return;
+      if (!validIds.has(el.id)) {
         if (el._longPressCleanup) {
           el._longPressCleanup();
           delete el._longPressCleanup;
         }
         el.remove();
-      }
-    });
-
-    // 遍历贴纸，渲染有位置的
-    this._library.forEach((item) => {
-      if (item.position) {
-        this._renderSingleDeco(item.id);
       }
     });
   },
@@ -498,17 +502,41 @@ export const DecoShelf = {
     const item = this.get(id);
     if (!item) return;
     const existing = document.getElementById('deco-' + id);
-    if (existing) {
-      if (existing._longPressCleanup) {
-        existing._longPressCleanup();
-        delete existing._longPressCleanup;
+
+    if (!item.position) {
+      // 无位置 → 移除已存在的元素
+      if (existing) {
+        if (existing._longPressCleanup) {
+          existing._longPressCleanup();
+          delete existing._longPressCleanup;
+        }
+        existing.remove();
       }
-      existing.remove();
+      return;
     }
-    if (!item.position) return;
+
+    const posStyle = item.style || 'fixed';
+
+    if (existing) {
+      // 元素已存在 → 原地更新 CSS，保留事件绑定，避免入场动画重播
+      existing.style.position = posStyle;
+      existing.style.top = item.position.top || 'auto';
+      existing.style.left = item.position.left || 'auto';
+      existing.style.bottom = item.position.bottom || 'auto';
+      existing.style.right = item.position.right || 'auto';
+      existing.style.width = item.position.width || 'auto';
+      existing.style.height = item.position.height || 'auto';
+      const imgSrc = item.dataUrl || item.url;
+      if (imgSrc) {
+        existing.style.backgroundImage = 'url(' + imgSrc + ')';
+      }
+      existing.title = item.name + ' (' + posStyle + ')';
+      return;
+    }
+
+    // 元素不存在 → 创建新元素（仅首次渲染时触发入场动画）
     const el = document.createElement('div');
     el.id = 'deco-' + id;
-    const posStyle = item.style || 'fixed';
     el.style.position = posStyle;
     el.style.top = item.position.top || 'auto';
     el.style.left = item.position.left || 'auto';
