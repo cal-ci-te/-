@@ -19,7 +19,7 @@ const RUSTFS_CONFIG = {
 
 // 本地存储配置
 const LOCAL_CONFIG = {
-    uploadDir: path.join(__dirname, '../../uploads/decos'),
+    uploadDir: path.join(__dirname, '..', 'uploads', 'decos'),
     baseUrl: '/uploads/decos',
 };
 

@@ -140,7 +140,7 @@ export const UI = {
 
     articles: {
         empty: '⚡ 意识流空转 ⚡<br><small>尚未记录任何角色</small>',
-        cardHint: '双击查看详情',
+        cardHint: '点击查看详情',
         cardMetaPrefix: '✍️ 最后修改 · ',
         loadMore: '📖 加载更多角色...',
         endMessage: '✨ 已经到底了 ✨',

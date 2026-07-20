@@ -73,8 +73,9 @@ server.on('error', (err) => { console.error('❌ 服务器错误:', err); });
 
 const PORT = 9999;
 dbModule.initDb().then(() => {
-    server.listen(PORT, '127.0.0.1', () => {
-        console.log(`✅ API & WebSocket 服务运行在 http://127.0.0.1:${PORT}`);
+    const host = process.env.HOST || '127.0.0.1';
+    server.listen(PORT, host, () => {
+        console.log(`✅ API & WebSocket 服务运行在 http://${host}:${PORT}`);
         console.log(`🔍 ErrPulse 仪表盘: http://localhost:3800`);
         console.log(`📁 贴纸存储于: ${storage.isLocal() ? '本地文件系统' : 'MinIO/RustFS'}`);
     });

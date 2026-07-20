@@ -21,32 +21,37 @@ export default defineConfig(({ mode }) => {
         server: {
             port: 3000,
             open: true,
-            proxy: {
-                "/api": {
-                    target: "http://127.0.0.1:9999",
-                    changeOrigin: true,
-                    secure: false,
-                    timeout: 10000,
-                    rewrite: (path) => path,
-                },
-                "/uploads": {
-                    target: "http://127.0.0.1:9999",
-                    changeOrigin: true,
-                    secure: false,
-                },
-                "/websocket": {
-                    target: "ws://127.0.0.1:9999",
-                    ws: true,
-                    changeOrigin: true,
-                    secure: false,
-                    timeout: 60000,
-                },
-            },
+            proxy: (() => {
+                const backendUrl = env.VITE_BACKEND_URL || 'http://127.0.0.1:9999';
+                const wsBackendUrl = backendUrl.replace(/^http/, 'ws');
+                return {
+                    "/api": {
+                        target: backendUrl,
+                        changeOrigin: true,
+                        secure: false,
+                        timeout: 10000,
+                        rewrite: (path) => path,
+                    },
+                    "/uploads": {
+                        target: backendUrl,
+                        changeOrigin: true,
+                        secure: false,
+                    },
+                    "/websocket": {
+                        target: wsBackendUrl,
+                        ws: true,
+                        changeOrigin: true,
+                        secure: false,
+                        timeout: 60000,
+                    },
+                };
+            })(),
             hmr: {
                 overlay: true,
             },
             watch: {
                 usePolling: true,
+                interval: 2000,
             },
         },
         build: {

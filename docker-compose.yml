@@ -1,0 +1,36 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "${BIND_ADDR:-127.0.0.1}:9999:9999"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+      - revachol_data:/app/data
+      - revachol_uploads:/app/uploads
+    environment:
+      - DB_PATH=/app/data/revachol.db
+      - STORAGE_TYPE=local
+      - HOST=0.0.0.0
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    ports:
+      - "${BIND_ADDR:-127.0.0.1}:3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - VITE_BACKEND_URL=http://backend:9999
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  revachol_data:
+  revachol_uploads:

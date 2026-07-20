@@ -328,7 +328,15 @@ export const DecoShelf = {
     item.style = newStyle;
     DecoRepository.save(item).then(() => {
       this._library = this._normalizeItems(DecoRepository.getAll());
-      if (item.position) {
+      // 原地更新 DOM 属性，跳过 remove+create 以避免入场动画重播
+      if (el && item.position) {
+        el.style.position = newStyle;
+        el.style.top = item.position.top || 'auto';
+        el.style.left = item.position.left || 'auto';
+        el.style.bottom = 'auto';
+        el.style.right = 'auto';
+        el.title = item.name + ' (' + newStyle + ')';
+      } else if (item.position) {
         this._renderSingleDeco(id);
       }
       EventBus.emit(EVENTS.DECO_LIBRARY_CHANGED);

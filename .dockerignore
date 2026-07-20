@@ -1,0 +1,9 @@
+node_modules
+*.db
+*.db-journal
+backend/uploads
+.env
+.git
+dist
+.vite
+*.log
