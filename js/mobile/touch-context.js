@@ -23,7 +23,7 @@ export function enableTouchContext(container, showMenuFn, duration = 500) {
         longPressTimer = setTimeout(() => {
             const nodeLi = target.closest('.tree-node');
             if (!nodeLi) return;
-            const isAdmin = window.AppState?.get('isLoggedIn') || false;
+            const isAdmin = window.__REVACHOL__.AppState?.get('isLoggedIn') || false;
             if (!isAdmin) {
                 Utils.showToast(UI.toast.touchAdminRequired, true);
                 return;

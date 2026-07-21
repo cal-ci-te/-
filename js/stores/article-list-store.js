@@ -154,7 +154,49 @@ export const ArticleListStore = {
 
     getSearchResults() {
         return this.getDisplayArticles();
-    }
+    },
+
+    // ---- 数据查询方法（透传 ArticleService，逐步收敛耦合） ----
+
+    /** 按 ID 查找单篇文章 */
+    getArticleById(id) {
+        return ArticleService.getAllArticles().find(function (a) { return a.id === id; }) || null;
+    },
+
+    /** 获取全部文章（含隐藏） */
+    getAllArticles() {
+        return ArticleService.getAllArticles();
+    },
+
+    /** 切换文章可见性 */
+    async setVisibility(id, visible) {
+        return ArticleService.setVisibility(id, visible);
+    },
+
+    /** 获取当前可见文章 */
+    getVisibleArticles() {
+        return ArticleService.getVisibleArticles();
+    },
+
+    /** 构建目录树 */
+    buildDirectoryTree(articles) {
+        return ArticleService.buildDirectoryTree(articles);
+    },
+
+    /** 获取指定分类的直接子分类 */
+    getCategoryChildren(parentId) {
+        return ArticleService.getCategoryChildren(parentId);
+    },
+
+    /** 按 ID 查找分类 */
+    findCategoryById(id) {
+        return ArticleService.findCategoryById(id);
+    },
+
+    /** 将旧父 ID 下子分类迁移到新父 ID */
+    reparentCategoryChildren(oldParentId, newParentId) {
+        ArticleService.reparentCategoryChildren(oldParentId, newParentId);
+    },
 };
 
 // 自动初始化

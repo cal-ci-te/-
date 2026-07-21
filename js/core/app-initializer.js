@@ -1,4 +1,5 @@
 import { EventBus } from './event-bus.js';
+import { EVENTS } from './event-constants.js';
 
 export const AppInitializer = {
   _modules: [],
@@ -33,7 +34,7 @@ export const AppInitializer = {
     });
     this._initialized = true;
     console.log('[AppInitializer] 应用启动完成');
-    EventBus.emit('app:started');
+    EventBus.emit(EVENTS.APP_STARTED);
   },
 
   _topologicalSort: function () {

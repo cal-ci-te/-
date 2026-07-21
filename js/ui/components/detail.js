@@ -1,5 +1,6 @@
 import { Article } from '../../models/article-model.js';
 import { ArticleService } from '../../services/article-service.js';
+import { ArticleListStore } from '../../stores/article-list-store.js';
 import { AppState } from '../../core/app-state.js';
 import { EventBus } from '../../core/event-bus.js';
 import { EVENTS } from '../../core/event-constants.js';
@@ -360,11 +361,7 @@ export const UIDetail = {
     if (!entry.paneElement) {
       this.openArticles = this.openArticles.filter(function (e) { return e.id !== id; });
       this._renderMinimizedBar();
-      var article = null;
-      if (window.ArticleService) {
-        var all = window.ArticleService.getAllArticles();
-        article = all.find(function (a) { return a.id === id; });
-      }
+      var article = ArticleListStore.getArticleById(id);
       if (article) { this.createTab(article); }
       else { Utils.showToast(UI.detail.defaultContent, true); }
       return;

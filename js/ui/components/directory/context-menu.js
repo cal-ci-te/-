@@ -206,12 +206,8 @@ async function handleContextAction(action, data, nodeLi, updateTreeFn) {
             console.log('[ContextMenu] 新文章 ID:', newArticle.id);
 
             const allArticles = ArticleService.getAllArticles();
-            const exists = allArticles.some(a => a.id === newArticle.id);
-            if (!exists && newArticle.id > 0) {
-                allArticles.push(newArticle);
-                ArticleService._data = allArticles;
-                ArticleService.cache.data = allArticles;
-                ArticleService.cache.timestamp = Date.now();
+            ArticleService.addArticleToCache(newArticle);
+            if (newArticle.id > 0) {
                 console.log('[ContextMenu] 已手动将新文章插入缓存，当前文章 ID 列表:', allArticles.map(a => a.id));
             }
 
@@ -239,12 +235,12 @@ async function handleContextAction(action, data, nodeLi, updateTreeFn) {
         const newName = prompt(UI.directory.menuRenameFolder + '：', data);
         if (newName && newName.trim() && newName.trim() !== data) {
             const trimmed = newName.trim();
-            const cat = ArticleService._categories.find(c => c.id === data);
+            const cat = ArticleService.findCategoryById(data);
             if (!cat) {
                 Utils.showToast(UI.toast.folderNotFound, true);
                 return;
             }
-            const siblings = ArticleService._categories.filter(c => c.parent === cat.parent);
+            const siblings = ArticleService.getCategoryChildren(cat.parent);
             if (siblings.some(c => c.name === trimmed && c.id !== data)) {
                 Utils.showToast(UI.toast.folderDuplicateName, true);
                 return;
@@ -254,10 +250,7 @@ async function handleContextAction(action, data, nodeLi, updateTreeFn) {
             cat.name = trimmed;
             const articles = Article.allArticles.filter(a => a.category === oldId);
             articles.forEach(a => a.category = trimmed);
-            ArticleService._categories.forEach(c => {
-                if (c.parent === oldId) c.parent = trimmed;
-            });
-            ArticleService._saveCategories();
+            ArticleService.reparentCategoryChildren(oldId, trimmed);
             try {
                 for (const a of articles) {
                     await ApiClient.put(`/api/articles/${a.id}`, {
@@ -279,18 +272,16 @@ async function handleContextAction(action, data, nodeLi, updateTreeFn) {
     // ---- 删除文件夹（仅文件夹） ----
     if (action === 'delete-folder-only') {
         if (!confirm(UI.directory.menuDeleteFolderOnly + '？')) return;
-        const cat = ArticleService._categories.find(c => c.id === data);
+        const cat = ArticleService.findCategoryById(data);
         if (!cat) {
             Utils.showToast(UI.toast.folderNotFound, true);
             return;
         }
-        const children = ArticleService._categories.filter(c => c.parent === data);
+        const children = ArticleService.getCategoryChildren(data);
         children.forEach(c => c.parent = null);
         const articles = Article.allArticles.filter(a => a.category === data);
         articles.forEach(a => a.category = '未分类');
-        const idx = ArticleService._categories.indexOf(cat);
-        if (idx !== -1) ArticleService._categories.splice(idx, 1);
-        ArticleService._saveCategories();
+        ArticleService.removeCategoryEntry(data);
         try {
             for (const a of articles) {
                 await ApiClient.put(`/api/articles/${a.id}`, {
@@ -311,13 +302,13 @@ async function handleContextAction(action, data, nodeLi, updateTreeFn) {
     // ---- 删除文件夹及所有内容 ----
     if (action === 'delete-folder-with-articles') {
         if (!confirm(UI.directory.menuDeleteFolderWithArticles + '？')) return;
-        const cat = ArticleService._categories.find(c => c.id === data);
+        const cat = ArticleService.findCategoryById(data);
         if (!cat) {
             Utils.showToast(UI.toast.folderNotFound, true);
             return;
         }
         const getDescendantIds = (id) => {
-            const children = ArticleService._categories.filter(c => c.parent === id);
+            const children = ArticleService.getCategoryChildren(id);
             let ids = [id];
             children.forEach(c => {
                 ids = ids.concat(getDescendantIds(c.id));
@@ -330,8 +321,7 @@ async function handleContextAction(action, data, nodeLi, updateTreeFn) {
             for (const a of articlesToDelete) {
                 await ApiClient.delete(`/api/articles/${a.id}`);
             }
-            ArticleService._categories = ArticleService._categories.filter(c => !idsToDelete.includes(c.id));
-            ArticleService._saveCategories();
+            ArticleService.removeCategoriesByIds(idsToDelete);
             Utils.showToast(UI.toast.folderDeleteSuccess, false);
             await ArticleService.fetchArticles(true);
             if (updateTreeFn) updateTreeFn();

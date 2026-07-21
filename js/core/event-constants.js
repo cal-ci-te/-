@@ -5,7 +5,6 @@ export const EVENTS = {
   ARTICLE_DATA_LOADED: 'article:data-loaded',
   ARTICLE_DATA_LOADING: 'article:data-loading',
   ARTICLE_DATA_ERROR: 'article:data-error',
-  // 新增：文章数据更新（用于目录树→文章列表解耦）
   ARTICLES_UPDATED: 'articles:updated',
 
   // UI相关
@@ -15,15 +14,35 @@ export const EVENTS = {
   // 认证相关
   AUTH_LOGGED_IN: 'auth:logged-in',
   AUTH_LOGGED_OUT: 'auth:logged-out',
+  AUTH_UNAUTHORIZED: 'auth:unauthorized',
 
   // 管理面板
   PANEL_TOGGLED: 'panel:toggled',
   PANEL_COLLAPSED: 'panel:collapsed',
 
+  // 管理面板 — 操作事件
+  ADMIN_AVATAR_UPLOAD: 'admin:avatar-upload',
+  ADMIN_BG_COLOR_APPLY: 'admin:bg-color-apply',
+  ADMIN_BG_COLOR_RESET: 'admin:bg-color-reset',
+  ADMIN_TEXTURE_UPLOAD: 'admin:texture-upload',
+  ADMIN_TEXTURE_APPLY: 'admin:texture-apply',
+  ADMIN_TEXTURE_RESET: 'admin:texture-reset',
+  ADMIN_TEXTURE_OPACITY_CHANGE: 'admin:texture-opacity-change',
+  ADMIN_WATERMARK_APPLY: 'admin:watermark-apply',
+  ADMIN_FOLDER_FILTER_CHANGE: 'admin:folder-filter-change',
+  ADMIN_LOGOUT: 'admin:logout',
+  ADMIN_PANEL_TOGGLE: 'admin:panel-toggle',
+  ADMIN_CONFIRM_EDIT_POS: 'admin:confirm-edit-pos',
+  ADMIN_CANCEL_EDIT_POS: 'admin:cancel-edit-pos',
+  ADMIN_POSITION_MODE_ENTER: 'admin:position-mode-enter',
+  ADMIN_POSITION_MODE_EXIT: 'admin:position-mode-exit',
+  ADMIN_POSITION_MODE_CANCEL: 'admin:position-mode-cancel',
+
   // 贴图相关
   DECO_LIBRARY_CHANGED: 'deco:library-changed',
   DECO_EDITING_STARTED: 'deco:editing-started',
   DECO_EDITING_STOPPED: 'deco:editing-stopped',
+  DECO_CONTEXT_MENU: 'deco:context-menu',
 
   // WebSocket
   WS_CONNECTED: 'ws:connected',
@@ -34,6 +53,9 @@ export const EVENTS = {
   NOTIFICATION_SHOW: 'notification:show',
   NOTIFICATION_HIDE: 'notification:hide',
 
+  // 其他
   ARTICLES_LIST_UPDATED: 'articles:list-updated',
+  APP_STARTED: 'app:started',
+  THEME_CHANGED: 'theme:changed',
 };
 

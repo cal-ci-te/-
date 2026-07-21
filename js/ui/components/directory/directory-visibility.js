@@ -1,4 +1,4 @@
-import { ArticleService } from '../../../services/article-service.js';
+import { ArticleListStore } from '../../../stores/article-list-store.js';
 import { Utils } from '../../../utils.js';
 
 /**
@@ -10,7 +10,7 @@ export async function handleVisibilityToggle(e, onSuccess) {
     const { id, btn } = e.detail;
     const currentVisible = btn.dataset.visible === 'true';
     const newVisible = !currentVisible;
-    const success = await ArticleService.setVisibility(id, newVisible);
+    const success = await ArticleListStore.setVisibility(id, newVisible);
     if (success) {
         btn.dataset.visible = newVisible;
         btn.textContent = newVisible ? '👁️' : '🚫';

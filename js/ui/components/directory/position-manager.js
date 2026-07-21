@@ -38,20 +38,14 @@ export function createPositionManager(context) {
     } = context;
 
     function saveSnapshot() {
-        snapshot = {
-            articles: JSON.parse(JSON.stringify(ArticleService._data || [])),
-            categories: JSON.parse(JSON.stringify(ArticleService._categories || []))
-        };
+        snapshot = ArticleService.saveSnapshot();
         console.log('[PositionManager] 已保存快照，文章数:', snapshot.articles.length);
     }
 
     function restoreSnapshot() {
         if (!snapshot) return;
         console.log('[PositionManager] 恢复快照');
-        ArticleService._data = snapshot.articles;
-        ArticleService._categories = snapshot.categories;
-        ArticleService.cache.data = null;
-        ArticleService.cache.timestamp = null;
+        ArticleService.restoreSnapshot(snapshot);
         snapshot = null;
     }
 

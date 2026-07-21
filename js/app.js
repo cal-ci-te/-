@@ -63,7 +63,7 @@ ApiClient.useRequestInterceptor((config) => {
 ApiClient.useResponseInterceptor(
     (data) => data,
     async (error) => {
-        if (error.status === 401) EventBus.emit('auth:unauthorized');
+        if (error.status === 401) EventBus.emit(EVENTS.AUTH_UNAUTHORIZED);
         return Promise.reject(error);
     }
 );
@@ -114,7 +114,7 @@ function setupPositionModeControls() {
     const updateVisibility = (isLoggedIn) => {
         controls.style.display = isLoggedIn ? 'block' : 'none';
         if (!isLoggedIn) {
-            EventBus.emit('admin:position-mode-exit');
+            EventBus.emit(EVENTS.ADMIN_POSITION_MODE_EXIT);
             enterBtn.style.display = 'inline-block';
             saveBtn.style.display = 'none';
             cancelBtn.style.display = 'none';
@@ -132,7 +132,7 @@ function setupPositionModeControls() {
 
     enterBtn = bindSafeEvent(enterBtn, function(e) {
         e.preventDefault();
-        EventBus.emit('admin:position-mode-enter');
+        EventBus.emit(EVENTS.ADMIN_POSITION_MODE_ENTER);
         enterBtn.style.display = 'none';
         saveBtn.style.display = 'inline-block';
         cancelBtn.style.display = 'inline-block';
@@ -147,7 +147,7 @@ function setupPositionModeControls() {
 
     saveBtn = bindSafeEvent(saveBtn, function(e) {
         e.preventDefault();
-        EventBus.emit('admin:position-mode-exit');
+        EventBus.emit(EVENTS.ADMIN_POSITION_MODE_EXIT);
         enterBtn.style.display = 'inline-block';
         saveBtn.style.display = 'none';
         cancelBtn.style.display = 'none';
@@ -158,7 +158,7 @@ function setupPositionModeControls() {
 
     cancelBtn = bindSafeEvent(cancelBtn, function(e) {
         e.preventDefault();
-        EventBus.emit('admin:position-mode-cancel');
+        EventBus.emit(EVENTS.ADMIN_POSITION_MODE_CANCEL);
         enterBtn.style.display = 'inline-block';
         saveBtn.style.display = 'none';
         cancelBtn.style.display = 'none';
@@ -168,7 +168,7 @@ function setupPositionModeControls() {
 
     saveBtn = bindSafeEvent(saveBtn, function(e) {
         e.preventDefault();
-        EventBus.emit('admin:position-mode-exit');
+        EventBus.emit(EVENTS.ADMIN_POSITION_MODE_EXIT);
         enterBtn.style.display = 'inline-block';
         saveBtn.style.display = 'none';
         cancelBtn.style.display = 'none';
@@ -179,7 +179,7 @@ function setupPositionModeControls() {
 
     cancelBtn = bindSafeEvent(cancelBtn, function(e) {
         e.preventDefault();
-        EventBus.emit('admin:position-mode-cancel');
+        EventBus.emit(EVENTS.ADMIN_POSITION_MODE_CANCEL);
         enterBtn.style.display = 'inline-block';
         saveBtn.style.display = 'none';
         cancelBtn.style.display = 'none';
@@ -254,22 +254,24 @@ if (document.readyState === 'loading') {
 }
 
 // 暴露关键模块到全局，便于调试和模块间松耦合访问
-// [TODO] 生产环境应收敛到 window.__REVACHOL__ 下避免全局命名污染
-window.EventBus = EventBus;
-window.AppState = AppState;
-window.EVENTS = EVENTS;
-window.UIController = UIController;
-window.Article = Article;
-window.ArticleService = ArticleService;
-window.DecoShelf = DecoShelf;
-window.DecoShelfUI = DecoShelfUI;
-window.HeroBackground = HeroBackground;
-window.Admin = Admin;
-window.Utils = Utils;
-window.DOMRefs = DOMRefs;
-window.UIDirectory = UIDirectory;
-window.ThemeService = ThemeService;
-window.Texture = Texture;
+// 收敛到 __REVACHOL__ 单命名空间，避免 14 个全局变量污染
+window.__REVACHOL__ = {
+  EventBus,
+  AppState,
+  EVENTS,
+  UIController,
+  Article,
+  ArticleService,
+  DecoShelf,
+  DecoShelfUI,
+  HeroBackground,
+  Admin,
+  Utils,
+  DOMRefs,
+  UIDirectory,
+  ThemeService,
+  Texture,
+};
 
 // 左上角工具栏：展开/收起切换
 setTimeout(() => {
@@ -289,8 +291,8 @@ setTimeout(() => {
                     title: '📖 使用说明',
                     content: `## 欢迎来到 REVACHOL\n\n原创角色档案馆\n\n### 浏览角色\n\n点击左侧目录树中的文章或文件夹，跳转到对应卡片。\n\n### 阅读详情\n\n点击卡片打开标签页式阅读界面，支持多篇同时打开、最小化、全屏。\n\n### 主题切换\n\n管理员面板中可在 **暗色 / 亮色 / 低保真** 三种主题间切换。\n\n### 搜索\n\n侧边栏搜索框支持按关键字过滤目录树。\n\n### 管理员功能\n\n登录后可管理文章可见性、上传贴纸、自定义水印与背景。`
                 };
-                if (window.UIController && window.UIController.detail) {
-                    window.UIController.detail.createTab(helpArticle);
+                if (UIController && UIController.detail) {
+                    UIController.detail.createTab(helpArticle);
                 }
             });
         }

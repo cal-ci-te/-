@@ -2,7 +2,6 @@ import { UIHelpers } from '../helpers.js';
 import { UIArticles } from '../articles.js';
 import { initLongPress } from '../../../utils/touch-context.js';
 import { UI } from '../../../utils/ui-strings.js';
-import { ArticleService } from '../../../services/article-service.js';
 import { ArticleListStore } from '../../../stores/article-list-store.js';
 import { Utils } from '../../../utils.js';
 
@@ -101,7 +100,7 @@ export function bindInteractions(container, contextMenuHandler, handleNodeClickF
         if (!content) return;
         const nodeLi = content.closest('.tree-node');
         if (!nodeLi) return;
-        const isAdmin = window.AppState?.get('isLoggedIn') || false;
+        const isAdmin = window.__REVACHOL__.AppState?.get('isLoggedIn') || false;
         if (!isAdmin) return;
         e.preventDefault();
         const type = nodeLi.dataset.type;
@@ -122,7 +121,7 @@ export function bindInteractions(container, contextMenuHandler, handleNodeClickF
 
     // 长按支持（移动端）
     const longPressCleanup = initLongPress(container, (touch, targetEl) => {
-        const isAdmin = window.AppState?.get('isLoggedIn') || false;
+        const isAdmin = window.__REVACHOL__.AppState?.get('isLoggedIn') || false;
         if (!isAdmin) return;
         const nodeLi = targetEl.closest('.tree-node');
         if (!nodeLi) return;
@@ -156,8 +155,8 @@ export function handleNodeClick(nodeElement, nodeData, isDouble, setActiveNodeFn
 
     if (type === 'article' && articleId) {
         if (isDouble) {
-            if (window._UIDetail) {
-                window._UIDetail.openDetail(articleId);
+            if (window.__REVACHOL__.UIController.detail) {
+                window.__REVACHOL__.UIController.detail.openDetail(articleId);
             }
         } else {
             const targetId = helpers.generateCardId(articleId);
@@ -166,8 +165,8 @@ export function handleNodeClick(nodeElement, nodeData, isDouble, setActiveNodeFn
                 helpers.scrollToElement(targetId);
                 setActiveNodeFn(nodeData.nodeId);
             } else {
-                // 使用 ArticleService 获取所有文章，查找目标文章的位置
-                const allArticles = ArticleService.getAllArticles();
+                // 使用 ArticleListStore 获取所有文章，查找目标文章的位置
+                const allArticles = ArticleListStore.getAllArticles();
                 const index = allArticles.findIndex(a => a.id === articleId);
                 if (index !== -1) {
                     const pageSize = ArticleListStore.getPageSize();
@@ -204,7 +203,7 @@ export function handleNodeClick(nodeElement, nodeData, isDouble, setActiveNodeFn
             helpers.scrollToElement(targetId);
             setActiveNodeFn(nodeData.nodeId);
         } else {
-            const allArticles = ArticleService.getAllArticles();
+            const allArticles = ArticleListStore.getAllArticles();
             const index = allArticles.findIndex(a => a.id === folderFirstId);
             if (index !== -1) {
                 const pageSize = ArticleListStore.getPageSize();

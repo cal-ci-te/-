@@ -357,13 +357,14 @@ export const DecoShelf = {
     const item = this.get(id);
     if (!item) return;
     this._editingId = id;
+    const origStyle = item.style || 'fixed';
     let el = document.getElementById('deco-' + id);
     if (!el) {
       const winW = window.innerWidth,
         winH = window.innerHeight;
       el = document.createElement('div');
       el.id = 'deco-' + id;
-      el.style.position = item.style || 'fixed';
+      el.style.position = 'fixed';
       el.style.top = winH / 2 - 50 + 'px';
       el.style.left = winW / 2 - 50 + 'px';
       el.style.width = '100px';
@@ -379,11 +380,22 @@ export const DecoShelf = {
       el.style.boxShadow = '0 0 20px rgba(196,122,68,0.5)';
       el.dataset.decoId = id;
       document.body.appendChild(el);
+      // 记录原始样式用于保存时坐标转换（fixed 元素视口坐标 → absolute 则转文档坐标）
+      el._origStyle = origStyle;
     } else {
+      el._origStyle = origStyle;
+      // absolute 定位的元素需临时转为 fixed 以便拖拽在视口坐标下工作
+      if (origStyle === 'absolute') {
+        const rect = el.getBoundingClientRect();
+        el.style.top = rect.top + 'px';
+        el.style.left = rect.left + 'px';
+        el.style.position = 'fixed';
+      } else {
+        el.style.position = origStyle;
+      }
       el.style.border = '2px solid #c47a44';
       el.style.boxShadow = '0 0 20px rgba(196,122,68,0.5)';
       el.style.cursor = 'grab';
-      el.style.position = item.style || 'fixed';
       const imgSrc = item.dataUrl || item.url;
       if (imgSrc) {
         el.style.backgroundImage = 'url(' + imgSrc + ')';
@@ -431,12 +443,16 @@ export const DecoShelf = {
     document.querySelectorAll('.deco-edit-control').forEach(el => el.remove());
     if (save && el) {
       const rect = el.getBoundingClientRect();
+      const origStyle = el._origStyle || (this.get(id) && this.get(id).style) || 'fixed';
+      const scrollX = window.scrollX || window.pageXOffset;
+      const scrollY = window.scrollY || window.pageYOffset;
       const pos = {
-        top: rect.top + 'px',
-        left: rect.left + 'px',
+        top: (origStyle === 'absolute' ? rect.top + scrollY : rect.top) + 'px',
+        left: (origStyle === 'absolute' ? rect.left + scrollX : rect.left) + 'px',
         width: el.offsetWidth + 'px',
         height: el.offsetHeight + 'px',
       };
+      delete el._origStyle;
       this.setPosition(id, pos);
       EventBus.emit(EVENTS.DECO_EDITING_STOPPED, { id: id, saved: true });
     } else {
@@ -563,13 +579,13 @@ export const DecoShelf = {
     el.addEventListener('contextmenu', function (e) {
       e.preventDefault();
       e.stopPropagation();
-      EventBus.emit('deco:context-menu', { decoId: id, x: e.clientX, y: e.clientY });
+      EventBus.emit(EVENTS.DECO_CONTEXT_MENU, { decoId: id, x: e.clientX, y: e.clientY });
     });
 
     // 长按支持（移动端）
     const cleanup = initLongPress(el, (touch, targetEl) => {
       const decoId = targetEl.dataset.decoId;
-      EventBus.emit('deco:context-menu', {
+      EventBus.emit(EVENTS.DECO_CONTEXT_MENU, {
         decoId: decoId,
         x: touch.clientX,
         y: touch.clientY,

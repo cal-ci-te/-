@@ -1,5 +1,6 @@
 import { AppState } from '../core/app-state.js';
 import { EventBus } from '../core/event-bus.js';
+import { EVENTS } from '../core/event-constants.js';
 import { Utils } from '../utils.js';
 
 import { AdminAuth } from './auth.js';
@@ -30,17 +31,17 @@ AppState.subscribe('isLoggedIn', function (_newValue) {
 
 EventBus
   // --- 头像 ---
-  .on('admin:avatar-upload', function () {
+  .on(EVENTS.ADMIN_AVATAR_UPLOAD, function () {
     AdminAvatar.openUpload();
   })
 
   // --- 背景颜色 ---
-  .on('admin:bg-color-apply', function (data) {
+  .on(EVENTS.ADMIN_BG_COLOR_APPLY, function (data) {
     Texture.setBgColor(data.color);
     Utils.showToast(UI.toast.adminBgColorApplied, false);
     Utils.storage.set('bg_color', data.color);
   })
-  .on('admin:bg-color-reset', function () {
+  .on(EVENTS.ADMIN_BG_COLOR_RESET, function () {
     Texture.resetBgColor();
     const picker = document.getElementById('bgColorPicker');
     const preview = document.getElementById('bgColorPreview');
@@ -50,10 +51,10 @@ EventBus
   })
 
   // --- 纹理 ---
-  .on('admin:texture-upload', function (data) {
+  .on(EVENTS.ADMIN_TEXTURE_UPLOAD, function (data) {
     Texture.uploadTexture(data.file);
   })
-  .on('admin:texture-apply', function () {
+  .on(EVENTS.ADMIN_TEXTURE_APPLY, function () {
     if (!Texture.textureConfig || !Texture.textureConfig.dataUrl) {
       Utils.showToast(UI.toast.adminTextureUploadFirst, true);
 
@@ -62,22 +63,22 @@ EventBus
     Texture.saveConfig();
     Utils.showToast(UI.toast.adminTextureSaved, false);
   })
-  .on('admin:texture-reset', function () {
+  .on(EVENTS.ADMIN_TEXTURE_RESET, function () {
     Texture.removeTexture();
     Utils.showToast(UI.toast.adminTextureRemoved, false);
   })
-  .on('admin:texture-opacity-change', function (data) {
+  .on(EVENTS.ADMIN_TEXTURE_OPACITY_CHANGE, function (data) {
     Texture.setOpacity(data.opacity);
   })
 
   // --- 水印 ---
-  .on('admin:watermark-apply', function (data) {
+  .on(EVENTS.ADMIN_WATERMARK_APPLY, function (data) {
     Watermark.apply(data.text, data.opacity);
     Utils.showToast(UI.toast.adminWatermarkApplied, false);
   })
 
   // --- 文件夹过滤（文章列表更新） ---
-  .on('admin:folder-filter-change', function () {
+  .on(EVENTS.ADMIN_FOLDER_FILTER_CHANGE, function () {
     // 删除未使用的 data 参数
     if (UIController && Article && Article.allArticles) {
       const categories = Article.buildDirectoryTree(Article.allArticles);
@@ -87,20 +88,20 @@ EventBus
   })
 
   // --- 退出登录 ---
-  .on('admin:logout', function () {
+  .on(EVENTS.ADMIN_LOGOUT, function () {
     AdminAuth.logout();
   })
 
   // --- 面板折叠切换 ---
-  .on('admin:panel-toggle', function () {
+  .on(EVENTS.ADMIN_PANEL_TOGGLE, function () {
     AdminPosition.toggleCollapse();
   })
 
   // --- 确认/取消编辑贴图位置 ---
-  .on('admin:confirm-edit-pos', function () {
+  .on(EVENTS.ADMIN_CONFIRM_EDIT_POS, function () {
     DecoShelf.confirmEditing();
   })
-  .on('admin:cancel-edit-pos', function () {
+  .on(EVENTS.ADMIN_CANCEL_EDIT_POS, function () {
     DecoShelf.cancelEditing();
   });
 

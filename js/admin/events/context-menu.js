@@ -2,6 +2,7 @@
 import { DecoShelf } from '../../services/deco.js';
 import { Utils } from '../../utils.js';
 import { EventBus } from '../../core/event-bus.js';
+import { EVENTS } from '../../core/event-constants.js';
 import { UI } from '../../utils/ui-strings.js';
 
 export const ContextMenu = {
@@ -43,8 +44,8 @@ export const ContextMenu = {
     });
 
     // 监听贴图右键事件（仅管理员可用）
-    EventBus.on('deco:context-menu', function (data) {
-      if (!window.AppState || !window.AppState.get('isLoggedIn')) return;
+    EventBus.on(EVENTS.DECO_CONTEXT_MENU, function (data) {
+      if (!window.__REVACHOL__.AppState || !window.__REVACHOL__.AppState.get('isLoggedIn')) return;
       ContextMenu.show(data.decoId, data.x, data.y);
     });
 

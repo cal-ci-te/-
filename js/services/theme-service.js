@@ -2,6 +2,7 @@
 // 使用变量回退会导致开发和调试成本高于直接维护三份独立样式文件。
 import { Utils } from '../utils.js';
 import { EventBus } from '../core/event-bus.js';
+import { EVENTS } from '../core/event-constants.js';
 import { Texture } from './texture.js';
 import { ContextMenu } from '../admin/events/context-menu.js';
 
@@ -83,12 +84,12 @@ export const ThemeService = {
         document.body.style.backgroundBlendMode = '';
 
         // 通知 Texture 进入主题模式
-        if (window.Texture && typeof Texture.setThemeMode === 'function') {
+        if (Texture && typeof Texture.setThemeMode === 'function') {
             Texture.setThemeMode(true);
         }
 
         // 通知主题变更
-        EventBus.emit('theme:changed', { themeId, theme, isRestore });
+        EventBus.emit(EVENTS.THEME_CHANGED, { themeId, theme, isRestore });
 
         // 跨页面同步：通知文章编辑器等其它标签页
         try {
@@ -102,8 +103,8 @@ export const ThemeService = {
 
         setTimeout(() => {
             // 刷新目录树
-            if (window.UIDirectory && typeof window.UIDirectory.updateTree === 'function') {
-                window.UIDirectory.updateTree(window.UIDirectory.filterKeyword || null);
+            if (window.__REVACHOL__.UIDirectory && typeof window.__REVACHOL__.UIDirectory.updateTree === 'function') {
+                window.__REVACHOL__.UIDirectory.updateTree(window.__REVACHOL__.UIDirectory.filterKeyword || null);
                 console.log('[ThemeService] 目录树已刷新');
             }
 
@@ -168,7 +169,7 @@ export const ThemeService = {
 
     init() {
         // 确保 Texture 进入主题模式
-        if (window.Texture && typeof Texture.setThemeMode === 'function') {
+        if (Texture && typeof Texture.setThemeMode === 'function') {
             Texture.setThemeMode(true);
         }
         this.loadTheme();

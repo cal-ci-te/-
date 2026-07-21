@@ -17,9 +17,9 @@ export function setupBroadcastChannel() {
                     .then(() => {
                         console.log('[BroadcastChannel] 数据刷新完成，触发 UI 更新');
                         EventBus.emit(EVENTS.ARTICLE_DATA_LOADED);
-                        if (window.UIDirectory && typeof window.UIDirectory.updateTree === 'function') {
-                            const filter = window.UIDirectory.filterKeyword || null;
-                            window.UIDirectory.updateTree(filter);
+                        if (window.__REVACHOL__.UIDirectory && typeof window.__REVACHOL__.UIDirectory.updateTree === 'function') {
+                            const filter = window.__REVACHOL__.UIDirectory.filterKeyword || null;
+                            window.__REVACHOL__.UIDirectory.updateTree(filter);
                             console.log('[BroadcastChannel] 目录树已手动更新');
                         }
                     })

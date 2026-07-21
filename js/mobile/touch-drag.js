@@ -31,7 +31,7 @@ export function enableTouchDrag(container, onDrop, updateTreeFn) {
         if (!target) return;
 
         // 检查是否有管理员权限
-        const isAdmin = window.AppState?.get('isLoggedIn') || false;
+        const isAdmin = window.__REVACHOL__.AppState?.get('isLoggedIn') || false;
         if (!isAdmin) {
             Utils.showToast(UI.toast.touchAdminRequiredDrag, true);
             return;
@@ -184,8 +184,7 @@ export function enableTouchDrag(container, onDrop, updateTreeFn) {
                 isSibling = (y - rect.top) > (rect.height / 2);
                 if (isSibling) {
                     // 平级：获取该文件夹的父级
-                    const categories = ArticleService._categories || [];
-                    const cat = categories.find(c => c.id === dropTarget.dataset.name);
+                    const cat = ArticleService.findCategoryById(dropTarget.dataset.name);
                     targetFolderId = cat?.parent || null;
                 } else {
                     targetFolderId = dropTarget.dataset.name;

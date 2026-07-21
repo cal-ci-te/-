@@ -157,7 +157,7 @@ export function enableDragDrop(container, updateTreeFn) {
         if (sourceType === 'folder' && !isSibling) {
             // 检查是否将文件夹拖到其子文件夹中（形成循环）
             const isDescendant = (id, targetId) => {
-                const children = ArticleService._categories.filter(c => c.parent === id);
+                const children = ArticleService.getCategoryChildren(id);
                 for (let child of children) {
                     if (child.id === targetId) return true;
                     if (isDescendant(child.id, targetId)) return true;

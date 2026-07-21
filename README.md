@@ -2,7 +2,7 @@
 
 原创角色档案馆，一个带内容管理、贴纸装饰、水印保护、多主题切换的 Web 应用。
 
-当前版本：v1.8.2
+当前版本：v1.9.0
 
 ---
 
@@ -117,6 +117,20 @@ Docker 安全部署：进程降权（非 root）、端口默认仅绑定 localho
 多主题系统：CSS 变量驱动，三套主题动态加载。
 
 ## 更新日志
+
+### v1.9.0
+
+**全局命名空间收敛与架构解耦**：
+
+- **全局收敛**：14 个 `window.X` 合并为 `window.__REVACHOL__` 单一命名空间，10 个消费方同步更新；附带修复 `window.UI`、`window._UIDetail`、`window._UISidebar` 三个从未赋值的死引用
+- **事件常量补全**：`event-constants.js` 从 20 → 40 个常量，覆盖 admin/deco/auth/theme/position 五个事件域；`admin/index.js` 等 6 个文件全部替换散落字符串为 `EVENTS.*`
+- **Service 层封装**：ArticleService 新增 6 个公开方法（`getCategoryChildren`、`findCategoryById`、`reparentCategoryChildren`、`removeCategoryEntry`、`removeCategoriesByIds`、`saveSnapshot/restoreSnapshot`），消除 `context-menu.js`（10 处）、`drag-drop.js`、`touch-drag.js`、`position-manager.js`（6 处）等外部文件对 `_categories`/`_data`/`cache` 私有字段的直接访问
+- **Store 透传**：ArticleListStore 新增 5 个代理方法，detail.js、events.js、directory-visibility.js、index.js 四个 UI 组件从直引 ArticleService 改为通过 Store 获取数据
+
+**Bug 修复**：
+
+- 修复贴纸在 `absolute` 定位下拖拽发生坐标偏移（编辑期间临时转为 `fixed`，保存时还原坐标系）
+- 修复目录树在位置管理模式中反复 enter/exit 后拖拽弹窗重复触发（`enableDragDrop` 旧监听器未清理导致叠加）
 
 ### v1.8.2
 

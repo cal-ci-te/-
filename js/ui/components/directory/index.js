@@ -17,7 +17,7 @@ import { Utils } from '../../../utils.js';
 import { AppState } from '../../../core/app-state.js';
 import { EventBus } from '../../../core/event-bus.js';
 import { EVENTS } from '../../../core/event-constants.js';
-import { ArticleService } from '../../../services/article-service.js';
+import { ArticleListStore } from '../../../stores/article-list-store.js';
 import { isMobile, enableTouchDrag, enableTouchContext } from '../../../mobile/index.js';
 
 
@@ -30,6 +30,11 @@ export const UIDirectory = {
     _touchContextDisableFn: null,
     _mobileControls: null,
     _pendingMovesManager: null,
+    _disableDragDrop: null,
+
+    _cleanupDragDrop() {
+        if (this._disableDragDrop) { this._disableDragDrop(); this._disableDragDrop = null; }
+    },
 
     init(container) {
         console.log('[UIDirectory] 初始化...');
@@ -60,9 +65,9 @@ export const UIDirectory = {
 
         // 事件监听
         EventBus.on(EVENTS.ARTICLE_DATA_LOADED, () => this.updateTree());
-        EventBus.on('admin:position-mode-enter', () => this._positionManager.enter());
-        EventBus.on('admin:position-mode-exit', () => this._positionManager.exit(true));
-        EventBus.on('admin:position-mode-cancel', () => this._positionManager.exit(false));
+        EventBus.on(EVENTS.ADMIN_POSITION_MODE_ENTER, () => this._positionManager.enter());
+        EventBus.on(EVENTS.ADMIN_POSITION_MODE_EXIT, () => { this._cleanupDragDrop(); this._positionManager.exit(true); });
+        EventBus.on(EVENTS.ADMIN_POSITION_MODE_CANCEL, () => { this._cleanupDragDrop(); this._positionManager.exit(false); });
         EventBus.on(EVENTS.AUTH_LOGGED_IN, () => {
             // 登录后刷新目录树，显示管理员控件（可见性按钮、拖拽区等）
             this.updateTree(this.filterKeyword);
@@ -85,10 +90,10 @@ export const UIDirectory = {
 
     updateTree(filterKeyword = null) {
         this.filterKeyword = filterKeyword;
-        const articles = ArticleService.getVisibleArticles();
+        const articles = ArticleListStore.getVisibleArticles();
         const sortedArticles = [...articles].sort((a, b) => a.id - b.id);
 
-        const treeData = ArticleService.buildDirectoryTree(sortedArticles);
+        const treeData = ArticleListStore.buildDirectoryTree(sortedArticles);
         this.container.innerHTML = renderTree(treeData, 0, filterKeyword, '');
 
         // 绑定交互（使用新的绑定器）
@@ -122,7 +127,9 @@ export const UIDirectory = {
                 );
                 showMobileControls();
             } else {
-                enableDragDrop(this.container, () => this.updateTree(this.filterKeyword));
+                // 移除旧监听器防止重复绑定（每次 updateTree 重建 DOM 后重绑）
+                if (this._disableDragDrop) this._disableDragDrop();
+                this._disableDragDrop = enableDragDrop(this.container, () => this.updateTree(this.filterKeyword));
                 applyDragDropVisuals(this.container, true);
             }
         }
@@ -143,7 +150,7 @@ export const UIDirectory = {
             onSetActiveNode: (nodeId) => self.setActiveNode(nodeId),
             onVisibilityToggleSuccess: () => {
                 // 可见性切换成功，触发列表更新
-                // 由于切换后 ArticleService 会触发事件，这里无需额外操作
+                // 由于切换后 ArticleListStore 会触发事件，这里无需额外操作
             },
         });
     },

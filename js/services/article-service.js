@@ -73,6 +73,16 @@ export const ArticleService = {
         return cat ? cat.parent : undefined;
     },
 
+    /** 获取指定分类的直接子分类 */
+    getCategoryChildren(parentId) {
+        return this._categories.filter(function (c) { return c.parent === parentId; });
+    },
+
+    /** 按 ID 查找分类 */
+    findCategoryById(id) {
+        return this._categories.find(function (c) { return c.id === id; }) || null;
+    },
+
     addCategory(name, parentId = null) {
         const trimmed = name.trim();
         if (!trimmed) return false;
@@ -111,6 +121,76 @@ export const ArticleService = {
         cat.parent = newParentId;
         this._saveCategories();
         EventBus.emit(EVENTS.ARTICLE_VISIBILITY_CHANGED);
+        return true;
+    },
+
+    /** 将旧父 ID 下所有子分类迁移到新父 ID */
+    reparentCategoryChildren(oldParentId, newParentId) {
+        this._categories.forEach(function (c) {
+            if (c.parent === oldParentId) c.parent = newParentId;
+        });
+        this._saveCategories();
+    },
+
+    /** 从 _categories 中移除单个分类条目（不处理子分类和文章） */
+    removeCategoryEntry(categoryId) {
+        const idx = this._categories.findIndex(function (c) { return c.id === categoryId; });
+        if (idx === -1) return false;
+        this._categories.splice(idx, 1);
+        this._saveCategories();
+        return true;
+    },
+
+    /** 批量移除指定 ID 的分类条目 */
+    removeCategoriesByIds(ids) {
+        this._categories = this._categories.filter(function (c) { return !ids.includes(c.id); });
+        this._saveCategories();
+    },
+
+    /** 将新创建的文章加入本地缓存，避免全量重新拉取 */
+    addArticleToCache(article) {
+        if (!article || !article.id) return;
+        const all = this.getAllArticles();
+        if (!all.some(function (a) { return a.id === article.id; })) {
+            all.push(article);
+        }
+        this._data = all;
+        this.cache = { data: all, timestamp: Date.now() };
+    },
+
+    /** 保存当前数据快照（深拷贝，用于撤销/恢复） */
+    saveSnapshot() {
+        return {
+            articles: JSON.parse(JSON.stringify(this._data || [])),
+            categories: JSON.parse(JSON.stringify(this._categories || [])),
+        };
+    },
+
+    /** 从快照恢复数据（含缓存清除） */
+    restoreSnapshot(snapshot) {
+        if (!snapshot) return;
+        this._data = snapshot.articles;
+        this._categories = snapshot.categories;
+        this.cache.data = null;
+        this.cache.timestamp = null;
+    },
+
+    /** 重命名分类并迁移子分类的 parent 引用 */
+    renameCategory(oldId, newName) {
+        const cat = this._categories.find(function (c) { return c.id === oldId; });
+        if (!cat) return false;
+        cat.id = newName;
+        cat.name = newName;
+        this._categories.forEach(function (c) {
+            if (c.parent === oldId) c.parent = newName;
+        });
+        this._saveCategories();
+        EventBus.emit(EVENTS.ARTICLE_VISIBILITY_CHANGED, { categoryRenamed: { oldId: oldId, newId: newName } });
+        // 同步更新文章的 category 字段
+        var self = this;
+        self._data.forEach(function (a) {
+            if (a.category === oldId) a.category = newName;
+        });
         return true;
     },
 
@@ -271,8 +351,8 @@ export const ArticleService = {
             EventBus.emit(EVENTS.ARTICLE_MADE_INVISIBLE, { articleId });
         }
         EventBus.emit(EVENTS.ARTICLE_VISIBILITY_CHANGED, { articleId, visible, fromRemote: true });
-        if (typeof window !== 'undefined' && window.UI && typeof window.UI.refreshDisplay === 'function') {
-            window.UI.refreshDisplay();
+        if (typeof window !== 'undefined' && window.__REVACHOL__.UIController && typeof window.__REVACHOL__.UIController.refreshDisplay === 'function') {
+            window.__REVACHOL__.UIController.refreshDisplay();
         }
     },
 

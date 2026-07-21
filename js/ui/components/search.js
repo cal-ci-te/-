@@ -37,8 +37,8 @@ export const UISearch = {
         this.searchInput.removeEventListener('keydown', this._keydownHandler);
 
         this._focusHandler = () => {
-            if (window._UISidebar && window._UISidebar.sidebarCollapsed) {
-                window._UISidebar.toggleCollapse();
+            if (window.__REVACHOL__.UIController.sidebar && window.__REVACHOL__.UIController.sidebar.sidebarCollapsed) {
+                window.__REVACHOL__.UIController.sidebar.toggleCollapse();
             }
         };
 
