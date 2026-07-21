@@ -16,6 +16,18 @@
 </head>
 <body>
 
+<!-- 主题预加载：心跳动画背景色跟随保存的主题，消除暗色闪烁 -->
+<style id="theme-preload">
+  html[data-theme="dark"] .heartbeat-loader  { background: #1a1612; }
+  html[data-theme="light"] .heartbeat-loader { background: #f5f0e8; }
+  html[data-theme="lofi"] .heartbeat-loader  { background: #f0ead8; }
+</style>
+<script>
+  (function(){var r=localStorage.getItem('rv_selected_theme'),t='dark';
+  if(r){try{t=JSON.parse(r)}catch(e){t=r.replace(/"/g,'');}}
+  document.documentElement.setAttribute('data-theme',t);})();
+</script>
+
 <!-- 平铺式背景水印层 -->
 <div class="tiled-watermark" id="tiledWatermark"></div>
 <div class="custom-texture" id="customTexture"></div>

@@ -36,10 +36,11 @@ export const Sidebar = {
 
   loadState: function () {
     const saved = Utils.storage.get('sidebar_state');
+    const isMobile = window.innerWidth <= 768;
     if (saved) {
       this.sidebarCollapsed = saved.collapsed !== undefined ? saved.collapsed : true;
       this.sidebarLeft = saved.left || 20;
-      this.sidebarTop = saved.top || 80;
+      this.sidebarTop = isMobile ? 68 : (saved.top || 80);
     } else {
       this.sidebarCollapsed = true;
       this.saveState();
@@ -58,7 +59,7 @@ export const Sidebar = {
     const saved = Utils.storage.get('sidebar_position');
     if (saved) {
       this.sidebarLeft = saved.left || 20;
-      this.sidebarTop = saved.top || 80;
+      this.sidebarTop = (window.innerWidth <= 768) ? 68 : (saved.top || 80);
     }
   },
 

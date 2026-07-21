@@ -102,3 +102,8 @@ html[data-theme="lofi"] .dropzone-background {
   font-size: 10px !important;
   letter-spacing: 3px !important;
 }
+
+/* ===== 心跳加载动画 ===== */
+html[data-theme="lofi"] .heartbeat-loader {
+  background: var(--color-bg-primary) !important;
+}

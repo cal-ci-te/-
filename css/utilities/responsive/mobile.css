@@ -53,18 +53,24 @@
 
   /* ===== 卡片 ===== */
   .card {
-    width: 100% !important;
-    max-width: 100% !important;
+    width: 92% !important;
+    max-width: 92% !important;
     padding: 16px !important;
     margin-bottom: 24px !important;
   }
 
-  .card:nth-child(odd),
-  .card:nth-child(even) {
-    align-self: center !important;
+  .card-left {
+    align-self: flex-start !important;
     margin-left: 0 !important;
+    margin-right: auto !important;
+    transform: rotate(-0.3deg) !important;
+  }
+
+  .card-right {
+    align-self: flex-end !important;
+    margin-left: auto !important;
     margin-right: 0 !important;
-    transform: rotate(0deg) !important;
+    transform: rotate(0.3deg) !important;
   }
 
   .card h3 {
@@ -77,20 +83,14 @@
     line-clamp: 3;
   }
 
-  #positionModeControls {
-        display: block !important;
-        padding: 8px 12px !important;
-        border-bottom: 1px solid #3a2a1a !important;
-    }
-
   /* ===== 侧边栏 ===== */
   .sidebar {
     position: fixed !important;
     left: 8px !important;
-    top: 56px !important;
+    top: 100px !important;
     width: 220px !important;
     max-width: calc(100vw - 16px) !important;
-    max-height: 55vh !important;
+    max-height: 50vh !important;
     border-radius: 6px;
     z-index: 1000;
     overflow: hidden;
@@ -150,21 +150,21 @@
   /* ===== 登录组件 ===== */
   .login-widget {
     position: fixed !important;
-    top: 8px !important;
+    top: 10px !important;
     right: 8px !important;
     z-index: 1002;
     max-width: calc(100vw - 16px) !important;
   }
 
   .login-trigger {
-    padding: 4px 10px 4px 6px;
+    padding: 6px 14px 6px 8px;
     border-radius: 30px;
     max-width: 100%;
   }
 
   .login-avatar {
-    width: 28px;
-    height: 28px;
+    width: 36px;
+    height: 36px;
     flex-shrink: 0;
   }
 
@@ -175,11 +175,11 @@
   }
 
   .login-label {
-    font-size: 8px;
+    font-size: 10px;
   }
 
   .welcome-text {
-    font-size: 7px;
+    font-size: 9px;
   }
 
   /* ===== 登录弹窗 ===== */
@@ -348,17 +348,10 @@
   #positionModeControls {
         display: block !important;
         padding: 10px 12px !important;
-        border-bottom: 1px solid #3a2a1a !important;
-        background: #1a1612;
+        border-bottom: 1px solid var(--color-border) !important;
+        background: var(--color-bg-secondary);
         margin-bottom: 4px;
         border-radius: 0 0 6px 6px;
-    }
-
-    #positionModeControls .pos-controls-row {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
-        align-items: center;
     }
 
     #positionModeControls button {
@@ -371,28 +364,24 @@
         -webkit-tap-highlight-color: transparent;
     }
 
-    #positionModeControls button:active {
-        transform: scale(0.96);
-    }
-
     #positionModeControls #enterPositionModeBtn {
-        background: #5a3e2b !important;
-        color: #e8d5b5 !important;
+        background: var(--color-accent-dark) !important;
+        color: var(--color-text-accent) !important;
     }
 
     #positionModeControls #savePositionChangesBtn {
-        background: #3a5a2b !important;
-        color: #e8d5b5 !important;
+        background: var(--color-success) !important;
+        color: var(--color-text-accent) !important;
     }
 
     #positionModeControls #cancelPositionChangesBtn {
-        background: #3a2a1a !important;
-        color: #c4b5a0 !important;
+        background: var(--color-danger) !important;
+        color: var(--color-text-secondary) !important;
     }
 
     #positionModeControls .pos-hint {
         font-size: 10px !important;
-        color: #7a6a58 !important;
+        color: var(--color-text-muted) !important;
         margin-top: 4px !important;
         width: 100%;
         text-align: center;
@@ -429,9 +418,17 @@
   #cancelEditPosBtn {
     display: none !important;
   }
+
+  /* 移动端不支持贴纸：隐藏管理面板中的贴图库入口 */
+  #assetUploadBtn,
+  #assetFileInput,
+  #assetListContainer {
+    display: none !important;
+  }
+
+  /* 工具栏 */
+  .side-toolbar {
+    left: 5px !important;     /* 靠右对齐 */
+    top: 25px !important;       /* 调整垂直位置 */
+  }
 }
-
-    
-
-
-  

@@ -22,7 +22,7 @@
   /* ===== 侧边栏 ===== */
   .sidebar {
     left: 4px !important;
-    top: 52px !important;
+    top: 68px !important;
     width: 180px !important;
     max-width: calc(100vw - 8px) !important;
   }
@@ -53,26 +53,26 @@
 
   /* ===== 登录组件 ===== */
   .login-widget {
-    top: 4px !important;
+    top: 8px !important;
     right: 4px !important;
     max-width: calc(100vw - 8px) !important;
   }
 
   .login-trigger {
-    padding: 2px 8px 2px 4px;
+    padding: 5px 12px 5px 6px;
   }
 
   .login-avatar {
-    width: 22px;
-    height: 22px;
+    width: 32px;
+    height: 32px;
   }
 
   .login-label {
-    font-size: 7px;
+    font-size: 9px;
   }
 
   .welcome-text {
-    font-size: 6px;
+    font-size: 8px;
   }
 
   /* ===== 弹窗 ===== */

@@ -2,7 +2,7 @@
 
 原创角色档案馆，一个带内容管理、贴纸装饰、水印保护、多主题切换的 Web 应用。
 
-当前版本：v1.9.0
+当前版本：v1.9.1
 
 ---
 
@@ -146,6 +146,24 @@ Docker 安全部署：进程降权（非 root）、端口默认仅绑定 localho
 多主题系统：CSS 变量驱动，三套主题动态加载。
 
 ## 更新日志
+
+### v1.9.1
+
+**移动端样式优化**：
+
+- 卡片严格左右交错排列：卡片交错从 `nth-child`（按父级计数）改为 `.card-left`/`.card-right` 类选择器（由 JS 全局 `cardIndex` 赋值），跨越文件夹边界连续交替
+- 侧边栏位置下移：`sidebar.js` 移动端默认 `top` 从 80px → 68px，`loadState`/`loadPosition` 双入口强制移动端覆盖已保存值
+- 登录入口增大：头像 28→36px，标签 8→10px，欢迎语 7→9px
+- 位置控件主题适配：三套主题 `_sidebar.css` 中写入 `var(--color-*)` 变量覆盖，替代 `admin.css` 硬编码暗色值
+- 心跳加载动画主题平滑：`index.html`/`article-editor.html` 内联预加载脚本（处理 StorageAdapter `rv_` 前缀 + JSON 编码），`data-theme` 在第一帧渲染前就位
+- 贴图库入口隐藏：`#assetUploadBtn`/`#assetFileInput`/`#assetListContainer` 移动端隐藏，仅显示移动端不支持贴纸
+
+**修复**：
+
+- 修复 `small-mobile.css`（≤480px）后加载覆盖 `mobile.css`（≤768px）导致移动端样式未生效
+- 修复 `sidebar.js` `loadPosition()` 在 `loadState()` 之后运行，用旧保存值覆盖移动端默认值
+- 修复内联预加载脚本读 `selected_theme` 裸键而非 StorageAdapter 前缀键 `rv_selected_theme`
+- 修复位置控件色值经 Vite HMR `@import` 链注入被绕过，改为主题 CSS `<link>` 直载
 
 ### v1.9.0
 

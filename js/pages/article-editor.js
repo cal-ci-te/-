@@ -147,6 +147,30 @@ HistoryUI.onRestore = async (articleId) => {
 };
 
 UIDirectory.init(treeContainer);
+
+const EDITOR_START_TIME = Date.now();
+const EDITOR_MIN_LOADER = 300;
+
+// 加载期间锁定页面滚动
+document.documentElement.style.overflow = 'hidden';
+document.body.style.overflow = 'hidden';
+
+function hideEditorLoader() {
+    const loader = document.getElementById('heartbeat-loader');
+    if (!loader) return;
+    loader.style.opacity = '0';
+    document.documentElement.style.overflow = '';
+    document.body.style.overflow = '';
+    document.body.classList.add('loaded');
+    setTimeout(function () { loader.style.display = 'none'; }, 600);
+}
+
+// 兜底：10 秒后强制隐藏
+setTimeout(function () {
+    var loader = document.getElementById('heartbeat-loader');
+    if (loader && loader.style.display !== 'none') hideEditorLoader();
+}, 10000);
+
 async function loadData() {
     // 安全兜底：5秒后无论如何清除加载指示器（独立于 fetch 超时）
     const safetyTimer = setTimeout(() => {
@@ -163,6 +187,9 @@ async function loadData() {
 
     try {
         UIDirectory.updateTree();
+        // 心跳加载动画隐藏（保证至少显示 300ms）
+        var elapsed = Date.now() - EDITOR_START_TIME;
+        setTimeout(hideEditorLoader, Math.max(0, EDITOR_MIN_LOADER - elapsed));
     } catch (e) {
         console.error('[article-editor] 更新目录树失败:', e);
         if (treeContainer) {

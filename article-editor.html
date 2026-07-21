@@ -10,6 +10,40 @@
 </head>
 <body>
 
+    <!-- 主题预加载：心跳动画背景色跟随保存的主题，消除暗色闪烁 -->
+    <style id="theme-preload">
+      html[data-theme="dark"] .heartbeat-loader  { background: #1a1612; }
+      html[data-theme="light"] .heartbeat-loader { background: #f5f0e8; }
+      html[data-theme="lofi"] .heartbeat-loader  { background: #f0ead8; }
+    </style>
+    <script>
+      (function(){var r=localStorage.getItem('rv_selected_theme'),t='dark';
+      if(r){try{t=JSON.parse(r)}catch(e){t=r.replace(/"/g,'');}}
+      document.documentElement.setAttribute('data-theme',t);})();
+    </script>
+
+    <!-- 心跳加载动画 — 与主页面一致的 SVG 波形 + 脉冲光晕 -->
+    <div id="heartbeat-loader" class="heartbeat-loader">
+        <svg viewBox="0 0 400 120" class="heartbeat-svg" xmlns="http://www.w3.org/2000/svg">
+            <polyline points="0,60 20,60 30,60 35,20 45,100 55,60 75,60 85,60 90,30 100,90 110,60 140,60 160,60 170,60 175,25 185,95 195,60 220,60 240,60 250,60 255,35 265,85 275,60 300,60 310,60 315,30 325,90 335,60 380,60 400,60"
+                      fill="none" stroke="var(--color-accent, #c47a44)" stroke-width="2.5"
+                      stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
+            <polyline points="0,60 20,60 30,60 35,20 45,100 55,60 75,60 85,60 90,30 100,90 110,60 140,60 160,60 170,60 175,25 185,95 195,60 220,60 240,60 250,60 255,35 265,85 275,60 300,60 310,60 315,30 325,90 335,60 380,60 400,60"
+                      fill="none" stroke="var(--color-accent, #c47a44)" stroke-width="4"
+                      stroke-linecap="round" stroke-linejoin="round" opacity="0">
+                <animate attributeName="opacity" values="0;0.9;0" dur="1s" repeatCount="indefinite"/>
+            </polyline>
+            <circle cx="50" cy="60" r="4" fill="var(--color-accent, #c47a44)" opacity="0.8">
+                <animate attributeName="r" values="4;16;4" dur="1s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0.8;0;0.8" dur="1s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="50" cy="60" r="5" fill="var(--color-accent, #c47a44)">
+                <animate attributeName="r" values="5;7;5" dur="1s" repeatCount="indefinite"/>
+            </circle>
+        </svg>
+        <p class="heartbeat-text">加载中</p>
+    </div>
+
     <!-- 顶部工具栏 -->
     <div class="editor-toolbar">
         <div class="left">
