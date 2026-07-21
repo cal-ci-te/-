@@ -6,19 +6,48 @@
 
 ---
 
-## 预览
+<!-- ===== 预览 ===== -->
+<h2>预览</h2>
 
-| 主题 | 截图 |
-|------|------|
-| 暗色 | ![暗色](images/screenshots/dark.png) |
-| 亮色 | ![亮色](images/screenshots/light.png) |
-| 低保真 | ![低保真](images/screenshots/lofi.png) |
+<h3>主题</h3>
+<table>
+  <tr>
+    <th align="center">主题</th>
+    <th align="center">截图</th>
+  </tr>
+  <tr>
+    <td align="center">暗色</td>
+    <td align="center"><img src="images/screenshots/dark.png" width="400" style="max-width:100%; height:auto;" alt="暗色主题"></td>
+  </tr>
+  <tr>
+    <td align="center">亮色</td>
+    <td align="center"><img src="images/screenshots/light.png" width="400" style="max-width:100%; height:auto;" alt="亮色主题"></td>
+  </tr>
+  <tr>
+    <td align="center">低保真</td>
+    <td align="center"><img src="images/screenshots/lofi.png" width="400" style="max-width:100%; height:auto;" alt="低保真主题"></td>
+  </tr>
+</table>
 
-| 功能 | 截图 |
-|------|------|
-| 目录树 | ![目录树](images/screenshots/tree.png) |
-| 贴纸系统 | ![贴纸系统](images/screenshots/deco.png) |
-| 移动端 | ![移动端](images/screenshots/mobile.png) |
+<h3>功能</h3>
+<table>
+  <tr>
+    <th align="center">功能</th>
+    <th align="center">截图</th>
+  </tr>
+  <tr>
+    <td align="center">目录树</td>
+    <td align="center"><img src="images/screenshots/tree.png" width="400" style="max-width:100%; height:auto;" alt="目录树"></td>
+  </tr>
+  <tr>
+    <td align="center">贴纸系统</td>
+    <td align="center"><img src="images/screenshots/deco.png" width="400" style="max-width:100%; height:auto;" alt="贴纸系统"></td>
+  </tr>
+  <tr>
+    <td align="center">移动端</td>
+    <td align="center"><img src="images/screenshots/mobile.png" width="400" style="max-width:100%; height:auto;" alt="移动端"></td>
+  </tr>
+</table>
 
 ---
 
