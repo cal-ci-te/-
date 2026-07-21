@@ -58,7 +58,7 @@ body::before {
   right: 15px;
   font-size: 9px;
   font-family: 'Courier New', monospace;
-  color: #5a3e2b;
+  color: var(--color-border);
   background: rgba(30, 26, 21, 0.6);
   padding: 3px 8px;
   border-radius: 4px;

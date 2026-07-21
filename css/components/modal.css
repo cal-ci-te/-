@@ -20,8 +20,8 @@
 /* ========== 登录弹窗 ========== */
 .login-modal {
   width: 340px;
-  background: #2a231c;
-  border: 2px solid #5a3e2b;
+  background: var(--color-bg-tertiary);
+  border: 2px solid var(--color-border);
   border-radius: 12px;
   box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.4);
   animation: modalFadeIn 0.2s ease;
@@ -43,8 +43,8 @@
   justify-content: space-between;
   align-items: center;
   padding: 14px 18px;
-  border-bottom: 1px solid #5a3e2b;
-  background: #1e1a15;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg-secondary);
   border-radius: 10px 10px 0 0;
 }
 
@@ -59,7 +59,7 @@
 .modal-close {
   background: none;
   border: none;
-  color: #c4b5a0;
+  color: var(--color-text-secondary);
   font-size: 18px;
   cursor: pointer;
   padding: 0 8px;
@@ -79,7 +79,7 @@
 
 .login-modal .input-group label {
   display: block;
-  color: #c4b5a0;
+  color: var(--color-text-secondary);
   font-size: 10px;
   margin-bottom: 4px;
   font-family: 'Courier New', monospace;
@@ -88,10 +88,10 @@
 .login-modal .input-group input {
   width: 100%;
   padding: 8px 10px;
-  background: #1e1a15;
-  border: 1px solid #5a3e2b;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
   border-radius: 6px;
-  color: #e8d5b5;
+  color: var(--color-text-accent);
   font-family: 'Courier New', monospace;
   font-size: 12px;
   outline: none;
@@ -104,10 +104,10 @@
 .login-submit-btn {
   width: 100%;
   padding: 8px;
-  background: #5a3e2b;
+  background: var(--color-border);
   border: none;
   border-radius: 6px;
-  color: #e8d5b5;
+  color: var(--color-text-accent);
   font-family: 'Courier New', monospace;
   font-size: 12px;
   cursor: pointer;
@@ -116,13 +116,13 @@
 
 .login-submit-btn:hover {
   background: #c47a44;
-  color: #1e1a15;
+  color: var(--color-bg-secondary);
 }
 
 .login-hint {
   text-align: center;
   font-size: 9px;
-  color: #7a6a58;
+  color: var(--color-text-muted);
   font-family: 'Courier New', monospace;
   margin-top: 10px;
 }

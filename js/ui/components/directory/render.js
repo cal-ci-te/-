@@ -79,7 +79,7 @@ function buildFilteredNode(node, keyword, articleMap) {
  */
 export function renderTree(nodes, level = 0, filterKeyword = null, parentPath = '') {
     if (!nodes || nodes.length === 0) {
-        return `<div style="padding: 16px; color: #7a6a58; text-align: center;">${UI.directory.emptyTree}</div>`;
+        return `<div style="padding: 16px; color: var(--color-text-muted); text-align: center;">${UI.directory.emptyTree}</div>`;
     }
 
     // 构建文章映射
@@ -95,7 +95,7 @@ export function renderTree(nodes, level = 0, filterKeyword = null, parentPath = 
                             .map(r => r.node);
         filteredNodes = result;
         if (filteredNodes.length === 0) {
-            return `<div style="padding: 16px; color: #7a6a58; text-align: center;">没有匹配的结果</div>`;
+            return `<div style="padding: 16px; color: var(--color-text-muted); text-align: center;">没有匹配的结果</div>`;
         }
     }
 
@@ -127,7 +127,7 @@ export function renderTree(nodes, level = 0, filterKeyword = null, parentPath = 
             const article = articleMap[node.articleId];
             visible = article ? !!article.visible : true;
             if (isAdmin) {
-                visibilityBtn = `<button class="visibility-toggle" data-id="${node.articleId}" data-visible="${visible}" style="background:none;border:none;color:${visible ? '#3a5a2b' : '#5a3e2b'};cursor:pointer;font-size:14px;margin-left:8px;" title="${UI.common.toggleVisible}">${visible ? '👁️' : '🚫'}</button>`;
+                visibilityBtn = `<button class="visibility-toggle" data-id="${node.articleId}" data-visible="${visible}" style="background:none;border:none;color:${visible ? 'var(--color-success)' : 'var(--color-border)'};cursor:pointer;font-size:14px;margin-left:8px;" title="${UI.common.toggleVisible}">${visible ? '👁️' : '🚫'}</button>`;
             }
         }
 
@@ -157,7 +157,7 @@ export function renderTree(nodes, level = 0, filterKeyword = null, parentPath = 
         html += `<span class="node-title">${Utils.escapeHtml(node.name)}</span>`;
 
         if (isAdmin && !isFolder && !visible) {
-            html += `<span style="font-size:9px;color:#7a6a58;margin-left:6px;">(访客不可见)</span>`;
+            html += `<span style="font-size:9px;color:var(--color-text-muted);margin-left:6px;">(访客不可见)</span>`;
         }
         if (isAdmin && !isFolder) {
             html += visibilityBtn;

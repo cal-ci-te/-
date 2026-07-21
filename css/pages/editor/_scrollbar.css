@@ -5,10 +5,10 @@
 }
 #directoryTreeContainer::-webkit-scrollbar-track,
 .editor-content::-webkit-scrollbar-track {
-    background: #1e1a15;
+    background: var(--color-bg-secondary);
 }
 #directoryTreeContainer::-webkit-scrollbar-thumb,
 .editor-content::-webkit-scrollbar-thumb {
-    background: #5a3e2b;
+    background: var(--color-border);
     border-radius: 4px;
 }

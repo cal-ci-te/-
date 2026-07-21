@@ -35,7 +35,7 @@ export function showContextMenu(x, y, type, name, articleId, nodeLi, updateTreeF
     const menu = document.createElement('div');
     menu.id = 'directory-context-menu';
     menu.style.cssText =
-        'position:fixed;left:' + x + 'px;top:' + y + 'px;background:#2a231c;border:1px solid #5a3e2b;border-radius:4px;padding:4px 0;z-index:99999;min-width:180px;box-shadow:0 4px 20px rgba(0,0,0,0.5);';
+        'position:fixed;left:' + x + 'px;top:' + y + 'px;background:var(--color-bg-tertiary);border:1px solid var(--color-border);border-radius:4px;padding:4px 0;z-index:99999;min-width:180px;box-shadow:0 4px 20px rgba(0,0,0,0.5);';
 
     let items = [];
     if (type === 'article') {
@@ -67,9 +67,9 @@ export function showContextMenu(x, y, type, name, articleId, nodeLi, updateTreeF
         div.className = 'ctx-item';
         div.textContent = item.label;
         div.style.cssText =
-            'padding:6px 16px;cursor:pointer;color:#e8d5b5;font-family:\'Courier New\',monospace;font-size:12px;';
+            'padding:6px 16px;cursor:pointer;color:var(--color-text-accent);font-family:\'Courier New\',monospace;font-size:12px;';
         div.addEventListener('mouseenter', function () {
-            this.style.background = '#3a2a1a';
+            this.style.background = 'var(--color-danger)';
         });
         div.addEventListener('mouseleave', function () {
             this.style.background = 'transparent';

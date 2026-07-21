@@ -11,7 +11,7 @@ AdminPanel.renderPalettes = function () {
   const palettes = Texture && Texture.palettes ? Texture.palettes : [];
   if (palettes.length === 0) {
     container.innerHTML =
-      `<div style="color: #7a6a58; text-align: center; padding: 6px;">${UI.admin.paletteEmpty}</div>`;
+      `<div style="color: var(--color-text-muted); text-align: center; padding: 6px;">${UI.admin.paletteEmpty}</div>`;
     return;
   }
 
@@ -19,15 +19,15 @@ AdminPanel.renderPalettes = function () {
   palettes.forEach((p) => {
     const colorPreview =
       p.mode === 'solid'
-        ? `<span style="display:inline-block;width:20px;height:20px;background:${p.colors[0]};border:1px solid #5a3e2b;border-radius:4px;vertical-align:middle;"></span>`
-        : `<span style="display:inline-block;width:20px;height:20px;background:linear-gradient(${p.direction}, ${p.colors.join(', ')});border:1px solid #5a3e2b;border-radius:4px;vertical-align:middle;"></span>`;
+        ? `<span style="display:inline-block;width:20px;height:20px;background:${p.colors[0]};border:1px solid var(--color-border);border-radius:4px;vertical-align:middle;"></span>`
+        : `<span style="display:inline-block;width:20px;height:20px;background:linear-gradient(${p.direction}, ${p.colors.join(', ')});border:1px solid var(--color-border);border-radius:4px;vertical-align:middle;"></span>`;
 
     html += `
-            <div style="display:flex; align-items:center; padding:4px 0; border-bottom:1px solid #3a2a1a;">
+            <div style="display:flex; align-items:center; padding:4px 0; border-bottom:1px solid var(--color-danger);">
                 ${colorPreview}
-                <span style="flex:1; margin-left:8px; font-size:11px; color:#e8d5b5; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${Utils.escapeHtml(p.name)}</span>
-                <button class="apply-palette" data-id="${p.id}" style="background:none; border:none; color:#c4b5a0; cursor:pointer; font-size:12px;" title="${UI.admin.paletteApply}">✅</button>
-                <button class="delete-palette" data-id="${p.id}" style="background:none; border:none; color:#c44a44; cursor:pointer; font-size:12px;" title="${UI.admin.paletteDelete}">🗑️</button>
+                <span style="flex:1; margin-left:8px; font-size:11px; color:var(--color-text-accent); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${Utils.escapeHtml(p.name)}</span>
+                <button class="apply-palette" data-id="${p.id}" style="background:none; border:none; color:var(--color-text-secondary); cursor:pointer; font-size:12px;" title="${UI.admin.paletteApply}">✅</button>
+                <button class="delete-palette" data-id="${p.id}" style="background:none; border:none; color:var(--color-error); cursor:pointer; font-size:12px;" title="${UI.admin.paletteDelete}">🗑️</button>
             </div>
         `;
   });

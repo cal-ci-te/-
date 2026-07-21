@@ -37,7 +37,7 @@ export const HistoryUI = {
     },
 
     renderEmpty(message, isError = false) {
-        const color = isError ? '#c44a44' : '#7a6a58';
+        const color = isError ? 'var(--color-error)' : 'var(--color-text-muted)';
         this.container.innerHTML = `
             <div style="text-align:center;color:${color};padding:10px;font-size:12px;">
                 ${message}
@@ -60,16 +60,16 @@ export const HistoryUI = {
             const preview = (draft.content || '').substring(0, 30) + (draft.content.length > 30 ? '…' : '');
 
             html += `
-                <div class="history-item" data-draft-id="${draft.id}" style="border-bottom:1px solid #3a2a1a;padding:6px 0;">
+                <div class="history-item" data-draft-id="${draft.id}" style="border-bottom:1px solid var(--color-danger);padding:6px 0;">
                     <div style="display:flex;justify-content:space-between;align-items:center;">
-                        <span style="font-size:11px;color:#e8d5b5;font-weight:bold;">${Utils.escapeHtml(path)}</span>
-                        <span style="font-size:10px;color:#7a6a58;">${timeStr}</span>
+                        <span style="font-size:11px;color:var(--color-text-accent);font-weight:bold;">${Utils.escapeHtml(path)}</span>
+                        <span style="font-size:10px;color:var(--color-text-muted);">${timeStr}</span>
                     </div>
-                    <div style="font-size:11px;color:#c4b5a0;margin:2px 0;">${Utils.escapeHtml(preview)}</div>
+                    <div style="font-size:11px;color:var(--color-text-secondary);margin:2px 0;">${Utils.escapeHtml(preview)}</div>
                     <div style="display:flex;gap:8px;margin-top:4px;flex-wrap:wrap;">
-                        <button class="history-preview-btn" data-draft-id="${draft.id}" style="background:none;border:1px solid #5a3e2b;color:#e8d5b5;padding:2px 8px;border-radius:4px;cursor:pointer;font-size:10px;">👁️ ${UI.draft.previewBtn || '查看'}</button>
-                        <button class="history-restore-btn" data-draft-id="${draft.id}" style="background:#5a3e2b;border:none;color:#e8d5b5;padding:2px 8px;border-radius:4px;cursor:pointer;font-size:10px;">↩️ ${UI.draft.restoreBtn || '恢复'}</button>
-                        <button class="history-delete-btn" data-draft-id="${draft.id}" style="background:none;border:none;color:#c44a44;cursor:pointer;font-size:10px;">🗑️ ${UI.draft.deleteBtn || '删除'}</button>
+                        <button class="history-preview-btn" data-draft-id="${draft.id}" style="background:none;border:1px solid var(--color-border);color:var(--color-text-accent);padding:2px 8px;border-radius:4px;cursor:pointer;font-size:10px;">👁️ ${UI.draft.previewBtn || '查看'}</button>
+                        <button class="history-restore-btn" data-draft-id="${draft.id}" style="background:var(--color-border);border:none;color:var(--color-text-accent);padding:2px 8px;border-radius:4px;cursor:pointer;font-size:10px;">↩️ ${UI.draft.restoreBtn || '恢复'}</button>
+                        <button class="history-delete-btn" data-draft-id="${draft.id}" style="background:none;border:none;color:var(--color-error);cursor:pointer;font-size:10px;">🗑️ ${UI.draft.deleteBtn || '删除'}</button>
                     </div>
                 </div>
             `;
@@ -140,15 +140,15 @@ export const HistoryUI = {
             z-index: 9999;
         `;
         modal.innerHTML = `
-            <div style="background:#2a231c;border:1px solid #5a3e2b;border-radius:12px;padding:24px;max-width:600px;width:90%;max-height:80vh;overflow-y:auto;">
+            <div style="background:var(--color-bg-tertiary);border:1px solid var(--color-border);border-radius:12px;padding:24px;max-width:600px;width:90%;max-height:80vh;overflow-y:auto;">
                 <h3 style="color:#e8c88a;margin-bottom:8px;">${UI.draft.previewTitle}</h3>
-                <p style="color:#c4b5a0;font-size:12px;border-bottom:1px solid #5a3e2b;padding-bottom:6px;">
+                <p style="color:var(--color-text-secondary);font-size:12px;border-bottom:1px solid var(--color-border);padding-bottom:6px;">
                     ${'保存于: '} ${new Date(draft.saved_at).toLocaleString('zh-CN')}
                 </p>
-                <div style="color:#e8d5b5;line-height:1.6;font-size:14px;margin-top:10px;white-space:pre-wrap;">
+                <div style="color:var(--color-text-accent);line-height:1.6;font-size:14px;margin-top:10px;white-space:pre-wrap;">
                     ${Utils.escapeHtml(draft.content || UI.draft.emptyContent || '（空内容）')}
                 </div>
-                <button id="closePreviewBtn" style="margin-top:16px;background:#5a3e2b;border:none;color:#e8d5b5;padding:6px 20px;border-radius:4px;cursor:pointer;">${UI.draft.previewClose}</button>
+                <button id="closePreviewBtn" style="margin-top:16px;background:var(--color-border);border:none;color:var(--color-text-accent);padding:6px 20px;border-radius:4px;cursor:pointer;">${UI.draft.previewClose}</button>
             </div>
         `;
         document.body.appendChild(modal);

@@ -48,19 +48,19 @@
 .children {
     margin-left: 20px;
     padding-left: 6px;
-    border-left: 1px dashed #5a3e2b;
+    border-left: 1px dashed var(--color-border);
 }
 .folder > .tree-node-content .node-title {
     color: #e8c88a;
     font-weight: 600;
 }
 .article > .tree-node-content .node-title {
-    color: #c4b5a0;
+    color: var(--color-text-secondary);
 }
 .visibility-toggle {
     background: none;
     border: none;
-    color: #3a5a2b;
+    color: var(--color-success);
     cursor: pointer;
     font-size: 14px;
     margin-left: 8px;
@@ -68,9 +68,9 @@
 .dropzone-background {
     margin: 12px 8px 8px 8px;
     padding: 16px;
-    border: 2px dashed #5a3e2b;
+    border: 2px dashed var(--color-border);
     border-radius: 6px;
-    color: #7a6a58;
+    color: var(--color-text-muted);
     text-align: center;
     font-size: 11px;
     transition: background 0.2s;
@@ -85,10 +85,10 @@
 #custom-context-menu .ctx-item {
     padding: 6px 16px;
     cursor: pointer;
-    color: #e8d5b5;
+    color: var(--color-text-accent);
     font-size: 12px;
     font-family: 'Courier New', monospace;
 }
 #custom-context-menu .ctx-item:hover {
-    background: #3a2a1a;
+    background: var(--color-danger);
 }

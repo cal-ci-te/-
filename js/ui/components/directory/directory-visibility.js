@@ -14,7 +14,7 @@ export async function handleVisibilityToggle(e, onSuccess) {
     if (success) {
         btn.dataset.visible = newVisible;
         btn.textContent = newVisible ? '👁️' : '🚫';
-        btn.style.color = newVisible ? '#3a5a2b' : '#5a3e2b';
+        btn.style.color = newVisible ? 'var(--color-success)' : 'var(--color-border)';
         const parentContent = btn.closest('.tree-node-content');
         const titleSpan = parentContent.querySelector('.node-title');
         const oldAnnot = parentContent.querySelector('.tree-node-content > span:last-child');
@@ -23,7 +23,7 @@ export async function handleVisibilityToggle(e, onSuccess) {
         }
         if (!newVisible) {
             const annot = document.createElement('span');
-            annot.style.cssText = 'font-size:9px;color:#7a6a58;margin-left:6px;';
+            annot.style.cssText = 'font-size:9px;color:var(--color-text-muted);margin-left:6px;';
             annot.textContent = '(访客不可见)';
             titleSpan.after(annot);
         }

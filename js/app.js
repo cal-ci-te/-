@@ -12,6 +12,7 @@ import { UI } from './utils/ui-strings.js';
 import { injectUITexts } from './bootstrap/ui-injector.js';
 import { registerAllModules, AppInitializer } from './bootstrap/module-registry.js';
 import { setupBroadcastChannel } from './bootstrap/broadcast-setup.js';
+import { SiteIcon } from './services/site-icon.js';
 
 import { Article } from './models/article-model.js';
 import { ArticleService } from './services/article-service.js';
@@ -299,28 +300,9 @@ setTimeout(() => {
     }
 }, 300);
 
-// 自定义站点图标（优先 localStorage.site_icon，其次 images/site-icon.png，回退 🎭）
-(function initSiteIcon() {
-  var avatar = document.getElementById('siteAvatar');
-  var img = document.getElementById('siteAvatarImg');
-  var fallback = document.getElementById('siteAvatarFallback');
-  if (!avatar || !img) return;
-
-  var stored = Utils.storage.get('site_icon');
-  var src = stored || 'images/site-icon.png';
-
-  img.onerror = function () {
-    img.style.display = 'none';
-    if (fallback) fallback.style.display = '';
-    avatar.classList.remove('has-custom');
-  };
-  img.onload = function () {
-    if (fallback) fallback.style.display = 'none';
-    avatar.classList.add('has-custom');
-  };
-  img.src = src;
-  setTimeout(function () { avatar.classList.add('animate'); }, 200);
-})();
+// 自定义站点图标（通过 SiteIcon 服务初始化）
+SiteIcon.init();
+SiteIcon.playEntranceAnimation();
 
 // [REVIEW] 心跳加载动画隐藏——保证至少显示 400ms，配合 10s 超时兜底
 const elapsed = Date.now() - APP_START_TIME;

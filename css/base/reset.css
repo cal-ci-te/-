@@ -9,7 +9,7 @@ body {
   font-family:
     -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei',
     'WenQuanYi Micro Hei', 'Noto Sans CJK SC', 'IM Fell English', 'Special Elite', monospace;
-  background-color: #1a1612;  /* 只设置背景色，不加 !important，便于主题覆盖 */
+  background-color: #1a1612;  /* CSS 变量 --color-bg-primary */
   min-height: 100vh;
   position: relative;
   color: #d4c9b8;

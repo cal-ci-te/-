@@ -16,7 +16,7 @@ export const ContextMenu = {
     const menu = document.createElement('div');
     menu.id = 'deco-context-menu';
     menu.style.cssText =
-      'position:fixed;display:none;background:#2a231c;border:1px solid #5a3e2b;border-radius:4px;padding:4px 0;z-index:99999;min-width:150px;box-shadow:0 4px 20px rgba(0,0,0,0.5);';
+      'position:fixed;display:none;background:var(--color-bg-tertiary);border:1px solid var(--color-border);border-radius:4px;padding:4px 0;z-index:99999;min-width:150px;box-shadow:0 4px 20px rgba(0,0,0,0.5);';
     menu.innerHTML = `
             <div class="ctx-item" data-action="duplicate">${UI.deco.menuDuplicate}</div>
             <div class="ctx-item" data-action="paste">${UI.deco.menuPaste}</div>
@@ -24,7 +24,7 @@ export const ContextMenu = {
             <div class="ctx-item" data-action="edit-pos">${UI.deco.menuEditPos}</div>
             <div class="ctx-item" data-action="toggle-style">${UI.deco.menuToggleStyle}</div>
             <div class="ctx-item" data-action="remove-page">${UI.deco.menuRemovePage}</div>
-            <div class="ctx-item" data-action="delete-lib" style="color:#c44a44;">${UI.deco.menuDeleteLib}</div>
+            <div class="ctx-item" data-action="delete-lib" style="color:var(--color-error);">${UI.deco.menuDeleteLib}</div>
         `;
     document.body.appendChild(menu);
     this._menu = menu;

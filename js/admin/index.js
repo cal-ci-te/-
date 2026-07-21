@@ -45,8 +45,8 @@ EventBus
     Texture.resetBgColor();
     const picker = document.getElementById('bgColorPicker');
     const preview = document.getElementById('bgColorPreview');
-    if (picker) picker.value = '#1a1612';
-    if (preview) preview.style.backgroundColor = '#1a1612';
+    if (picker) picker.value = '#1a1612'; // → var(--color-bg-primary), color picker 需 hex
+    if (preview) preview.style.backgroundColor = '#1a1612'; // → var(--color-bg-primary)
     Utils.showToast(UI.toast.adminBgColorReset, false);
   })
 

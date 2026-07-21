@@ -62,8 +62,8 @@ export function enableTouchDrag(container, onDrop, updateTreeFn) {
             opacity: 0.85;
             pointer-events: none;
             z-index: 99999;
-            background: #3a2a1a;
-            border: 2px solid #c47a44;
+            background: var(--color-danger);
+            border: 2px solid var(--color-accent);
             border-radius: 6px;
             padding: 6px 14px;
             box-shadow: 0 8px 30px rgba(0,0,0,0.6);
@@ -73,7 +73,7 @@ export function enableTouchDrag(container, onDrop, updateTreeFn) {
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-            color: #e8d5b5;
+            color: var(--color-text-accent);
             font-size: 13px;
         `;
         // 提取文本内容（去除多余元素）

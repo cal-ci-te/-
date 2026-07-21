@@ -194,7 +194,7 @@ async function loadData() {
         console.error('[article-editor] 更新目录树失败:', e);
         if (treeContainer) {
             treeContainer.innerHTML =
-                '<div style="padding:20px;text-align:center;color:#c44a44;">加载失败，请刷新页面重试</div>';
+                '<div style="padding:20px;text-align:center;color:var(--color-error);">加载失败，请刷新页面重试</div>';
         }
     }
 }

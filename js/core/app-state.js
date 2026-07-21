@@ -60,7 +60,7 @@ export const AppState = {
     articles: [], visibleArticles: [], articleVisibility: {},
     watermarkText: 'REVACHOL', watermarkOpacity: 0.08,
     textureDataUrl: null, textureOpacity: 0.12,
-    bgColor: '#1a1612', admin: null, ui: null,
+    bgColor: '#1a1612', // → var(--color-bg-primary); admin: null, ui: null,
   },
 
   _subscribers: {},
@@ -113,7 +113,7 @@ export const AppState = {
       articles: [], visibleArticles: [], articleVisibility: {},
       watermarkText: 'REVACHOL', watermarkOpacity: 0.08,
       textureDataUrl: null, textureOpacity: 0.12,
-      bgColor: '#1a1612', admin: null, ui: null,
+      bgColor: '#1a1612', // → var(--color-bg-primary); admin: null, ui: null,
     };
     this._subscribers = {};
     return this;

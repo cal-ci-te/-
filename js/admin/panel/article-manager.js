@@ -25,12 +25,12 @@ export const AdminArticleManager = {
         if (!container) return;
         // 只对管理员显示
         if (!AppState.get('isLoggedIn')) {
-            container.innerHTML = `<div style="color:#7a6a58;text-align:center;padding:10px;">${UI.notification.loginRequired}</div>`;
+            container.innerHTML = `<div style="color:var(--color-text-muted);text-align:center;padding:10px;">${UI.notification.loginRequired}</div>`;
             return;
         }
         const articles = ArticleService.getAllArticles();
         if (!articles || articles.length === 0) {
-            container.innerHTML = `<div style="color:#7a6a58;text-align:center;padding:10px;">${UI.admin.articleEmpty}</div>`;
+            container.innerHTML = `<div style="color:var(--color-text-muted);text-align:center;padding:10px;">${UI.admin.articleEmpty}</div>`;
             return;
         }
         // 按分类分组
@@ -42,15 +42,15 @@ export const AdminArticleManager = {
         });
         let html = '';
         for (const [cat, items] of Object.entries(groups)) {
-            html += `<div style="font-size:10px;color:#c4b5a0;padding:2px 8px;background:#1e1a15;border-bottom:1px solid #3a2a1a;">📁 ${Utils.escapeHtml(cat)}</div>`;
+            html += `<div style="font-size:10px;color:var(--color-text-secondary);padding:2px 8px;background:var(--color-bg-secondary);border-bottom:1px solid var(--color-danger);">📁 ${Utils.escapeHtml(cat)}</div>`;
             items.forEach(a => {
                 const visible = a.visible !== false;
                 html += `
-                    <div class="article-list-item" data-id="${a.id}" style="display:flex;align-items:center;padding:4px 8px;border-bottom:1px solid #2a231c;cursor:pointer;hover:background:#3a2a1a;">
-                        <span style="flex:1;font-size:11px;color:#e8d5b5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${Utils.escapeHtml(a.title)}</span>
-                        <span style="font-size:9px;color:${visible ? '#3a5a2b' : '#5a3e2b'};margin-right:8px;">${visible ? '👁️' : '🚫'}</span>
-                        <button class="edit-article-btn" data-id="${a.id}" style="background:none;border:none;color:#c4b5a0;cursor:pointer;font-size:12px;padding:0 4px;" title="${UI.common.edit}">✏️</button>
-                        <button class="delete-article-btn" data-id="${a.id}" style="background:none;border:none;color:#c44a44;cursor:pointer;font-size:12px;padding:0 4px;" title="${UI.common.delete}">🗑️</button>
+                    <div class="article-list-item" data-id="${a.id}" style="display:flex;align-items:center;padding:4px 8px;border-bottom:1px solid var(--color-bg-tertiary);cursor:pointer;hover:background:var(--color-danger);">
+                        <span style="flex:1;font-size:11px;color:var(--color-text-accent);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${Utils.escapeHtml(a.title)}</span>
+                        <span style="font-size:9px;color:${visible ? 'var(--color-success)' : 'var(--color-border)'};margin-right:8px;">${visible ? '👁️' : '🚫'}</span>
+                        <button class="edit-article-btn" data-id="${a.id}" style="background:none;border:none;color:var(--color-text-secondary);cursor:pointer;font-size:12px;padding:0 4px;" title="${UI.common.edit}">✏️</button>
+                        <button class="delete-article-btn" data-id="${a.id}" style="background:none;border:none;color:var(--color-error);cursor:pointer;font-size:12px;padding:0 4px;" title="${UI.common.delete}">🗑️</button>
                     </div>
                 `;
             });

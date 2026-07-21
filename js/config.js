@@ -35,7 +35,7 @@ export const CONFIG = {
     opacity: 0.12,
   },
 
-  bgColorDefault: '#1a1612',
+  bgColorDefault: '#1a1612', // → var(--color-bg-primary)
 };
 
 export const API_ENDPOINTS = {

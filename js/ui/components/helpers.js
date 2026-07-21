@@ -18,9 +18,9 @@ export const UIHelpers = {
             bottom: 100px;
             left: 50%;
             transform: translateX(-50%);
-            background: #1e1a15;
+            background: var(--color-bg-secondary);
             border: 1px solid #c47a44;
-            color: #e8d5b5;
+            color: var(--color-text-accent);
             padding: 10px 20px;
             font-family: 'Courier New', monospace;
             font-size: 12px;
@@ -114,10 +114,10 @@ export const UIHelpers = {
             transform: translateX(-50%);
             background: ${isWarning ? 'rgba(196, 68, 68, 0.9)' : 'rgba(42, 35, 28, 0.95)'};
             backdrop-filter: blur(8px);
-            border: 1px solid ${isWarning ? '#c44a44' : '#c47a44'};
+            border: 1px solid ${isWarning ? 'var(--color-error)' : 'var(--color-accent)'};
             border-radius: 30px;
             padding: 10px 24px;
-            color: #e8d5b5;
+            color: var(--color-text-accent);
             font-family: 'Courier New', monospace;
             font-size: 13px;
             z-index: 2100;

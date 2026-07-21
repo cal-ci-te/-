@@ -91,9 +91,9 @@
 .dropzone-background {
   margin: 12px 0 8px 0;
   padding: 20px 16px;
-  border: 2px dashed #5a3e2b;
+  border: 2px dashed var(--color-border);
   border-radius: 6px;
-  color: #7a6a58;
+  color: var(--color-text-muted);
   text-align: center;
   font-size: 12px;
   font-family: 'Courier New', monospace;

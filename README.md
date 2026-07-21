@@ -2,7 +2,7 @@
 
 原创角色档案馆，一个带内容管理、贴纸装饰、水印保护、多主题切换的 Web 应用。
 
-当前版本：v1.9.1
+当前版本：v1.9.2
 
 ---
 
@@ -146,6 +146,36 @@ Docker 安全部署：进程降权（非 root）、端口默认仅绑定 localho
 多主题系统：CSS 变量驱动，三套主题动态加载。
 
 ## 更新日志
+
+### v1.9.2
+
+**Service 层通用化**：
+
+- 新增 `CustomIconManager`（js/services/custom-icon.js）：通用自定义图标管理器，支持任意 UI 元素的"自定义图标 + 回退"能力，每实例独立 `storageKey` + DOM 选择器，零实例冲突
+- 站点图标重构：app.js 内联 IIFE（22 行）提取为 `js/services/site-icon.js` SiteIcon 实例，保持向后兼容
+
+**色值统一为 CSS 变量（Phase 1-3）**：
+
+- Phase 1：10 个 CSS 组件文件 ~90 处硬编码色值 → `var(--color-*)`
+- Phase 2：8 个编辑器/页面 CSS 文件 ~55 处硬编码色值 → `var(--color-*)`
+- Phase 3：22 个 JS 文件 ~80 处内联样式色值 → `var(--color-*)`
+- 全项目非 themes/ CSS 中 12 种核心暗色硬编码清零（仅保留 `<input type="color">` 和 JS 运行时默认值）
+
+**站点图标样式升级**：
+
+- 针脚装饰：单 `::before` 线段 → 双 `::before` + `::after` 圆形钉（accent 色）
+- 图标容器：+`border-radius`、+`box-shadow`、+`flex` 居中、+`transform-origin`
+- Emoji 回退字号：40px → 60px，+`line-height: 100px`
+- img/span：+`transform-origin`、+`transition: transform 0.2s`
+
+**Bug 修复**：
+
+- 修复最小化标签页关闭后刷新再现：`closeTab` 增加 `tabElement`/`paneElement` null 守卫（最小化条目无 DOM 元素，`.remove()` 抛 TypeError 阻断 `_saveMinimizedState`）
+- 修复 `closeAll` 同款 null 守卫缺失
+
+**文档**：
+
+- 新增 `docs/development/custom-icon-guide.md`：自定义图标组件使用指南（实例创建 / CSS / 管理面板集成）
 
 ### v1.9.1
 

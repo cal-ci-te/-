@@ -64,9 +64,9 @@
 /* ========== 卡片容器（每个卡片单独一行） ========== */
 .card {
   width: 50%;
-  background: #2a231c;
+  background: var(--color-bg-tertiary);
   background-image: linear-gradient(135deg, #332b22 0%, #231e18 100%);
-  border: 1px solid #5a3e2b;
+  border: 1px solid var(--color-border);
   padding: 22px;
   transition: all 0.25s;
   position: relative;
@@ -160,7 +160,7 @@
 .card-meta {
   margin-top: 14px;
   font-size: 10px;
-  color: #7a6a58;
+  color: var(--color-text-muted);
   border-top: 1px solid #4a3a28;
   padding-top: 10px;
   font-family: 'Courier New', monospace;
@@ -180,8 +180,8 @@
 /* ========== 骨架屏（适配左右交替） ========== */
 .skeleton-card {
   width: 50%;
-  background: #2a231c;
-  border: 1px solid #5a3e2b;
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border);
   padding: 22px;
   position: relative;
   box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.35);
@@ -203,7 +203,7 @@
 
 .skeleton-card .skeleton-line {
   height: 16px;
-  background: #3a2a1a;
+  background: var(--color-danger);
   margin-bottom: 12px;
   border-radius: 4px;
   animation: pulse 1.5s ease-in-out infinite;
@@ -226,7 +226,7 @@
 .loading-more {
   text-align: center;
   padding: 30px;
-  color: #c4b5a0;
+  color: var(--color-text-secondary);
   font-family: 'Courier New', monospace;
   font-size: 12px;
   width: 100%;
@@ -236,7 +236,7 @@
 .end-message {
   text-align: center;
   padding: 30px;
-  color: #7a6a58;
+  color: var(--color-text-muted);
   font-family: 'Courier New', monospace;
   font-size: 12px;
   width: 100%;

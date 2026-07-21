@@ -671,7 +671,7 @@ export const DecoShelf = {
       const btn = document.createElement('button');
       btn.textContent = b.text;
       btn.style.cssText =
-        'background:#2a231c;border:1px solid #c47a44;color:#e8d5b5;padding:6px 14px;border-radius:4px;cursor:pointer;font-family:Courier New,monospace;font-size:12px;white-space:nowrap;';
+        'background:var(--color-bg-tertiary);border:1px solid var(--color-accent);color:var(--color-text-accent);padding:6px 14px;border-radius:4px;cursor:pointer;font-family:Courier New,monospace;font-size:12px;white-space:nowrap;';
       if (b.cls === 'confirm') btn.style.background = '#2a3a1a';
       btn.addEventListener('click', (e) => { e.stopPropagation(); b.action(); });
       container.appendChild(btn);

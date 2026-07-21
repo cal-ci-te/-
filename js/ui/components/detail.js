@@ -427,8 +427,8 @@ export const UIDetail = {
       entry.minimizedItem.remove();
       entry.minimizedItem = null;
     }
-    entry.tabElement.remove();
-    entry.paneElement.remove();
+    if (entry.tabElement) entry.tabElement.remove();
+    if (entry.paneElement) entry.paneElement.remove();
     this.openArticles.splice(index, 1);
 
     this._renderMinimizedBar();
@@ -455,8 +455,8 @@ export const UIDetail = {
     while (this.openArticles.length > 0) {
       const item = this.openArticles[0];
       if (item.minimizedItem) item.minimizedItem.remove();
-      item.tabElement.remove();
-      item.paneElement.remove();
+      if (item.tabElement) item.tabElement.remove();
+      if (item.paneElement) item.paneElement.remove();
       this.openArticles.splice(0, 1);
     }
     if (this.minimizedContainer) {

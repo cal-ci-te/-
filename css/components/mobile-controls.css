@@ -4,7 +4,7 @@
     position: sticky;
     top: 0;
     z-index: 100;
-    background: #1a1612;
+    background: var(--color-bg-primary);
     border-bottom: 2px solid #c47a44;
     padding: 10px 12px;
     margin: 0 0 8px 0;
@@ -13,7 +13,7 @@
 }
 
 .mobile-position-controls .mobile-pos-hint {
-    color: #e8d5b5;
+    color: var(--color-text-accent);
     font-size: 12px;
     font-family: 'Courier New', monospace;
     text-align: center;
@@ -45,24 +45,24 @@
 }
 
 .mobile-position-controls .mobile-pos-save {
-    background: #3a5a2b;
-    color: #e8d5b5;
+    background: var(--color-success);
+    color: var(--color-text-accent);
 }
 
 .mobile-position-controls .mobile-pos-save:hover,
 .mobile-position-controls .mobile-pos-save:active {
-    background: #4a7a3a;
+    background: var(--color-success-hover);
     transform: scale(0.97);
 }
 
 .mobile-position-controls .mobile-pos-cancel {
-    background: #3a2a1a;
-    color: #c4b5a0;
+    background: var(--color-danger);
+    color: var(--color-text-secondary);
 }
 
 .mobile-position-controls .mobile-pos-cancel:hover,
 .mobile-position-controls .mobile-pos-cancel:active {
-    background: #5a3e2b;
+    background: var(--color-border);
     transform: scale(0.97);
 }
 

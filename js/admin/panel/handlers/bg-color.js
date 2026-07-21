@@ -21,8 +21,8 @@ export function resetBgColor() {
     Texture.resetBgColor();
     const picker = document.getElementById('bgColorPicker');
     const preview = document.getElementById('bgColorPreview');
-    if (picker) picker.value = '#1a1612';
-    if (preview) preview.style.backgroundColor = '#1a1612';
+    if (picker) picker.value = '#1a1612'; // → var(--color-bg-primary), color picker 需 hex
+    if (preview) preview.style.backgroundColor = '#1a1612'; // → var(--color-bg-primary)
     Utils.showToast('背景颜色已重置', false);
   } else {
     Utils.showToast('纹理模块未加载', true);

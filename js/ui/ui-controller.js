@@ -70,7 +70,7 @@ export const UIController = {
     } else {
       if (this.elements.treeContainer) {
         this.elements.treeContainer.innerHTML =
-          '<div style="padding: 20px; text-align: center; color: #7a6a58;">📖 加载中...</div>';
+          '<div style="padding: 20px; text-align: center; color: var(--color-text-muted);">📖 加载中...</div>';
       }
       if (this.elements.articlesContainer) {
         this.elements.articlesContainer.innerHTML = '<div class="loading">⏳ 正在加载角色...</div>';
@@ -98,7 +98,7 @@ export const UIController = {
    if (!this._dataLoaded) {
        if (this.elements.treeContainer) {
            this.elements.treeContainer.innerHTML =
-               '<div style="padding: 20px; text-align: center; color: #7a6a58;">📖 加载中...</div>';
+               '<div style="padding: 20px; text-align: center; color: var(--color-text-muted);">📖 加载中...</div>';
        }
        if (this.elements.articlesContainer) {
            this.elements.articlesContainer.innerHTML =
@@ -120,7 +120,7 @@ export const UIController = {
     const panel = DOMRefs.get(DOMRefs.adminControls.articleListPanel);
     if (panel) {
       panel.innerHTML =
-        '<div style="color: #7a6a58; text-align: center; padding: 10px;">可见性控制已移至目录树</div>';
+        '<div style="color: var(--color-text-muted); text-align: center; padding: 10px;">可见性控制已移至目录树</div>';
     }
   },
 

@@ -15,7 +15,7 @@
   backdrop-filter: blur(8px);
   padding: 8px 18px 8px 12px;
   border-radius: 50px;
-  border: 1px solid #5a3e2b;
+  border: 1px solid var(--color-border);
   transition: all 0.2s ease;
 }
 
@@ -29,8 +29,8 @@
   height: 44px;
   border-radius: 8px;
   object-fit: cover;
-  border: 1px solid #5a3e2b;
-  background: #1e1a15;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-secondary);
 }
 
 .login-info {
@@ -48,7 +48,7 @@
 
 .welcome-text {
   font-size: 10px;
-  color: #c4b5a0;
+  color: var(--color-text-secondary);
   font-family: 'Courier New', monospace;
   opacity: 0.8;
 }

@@ -3,10 +3,10 @@ import { Utils } from '../utils.js';
 import { UI } from '../utils/ui-strings.js';
 
 export const Texture = {
-  // 纯色背景
+  // 纯色背景 (hex 值仅供 JS 运行时使用; CSS 中 → var(--color-bg-primary))
   bgColor: '#1a1612',
 
-  // 渐变背景配置
+  // 渐变背景配置 (hex 值供 color picker 使用)
   bgMode: 'solid',
   gradientColors: ['#1a1612', '#2a231c'],
   gradientDirection: 'to bottom',

@@ -62,7 +62,7 @@ AdminPanel.renderContent = function () {
             <div class="texture-preview" id="texturePreview"></div>
             <div class="admin-button-group">
                 <button id="applyTextureBtn" data-action="apply-texture" style="margin:0;">${UI.admin.textureApplyButton}</button>
-                <button id="resetTextureBtn" data-action="reset-texture" style="margin:0; background:#3a2a1a;">${UI.admin.textureRemoveButton}</button>
+                <button id="resetTextureBtn" data-action="reset-texture" style="margin:0; background:var(--color-danger);">${UI.admin.textureRemoveButton}</button>
             </div>
         </div>
 
@@ -105,13 +105,13 @@ AdminPanel.renderContent = function () {
         </div>
 
         <!-- 背景模式 -->
-        <div class="admin-control-group" style="border-top:1px solid #5a3e2b; padding-top:12px; margin-top:12px;">
+        <div class="admin-control-group" style="border-top:1px solid var(--color-border); padding-top:12px; margin-top:12px;">
             <label>${UI.admin.bgModeLabel}</label>
             <div style="display:flex; gap:12px; margin:4px 0 8px;">
-                <label style="color:#c4b5a0; font-size:12px;">
+                <label style="color:var(--color-text-secondary); font-size:12px;">
                     <input type="radio" name="bgMode" data-action="bg-mode" value="solid" ${gradMode === 'solid' ? 'checked' : ''}> ${UI.admin.bgModeSolid}
                 </label>
-                <label style="color:#c4b5a0; font-size:12px;">
+                <label style="color:var(--color-text-secondary); font-size:12px;">
                     <input type="radio" name="bgMode" data-action="bg-mode" value="gradient" ${gradMode === 'gradient' ? 'checked' : ''}> ${UI.admin.bgModeGradient}
                 </label>
             </div>
@@ -152,8 +152,8 @@ AdminPanel.renderContent = function () {
             </div>
 
             <div class="admin-button-group" style="margin-top:6px;">
-                <button id="applyGradientBtn" data-action="apply-gradient" style="background:#3a5a2b;">${UI.admin.gradientApplyButton}</button>
-                <button id="savePaletteBtn" data-action="save-palette" style="background:#5a3e2b;">${UI.admin.paletteSaveButton}</button>
+                <button id="applyGradientBtn" data-action="apply-gradient" style="background:var(--color-success);">${UI.admin.gradientApplyButton}</button>
+                <button id="savePaletteBtn" data-action="save-palette" style="background:var(--color-border);">${UI.admin.paletteSaveButton}</button>
             </div>
             <div class="admin-flex-row" style="margin-top:6px;">
                 <input type="text" id="paletteNameInput" placeholder="${UI.admin.paletteNamePlaceholder}" class="admin-palette-input">
@@ -163,33 +163,33 @@ AdminPanel.renderContent = function () {
         <!-- 色卡列表 -->
         <div class="admin-control-group" style="margin-top:8px;">
             <label>${UI.admin.paletteListLabel}</label>
-            <div id="paletteList" style="max-height:120px; overflow-y:auto; border-top:1px solid #5a3e2b; padding-top:6px;"></div>
+            <div id="paletteList" style="max-height:120px; overflow-y:auto; border-top:1px solid var(--color-border); padding-top:6px;"></div>
         </div>
 
         <!-- 贴图库 -->
         <div class="admin-control-group" style="margin-top:12px;">
             <label>${UI.admin.decoLibraryLabel}</label>
             <div class="admin-button-group" style="margin-bottom:8px;">
-                <button id="assetUploadBtn" style="width:auto;background:#3a5a2b;">${UI.admin.decoUploadButton}</button>
+                <button id="assetUploadBtn" style="width:auto;background:var(--color-success);">${UI.admin.decoUploadButton}</button>
                 <input type="file" id="assetFileInput" accept="image/png,image/webp,image/jpeg" style="display:none;">
             </div>
             <div class="admin-avatar-hint" style="margin-bottom:8px;">${UI.admin.decoUploadHint}</div>
             <div id="assetListContainer" class="admin-asset-list">
-                <div style="color:#7a6a58;text-align:center;padding:10px;">${UI.admin.decoLoading}</div>
+                <div style="color:var(--color-text-muted);text-align:center;padding:10px;">${UI.admin.decoLoading}</div>
             </div>
         </div>
 
         <!-- 文章管理 -->
-        <div class="admin-control-group" style="border-top:1px solid #5a3e2b;padding-top:12px;margin-top:12px;">
+        <div class="admin-control-group" style="border-top:1px solid var(--color-border);padding-top:12px;margin-top:12px;">
             <label>${UI.admin.articleEditorLabel}</label>
-            <button id="openArticleEditorBtn" style="width:100%;background:#3a5a2b;margin-top:4px;">${UI.admin.articleEditorButton}</button>
+            <button id="openArticleEditorBtn" style="width:100%;background:var(--color-success);margin-top:4px;">${UI.admin.articleEditorButton}</button>
             <div class="admin-avatar-hint" style="margin-top:4px;">${UI.admin.articleEditorHint}</div>
         </div>
 
         <!-- 可见性说明 -->
-        <div class="admin-control-group" style="margin-top:12px; border-top: 1px solid #5a3e2b; padding-top: 12px;">
+        <div class="admin-control-group" style="margin-top:12px; border-top: 1px solid var(--color-border); padding-top: 12px;">
             <label>${UI.admin.articleVisibilityLabel}</label>
-            <div style="color:#c4b5a0; font-size:12px; padding:8px 0;">
+            <div style="color:var(--color-text-secondary); font-size:12px; padding:8px 0;">
                 ${UI.admin.articleVisibilityHint}
             </div>
             <div class="admin-avatar-hint" style="margin-top:4px;">
@@ -198,7 +198,7 @@ AdminPanel.renderContent = function () {
         </div>
 
         <!-- 主题切换 -->
-        <div class="admin-control-group" style="border-top: 1px solid #5a3e2b; padding-top: 12px; margin-top: 12px;">
+        <div class="admin-control-group" style="border-top: 1px solid var(--color-border); padding-top: 12px; margin-top: 12px;">
             <label>🎨 主题切换</label>
             <div id="themeSelector" class="admin-flex-row" style="margin-top:6px;">
                 <button data-action="theme-switch" data-theme="dark" class="theme-btn theme-btn-dark">${UI.theme.dark}</button>
@@ -209,7 +209,7 @@ AdminPanel.renderContent = function () {
         </div>
 
         <!-- 退出登录 -->
-        <button id="logoutBtn" data-action="logout" style="margin-top:12px;background:#3a2a1a;">${UI.admin.logoutButton}</button>
+        <button id="logoutBtn" data-action="logout" style="margin-top:12px;background:var(--color-danger);">${UI.admin.logoutButton}</button>
     `;
 
     console.log('[AdminPanel] 面板内容渲染完成（首次渲染）');

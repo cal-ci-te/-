@@ -7,7 +7,7 @@ import { UI } from '../utils/ui-strings.js';
 export function createDraftHistory(historyList, historyPanel, toggleHistoryBtn, getCurrentEditingId, loadArticleForEdit) {
     async function loadHistory(articleId) {
         if (!articleId) {
-            historyList.innerHTML = `<div style="text-align:center;color:#7a6a58;padding:10px;">${UI.draft.selectArticle}</div>`;
+            historyList.innerHTML = `<div style="text-align:center;color:var(--color-text-muted);padding:10px;">${UI.draft.selectArticle}</div>`;
             return;
         }
         try {
@@ -15,7 +15,7 @@ export function createDraftHistory(historyList, historyPanel, toggleHistoryBtn, 
             const drafts = await ApiClient.get(`/api/articles/${articleId}/drafts`);
             console.log('[DraftHistory] 获取到草稿列表:', drafts.length, '条');
             if (!drafts || drafts.length === 0) {
-                historyList.innerHTML = `<div style="text-align:center;color:#7a6a58;padding:10px;">${UI.draft.noHistory}</div>`;
+                historyList.innerHTML = `<div style="text-align:center;color:var(--color-text-muted);padding:10px;">${UI.draft.noHistory}</div>`;
                 return;
             }
             const article = Article.allArticles.find(a => a.id === articleId);
@@ -63,7 +63,7 @@ export function createDraftHistory(historyList, historyPanel, toggleHistoryBtn, 
             });
         } catch (err) {
             console.error('[DraftHistory] 加载历史失败:', err);
-            historyList.innerHTML = `<div style="color:#c44a44;text-align:center;padding:10px;">${UI.draft.loadFailed}</div>`;
+            historyList.innerHTML = `<div style="color:var(--color-error);text-align:center;padding:10px;">${UI.draft.loadFailed}</div>`;
         }
     }
 
