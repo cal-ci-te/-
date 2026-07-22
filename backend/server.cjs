@@ -4,6 +4,13 @@ const { initWebSocket } = require('./websocket.cjs');
 const { ensureUploadDir } = require('./utils.cjs');
 const { handleDecoUpload } = require('./upload.cjs');
 
+// 认证模块：Token 生成/验证/撤销 + requireAuth 包装器
+const { requireAuth, generateToken, revokeToken } = require('./auth.js');
+
+// 管理员凭据：优先从环境变量读取，未设置时回退到默认值（开发环境兼容）
+// 生产部署时通过 .env 或 docker-compose.yml 注入 ADMIN_PASSWORD 环境变量
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
+
 // 存储层：通过适配器模式在本地文件系统 / S3 兼容存储之间切换，业务代码无感知
 const { storage } = require('./storage/index.cjs');
 console.log('[Server] 存储服务已初始化:', storage.isLocal() ? '本地' : 'RustFS');
@@ -43,12 +50,62 @@ const server = http.createServer(async (req, res) => {
     // CORS：开发环境 Vite 端口 (3000) 与后端 (9999) 不同源
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     if (method === 'OPTIONS') { res.writeHead(200); res.end(); return; }
 
     // 贴图上传需要手动处理请求体（FormData / base64 JSON），不走通用 json() 解析
+    // requireAuth 包装器：只有携带有效 Token 的管理员可上传贴纸
     if (pathname === '/api/decos' && method === 'POST') {
-        handleDecoUpload(req, res);
+        await requireAuth(handleDecoUpload)(req, res);
+        return;
+    }
+
+    // ---- 认证路由：登录 / 登出 / 当前用户 ----
+    // 登录：比对 ADMIN_PASSWORD（从环境变量读取，开发环境回退 'admin123'）
+    // 未来升级 bcrypt：将明文比对替换为 bcrypt.compare(password, hash)
+    if (pathname === '/api/auth/login' && method === 'POST') {
+        try {
+            const body = await new Promise((resolve, reject) => {
+                let data = '';
+                req.on('data', chunk => data += chunk);
+                req.on('end', () => { try { resolve(JSON.parse(data)); } catch (e) { resolve({}); } });
+                req.on('error', reject);
+            });
+            const { username, password } = body;
+            if (username === 'admin' && password === ADMIN_PASSWORD) {
+                const token = generateToken('admin', 'admin');
+                const expiresIn = 7 * 24 * 60 * 60; // 7 天，单位秒 — 前端可据此提前提示用户
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ token, userId: 'admin', role: 'admin', expiresIn }));
+            } else {
+                res.writeHead(401, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: '用户名或密码错误' }));
+            }
+        } catch (err) {
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: '服务器错误' }));
+        }
+        return;
+    }
+
+    // 登出：需携带有效 Token，成功后 Token 失效
+    if (pathname === '/api/auth/logout' && method === 'POST') {
+        await requireAuth(async (req, res) => {
+            const authHeader = req.headers['authorization'];
+            const token = authHeader.slice(7); // 去掉 "Bearer "
+            revokeToken(token);
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ success: true }));
+        })(req, res);
+        return;
+    }
+
+    // 当前用户信息：需携带有效 Token
+    if (pathname === '/api/auth/me' && method === 'GET') {
+        await requireAuth(async (req, res) => {
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ userId: req.user.userId, role: req.user.role }));
+        })(req, res);
         return;
     }
 

@@ -62,8 +62,10 @@ function loadEditorTheme(themeId) {
 
 loadEditorTheme(Utils.storage.get('selected_theme'));
 
-AppState.commit(MUTATIONS.SET_LOGGED_IN, true);
-Utils.storage.set('admin_logged_in', true);
+// 编辑器页面登录状态：从 localStorage 读取 auth_token，与主页面保持一致
+// 不再硬编码 SET_LOGGED_IN, true，避免未登录用户获得管理员权限
+const token = localStorage.getItem('auth_token');
+AppState.commit(MUTATIONS.SET_LOGGED_IN, !!token);
 
 const sidebarEl = document.getElementById('editorSidebar');
 const treeContainer = document.getElementById('directoryTreeContainer');

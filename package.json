@@ -1,6 +1,6 @@
 {
   "name": "revachol",
-  "version": "1.9.2",
+  "version": "1.10.0",
   "description": "原创角色档案馆",
   "main": "index.html",
   "type": "module",
@@ -43,6 +43,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1089.0",
     "@errpulse/node": "^0.7.0",
+    "bcrypt": "^5.1.1",
     "busboy": "^1.6.0",
     "dotenv": "^17.4.2",
     "sql.js": "^1.14.1",

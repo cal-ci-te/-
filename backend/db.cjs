@@ -58,11 +58,28 @@ async function initDb() {
         db.run('CREATE INDEX IF NOT EXISTS idx_drafts_article ON article_drafts(article_id)');
         db.run('CREATE INDEX IF NOT EXISTS idx_drafts_saved_at ON article_drafts(saved_at)');
 
+        // 用户表：为三模式认证预留（当前仅 admin 种子用户）
+        db.run(`CREATE TABLE IF NOT EXISTS users (
+            id          INTEGER PRIMARY KEY AUTOINCREMENT,
+            username    TEXT    NOT NULL UNIQUE,
+            password    TEXT    NOT NULL,
+            role        TEXT    NOT NULL DEFAULT 'user',
+            created_at  TEXT    NOT NULL DEFAULT (datetime('now'))
+        )`);
+
         try {
             db.run(`ALTER TABLE decos ADD COLUMN image_path TEXT`);
             console.log('✅ 已添加 image_path 列');
         } catch (e) {
             console.log('ℹ️ image_path 列已存在');
+        }
+
+        // 迁移：为三模式扩展预留 author_id 字段（现有文章默认归属于管理员 id=1）
+        try {
+            db.run(`ALTER TABLE articles ADD COLUMN author_id INTEGER DEFAULT 1`);
+            console.log('✅ 已添加 author_id 列');
+        } catch (e) {
+            console.log('ℹ️ author_id 列已存在');
         }
 
         saveDb();

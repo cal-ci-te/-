@@ -5,6 +5,7 @@ import { Utils } from './utils.js';
 import { DOMRefs } from './core/dom-refs.js';
 import { EventBus } from './core/event-bus.js';
 import { AppState } from './core/app-state.js';
+import { MUTATIONS } from './core/state-mutations.js';
 import { EVENTS } from './core/event-constants.js';
 import { ApiClient } from './services/api-client.js';
 import { UI } from './utils/ui-strings.js';
@@ -69,7 +70,24 @@ ApiClient.useResponseInterceptor(
     }
 );
 
+// 401 响应 → 自动清理过期 Token 并退回访客模式
+EventBus.on(EVENTS.AUTH_UNAUTHORIZED, () => {
+    console.log('[app] 收到 401，Token 已过期或无效，自动登出');
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('user_role');
+    localStorage.removeItem('admin_logged_in'); // 清理 v1.9 旧标记
+    AppState.commit(MUTATIONS.SET_LOGGED_IN, false);
+    EventBus.emit(EVENTS.AUTH_LOGGED_OUT);
+});
+
 registerAllModules();
+
+// 页面刷新时从 localStorage 恢复登录状态（Token 仍有效则视为已登录）
+if (localStorage.getItem('auth_token')) {
+    AppState.commit(MUTATIONS.SET_LOGGED_IN, true);
+    console.log('[app] 检测到 auth_token，恢复登录状态');
+}
+
 AppInitializer.start();
 setupBroadcastChannel();
 

@@ -2,7 +2,7 @@
 
 原创角色档案馆，一个带内容管理、贴纸装饰、水印保护、多主题切换的 Web 应用。
 
-当前版本：v1.9.2
+当前版本：v1.10.0
 
 ---
 
@@ -118,7 +118,7 @@ docker compose up -d --build
 
 详见 [`docs/deployment/docker-setup.md`](docs/deployment/docker-setup.md)
 
-管理员账号：admin / admin123
+管理员账号：admin / admin123（生产环境通过 `ADMIN_PASSWORD` 环境变量覆盖）
 
 ### 存储配置
 
@@ -146,6 +146,33 @@ Docker 安全部署：进程降权（非 root）、端口默认仅绑定 localho
 多主题系统：CSS 变量驱动，三套主题动态加载。
 
 ## 更新日志
+
+### v1.10.0
+
+**后端 Token 认证体系**：
+
+- **Token 管理**：新增 `backend/auth.js`（232 行），基于内存 Map 的 Token 生成/验证/撤销
+  - Token 生成使用 `crypto.randomBytes(32).toString('hex')`（密码学安全）
+  - `requireAuth` handler 包装器：不修改 enhance.cjs，以最小侵入保护路由
+  - `optionalAuth`：有 Token 注入用户信息，无 Token 不阻塞（适配"登录看更多"场景）
+  - `compose` 中间件组合工具 + `requireRole` 角色校验，为未来多角色扩展预留接口
+  - `tokenStore` 抽象层封装 Map，标注 Redis 迁移路径
+- **路由保护**：全部写操作端点（articles/decos/drafts/settings）包裹 `requireAuth`
+  - 读操作（GET）保持公开，访客可正常浏览
+  - CORS 头增加 `Authorization` 支持
+- **登录/登出 API**：`POST /api/auth/login`、`POST /api/auth/logout`、`GET /api/auth/me`
+  - 密码从 `ADMIN_PASSWORD` 环境变量读取（开发环境回退 `admin123`）
+  - 登录响应返回 `{token, userId, role, expiresIn}`
+- **前端认证闭环**：
+  - `AdminAuth.login/logout` 改为 async 调用后端 API，Token 存入 `localStorage`
+  - `ApiClient` 请求拦截器自动注入 `Authorization: Bearer <token>` 头
+  - 401 响应 → `EVENTS.AUTH_UNAUTHORIZED` → 自动清理 Token + 退回访客模式
+  - 页面刷新从 `localStorage` 恢复登录状态
+  - `article-editor.js` 改为从 Token 判断登录状态（不再硬编码）
+- **工程预留**：
+  - `db.cjs` 新增 `users` 表 + `articles.author_id` 列迁移
+  - `backend/scripts/seed-admin.js` 管理员种子脚本（bcrypt 哈希 + 幂等）
+  - 5 条 `[FUTURE]`/`[DEPLOY]` 注释：Redis 迁移、bcrypt 升级、刷新 Token、暴力破解防护、服务器重启行为
 
 ### v1.9.2
 

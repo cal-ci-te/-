@@ -1,9 +1,11 @@
 // 贴图路由：元数据存 SQLite，图片文件通过 StorageService 独立存储。
 // GET /api/decos/:id/image 直接从适配器读取二进制返回，不经过 JSON 序列化。
+// 写操作（PUT/DELETE）通过 requireAuth 包装器保护，GET 保持公开。
 const { send, json } = require('../enhance.cjs'); 
 const { storage } = require('../storage/index.cjs');
 const dbModule = require('../db.cjs');
 const { broadcast } = require('../websocket.cjs');
+const { requireAuth } = require('../auth.js');
 
 function registerDecoRoutes(GET, PUT, DELETE) {
 
@@ -73,7 +75,7 @@ function registerDecoRoutes(GET, PUT, DELETE) {
         }
     });
 
-    PUT('/api/decos/:id', async (req, res) => {
+    PUT('/api/decos/:id', requireAuth(async (req, res) => {
         const id = req.params.id;
         console.log('[PUT /api/decos/:id] ===== 开始处理 =====');
         console.log('[PUT /api/decos/:id] 接收到的 id:', id, '类型:', typeof id);
@@ -202,9 +204,9 @@ function registerDecoRoutes(GET, PUT, DELETE) {
                 error: 'Internal server error: ' + err.message 
             }, 500);
         }
-    });
+    }));
 
-    DELETE('/api/decos/:id', async (req, res) => {
+    DELETE('/api/decos/:id', requireAuth(async (req, res) => {
         const id = req.params.id;
         console.log('[DELETE /api/decos/:id] 删除贴图:', id);
 
@@ -231,7 +233,7 @@ function registerDecoRoutes(GET, PUT, DELETE) {
             console.error('[DELETE /api/decos/:id] 错误:', err);
             send(res, { error: err.message }, 500);
         }
-    });
+    }));
 }
 
 module.exports = { registerDecoRoutes };

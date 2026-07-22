@@ -12,6 +12,8 @@ export const CONFIG = {
   },
   WS_URL: isLocal ? '' : 'ws://47.108.52.6/websocket/',
   ADMIN_USERNAME: 'admin',
+  // ADMIN_PASSWORD 已弃用（v1.10）：密码验证已迁移至后端 server.cjs，
+  // 由环境变量 ADMIN_PASSWORD 控制。此处保留仅用于向后兼容，不再作为登录校验依据。
   ADMIN_PASSWORD: 'admin123',
   CACHE_TTL: 5 * 60 * 1000,
 
