@@ -29,6 +29,8 @@ const mutationHandlers = {
   [MUTATIONS.SET_KEY]: (state, payload) => {
     if (payload && payload.key !== undefined) state[payload.key] = payload.value;
   },
+  [MUTATIONS.SET_PUZZLE_IMAGE]: (state, payload) => { state.puzzleImage = payload; },
+  [MUTATIONS.SET_PUZZLE_COMPLETED]: (state, payload) => { state.puzzleCompleted = payload; },
 };
 
 const mutationKeyMap = {
@@ -49,6 +51,8 @@ const mutationKeyMap = {
   [MUTATIONS.SET_ADMIN]: 'admin',
   [MUTATIONS.SET_UI]: 'ui',
   [MUTATIONS.SET_KEY]: null,
+  [MUTATIONS.SET_PUZZLE_IMAGE]: 'puzzleImage',
+  [MUTATIONS.SET_PUZZLE_COMPLETED]: 'puzzleCompleted',
 };
 
 export const AppState = {
@@ -61,6 +65,7 @@ export const AppState = {
     watermarkText: 'REVACHOL', watermarkOpacity: 0.08,
     textureDataUrl: null, textureOpacity: 0.12,
     bgColor: '#1a1612', // → var(--color-bg-primary); admin: null, ui: null,
+    puzzleImage: null, puzzleCompleted: false,
   },
 
   _subscribers: {},
@@ -114,6 +119,7 @@ export const AppState = {
       watermarkText: 'REVACHOL', watermarkOpacity: 0.08,
       textureDataUrl: null, textureOpacity: 0.12,
       bgColor: '#1a1612', // → var(--color-bg-primary); admin: null, ui: null,
+      puzzleImage: null, puzzleCompleted: false,
     };
     this._subscribers = {};
     return this;

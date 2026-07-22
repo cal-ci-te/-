@@ -7,6 +7,8 @@ import { Texture } from '../../services/texture.js';
 import { HeroBackground } from '../../services/hero-background.js';
 import { DecoShelfUI } from '../../ui/components/deco-ui.js';
 import { EventBus } from '../../core/event-bus.js';
+import { AppState } from '../../core/app-state.js';
+import { MUTATIONS } from '../../core/state-mutations.js';
 import { ArticleService } from '../../services/article-service.js';
 import { UI } from '../../utils/ui-strings.js';
 import { DecoShelf } from '../../services/deco.js';
@@ -208,6 +210,17 @@ AdminPanel.renderContent = function () {
             <div class="admin-avatar-hint">点击切换主题，偏好自动保存</div>
         </div>
 
+        <!-- 拼图自定义 -->
+        <div class="admin-control-group" style="border-top: 1px solid var(--color-border); padding-top: 12px; margin-top: 12px;">
+            <label>${UI.puzzle.title}</label>
+            <div class="admin-button-group" style="margin:6px 0;">
+                <button id="puzzleUploadBtn" data-action="upload-puzzle-image" style="background:var(--color-success);">${UI.puzzle.uploadBtn}</button>
+                <button id="puzzleResetDefaultBtn" data-action="reset-puzzle-image" style="background:var(--color-bg-tertiary);">${UI.puzzle.resetBtn}</button>
+            </div>
+            <input type="file" id="puzzleFileInput" accept="image/*" style="display:none;">
+            <div class="admin-avatar-hint">${UI.puzzle.adminHint}</div>
+        </div>
+
         <!-- 退出登录 -->
         <button id="logoutBtn" data-action="logout" style="margin-top:12px;background:var(--color-danger);">${UI.admin.logoutButton}</button>
     `;
@@ -289,6 +302,29 @@ AdminPanel.renderContent = function () {
         console.log('[Upload] 上传事件绑定完成');
     }
 
+    // 拼图图片上传处理
+    const puzzleInput = document.getElementById('puzzleFileInput');
+    if (puzzleInput) {
+        if (AdminPanel._puzzleFileHandler) {
+            puzzleInput.removeEventListener('change', AdminPanel._puzzleFileHandler);
+        }
+        AdminPanel._puzzleFileHandler = function (event) {
+            const file = event.target.files[0];
+            event.target.value = '';
+            if (!file) return;
+            if (!file.type.startsWith('image/')) {
+                Utils.showToast(UI.puzzle.invalidFormat, true);
+                return;
+            }
+            // 复用头像裁剪 UI，8:3 宽高比匹配拼图 Canvas (480×180)
+            AdminAvatar.openCustomCrop(file, 8 / 3, 480, (dataUrl) => {
+                AppState.commit(MUTATIONS.SET_PUZZLE_IMAGE, dataUrl);
+                Utils.showToast(UI.puzzle.imageUpdated, false);
+            });
+        };
+        puzzleInput.addEventListener('change', AdminPanel._puzzleFileHandler);
+    }
+
     AdminPanel._rendered = true;
 };
 
@@ -324,6 +360,11 @@ AdminPanel.unbindEvents = function () {
     if (assetFileInput && AdminPanel._assetFileHandler) {
         assetFileInput.removeEventListener('change', AdminPanel._assetFileHandler);
         delete AdminPanel._assetFileHandler;
+    }
+    const puzzleInput = document.getElementById('puzzleFileInput');
+    if (puzzleInput && AdminPanel._puzzleFileHandler) {
+        puzzleInput.removeEventListener('change', AdminPanel._puzzleFileHandler);
+        delete AdminPanel._puzzleFileHandler;
     }
     if (typeof originalUnbind === 'function') {
         originalUnbind.call(this);

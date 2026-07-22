@@ -43,6 +43,10 @@ export const MUTATIONS = {
 
   // 通用：设置任意键（用于过渡，但建议直接用具体 mutation）
   SET_KEY: 'SET_KEY',
+
+  // 拼图组件
+  SET_PUZZLE_IMAGE: 'SET_PUZZLE_IMAGE',           // 拼图自定义图片 dataUrl
+  SET_PUZZLE_COMPLETED: 'SET_PUZZLE_COMPLETED',   // 拼图是否已对齐完成
 };
 
 /**

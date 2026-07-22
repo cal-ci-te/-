@@ -1,0 +1,178 @@
+/* ============================================================
+   滑动拼图组件样式 — 使用 var(--color-*) 适配三套主题
+   ============================================================ */
+
+.puzzle-widget {
+  max-width: 500px;
+  margin: 24px auto;
+  border-radius: var(--radius-md, 8px);
+  background: var(--color-bg-secondary, #2a231c);
+  border: 1px solid var(--color-border, #3a3028);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+}
+
+.puzzle-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--color-border, #3a3028);
+}
+
+.puzzle-title {
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  color: var(--color-text-secondary, #b0a090);
+  letter-spacing: 0.5px;
+}
+
+.puzzle-reset-btn {
+  background: none;
+  border: 1px solid var(--color-border, #3a3028);
+  border-radius: 4px;
+  color: var(--color-text-secondary, #b0a090);
+  font-size: 16px;
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.puzzle-reset-btn:hover {
+  color: var(--color-accent, #c9a87c);
+  border-color: var(--color-accent, #c9a87c);
+}
+
+.puzzle-canvas-wrapper {
+  position: relative;
+  overflow: visible;          /* 允许 DOM 拼图块超出 Canvas 边界 */
+}
+
+#puzzleCanvas {
+  display: block;
+  width: 480px;
+  height: 180px;
+  max-width: 100%;
+}
+
+/* ===== DOM 拼图块（替代 Canvas 绘制，支持 CSS overflow） ===== */
+.puzzle-block {
+  position: absolute;
+  width: 72px;                /* = GAP_W */
+  height: 72px;               /* = GAP_H */
+  border-radius: 8px;         /* = GAP_RADIUS */
+  border: 1px solid rgba(255,255,255,0.5);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.15);
+  background-size: cover;
+  background-position: center;
+  z-index: 3;
+  pointer-events: none;       /* 不阻挡 Canvas 交互 */
+  transition: box-shadow 0.2s;
+}
+
+.puzzle-block.puzzle-block-aligned {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4), 0 0 18px rgba(255,215,0,0.5);
+}
+
+/* ===== 闪光动画层 ===== */
+.puzzle-flash {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, rgba(255, 215, 0, 0.6) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.1s;
+  z-index: 2;
+}
+
+.puzzle-flash.puzzle-flash-active {
+  animation: flashPuzzle 0.6s ease-out forwards;
+}
+
+@keyframes flashPuzzle {
+  0%   { opacity: 0.8; }
+  100% { opacity: 0; }
+}
+
+/* ===== 自定义滑块（纯 DOM track + thumb，自由溢出） ===== */
+.puzzle-slider-container {
+  padding: 12px 0 14px;
+  overflow: visible;
+}
+
+.puzzle-track {
+  position: relative;
+  width: 480px;
+  max-width: 100%;             /* 与 Canvas 同步缩放 */
+  height: 6px;
+  border-radius: 3px;
+  background: var(--color-bg-tertiary, #1a1612);
+  border: 1px solid var(--color-border, #3a3028);
+  cursor: pointer;
+  /* 左对齐，与 Canvas 共享同一坐标系原点 */
+}
+
+.puzzle-thumb {
+  position: absolute;
+  top: 50%;
+  width: 72px;                /* = GAP_W = BLOCK_W，与拼图块同尺寸 */
+  height: 72px;               /* = GAP_H */
+  border-radius: 8px;
+  background: var(--color-accent, #c9a87c);
+  border: 2px solid var(--color-bg-primary, #1a1612);
+  cursor: grab;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255,255,255,0.15);
+  transform: translateY(-50%);
+  transition: box-shadow 0.2s;
+  z-index: 2;
+}
+
+.puzzle-thumb.puzzle-slider-thumb-active {
+  cursor: grabbing;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5), 0 0 12px rgba(255, 215, 0, 0.3);
+}
+
+/* ===== 提示文字 ===== */
+.puzzle-hint {
+  text-align: center;
+  margin-top: 8px;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  color: var(--color-text-muted, #8a7a6a);
+  transition: color 0.3s;
+}
+
+/* ===== 响应式：小屏手机 ===== */
+@media (max-width: 600px) {
+  .puzzle-widget {
+    margin: 16px 8px;
+    border-radius: 6px;
+    overflow: hidden;          /* 移动端禁用溢出 */
+    max-width: calc(100vw - 16px);
+  }
+  .puzzle-canvas-wrapper {
+    overflow: hidden;          /* 拼图块不超出 Canvas */
+  }
+  #puzzleCanvas {
+    width: 100%;
+    height: auto;
+  }
+  .puzzle-block {
+    width: 72px;               /* 块宽度不变，但 overflow:hidden 阻止溢出显示 */
+    height: 72px;
+  }
+  .puzzle-track {
+    width: 100%;
+  }
+  .puzzle-thumb {
+    width: 36px;
+    height: 36px;
+    border-radius: 4px;
+  }
+}

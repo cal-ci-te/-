@@ -13,6 +13,7 @@ const THEMES = {
         icon: '🌙',
         cssFile: '/css/themes/dark.css',
         isDefault: true,
+        puzzleBg: '#1a1612',   // 拼图缺省背景色
     },
     light: {
         id: 'light',
@@ -20,6 +21,7 @@ const THEMES = {
         icon: '☀️',
         cssFile: '/css/themes/light.css',
         isDefault: false,
+        puzzleBg: '#f5f0eb',
     },
     lofi: {
         id: 'lofi',
@@ -27,6 +29,7 @@ const THEMES = {
         icon: '📼',
         cssFile: '/css/themes/lofi.css',
         isDefault: false,
+        puzzleBg: '#fdf6e3',
     },
 };
 
@@ -45,6 +48,12 @@ export const ThemeService = {
 
     getThemeInfo(themeId) {
         return THEMES[themeId] || THEMES.dark;
+    },
+
+    /** 获取拼图组件的缺省背景色（根据当前主题返回纯色） */
+    getPuzzleBackground() {
+        const theme = THEMES[currentTheme] || THEMES.dark;
+        return theme.puzzleBg || '#1a1612';
     },
 
     loadTheme() {

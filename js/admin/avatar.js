@@ -5,6 +5,9 @@ import { UI } from '../utils/ui-strings.js';
 
 export const AdminAvatar = {
   originalImage: null,
+  _cropCallback: null,      // 裁剪确认后的回调 (dataUrl) => void
+  _cropAspectRatio: 1,      // 裁剪框宽高比，1=正方形(头像)，8/3=拼图
+  _outputWidth: 200,        // 输出图片宽度（高度 = width / ratio）
   cropSelection: {
     x: 0,
     y: 0,
@@ -53,6 +56,14 @@ export const AdminAvatar = {
       }
     };
     input.click();
+  },
+
+  /** 通用裁剪入口：复用头像裁剪 UI，支持自定义宽高比和回调 */
+  openCustomCrop: function (file, aspectRatio, outputWidth, callback) {
+    this._cropAspectRatio = aspectRatio || 1;
+    this._outputWidth = outputWidth || 200;
+    this._cropCallback = callback || null;
+    this.initCropModal(file);
   },
 
   initCropModal: function (file) {
@@ -130,12 +141,20 @@ export const AdminAvatar = {
     canvas.style.height = displayH + 'px';
     ctx.drawImage(img, 0, 0, displayW, displayH);
 
-    const cropSize = Math.min(displayW, displayH) * 0.7;
+    const ratio = AdminAvatar._cropAspectRatio || 1;
+    let cropW, cropH;
+    if (ratio >= 1) {
+      cropW = Math.min(displayW, displayH * ratio) * 0.7;
+      cropH = cropW / ratio;
+    } else {
+      cropH = Math.min(displayH, displayW / ratio) * 0.7;
+      cropW = cropH * ratio;
+    }
     AdminAvatar.cropSelection = {
-      x: (displayW - cropSize) / 2,
-      y: (displayH - cropSize) / 2,
-      w: cropSize,
-      h: cropSize,
+      x: (displayW - cropW) / 2,
+      y: (displayH - cropH) / 2,
+      w: cropW,
+      h: cropH,
       originalW: img.width,
       originalH: img.height,
       displayW: displayW,
@@ -270,11 +289,19 @@ export const AdminAvatar = {
           newY2 = pos.y;
         }
 
-        const size = Math.min(newW, newH);
-        // 删除无用的赋值 newW = size; newH = size;（已移除）
-
-        sel.w = Math.max(20, Math.min(size, canvasWidth - newX2));
-        sel.h = sel.w;
+        const ratio = self._cropAspectRatio || 1;
+        if (ratio !== 1) {
+          // 非正方形：以宽度为基准锁定宽高比
+          sel.w = Math.max(20, Math.min(newW, canvasWidth - newX2));
+          sel.h = Math.max(20, sel.w / ratio);
+          if (sel.h > canvasHeight - newY2) {
+            sel.h = Math.max(20, canvasHeight - newY2);
+            sel.w = sel.h * ratio;
+          }
+        } else {
+          const size = Math.min(newW, newH);
+          sel.w = sel.h = Math.max(20, Math.min(size, canvasWidth - newX2));
+        }
         sel.x = Math.max(0, Math.min(newX2, canvasWidth - sel.w));
         sel.y = Math.max(0, Math.min(newY2, canvasHeight - sel.h));
       }
@@ -325,6 +352,9 @@ export const AdminAvatar = {
   },
 
   confirmCrop: function () {
+    const outputW = this._outputWidth || 200;
+    const ratio = this._cropAspectRatio || 1;
+    const outputH = Math.round(outputW / ratio);
     const cropCanvas = document.createElement('canvas');
     const sel = this.cropSelection;
     const scaleX = this.originalImage.width / sel.displayW;
@@ -335,34 +365,45 @@ export const AdminAvatar = {
     const sw = sel.w * scaleX;
     const sh = sel.h * scaleY;
 
-    cropCanvas.width = 200;
-    cropCanvas.height = 200;
+    cropCanvas.width = outputW;
+    cropCanvas.height = outputH;
     const ctx = cropCanvas.getContext('2d');
-    ctx.drawImage(this.originalImage, sx, sy, sw, sh, 0, 0, 200, 200);
+    ctx.drawImage(this.originalImage, sx, sy, sw, sh, 0, 0, outputW, outputH);
 
     cropCanvas.toBlob(
-      function (blob) {
+      (blob) => {
         if (blob) {
           const reader = new FileReader();
-          reader.onload = function (e) {
-            AdminAvatar.setAvatarImage(e.target.result);
+          reader.onload = (e) => {
+            const dataUrl = e.target.result;
+            if (AdminAvatar._cropCallback) {
+              AdminAvatar._cropCallback(dataUrl);
+            } else {
+              AdminAvatar.setAvatarImage(dataUrl);
+              const adminPreview = DOMRefs.get(DOMRefs.adminControls.adminAvatarPreview);
+              if (adminPreview) adminPreview.src = dataUrl;
+            }
             Utils.showToast(UI.toast.avatarUploadSuccess, false);
-            const adminPreview = DOMRefs.get(DOMRefs.adminControls.adminAvatarPreview);
-            if (adminPreview) adminPreview.src = e.target.result;
           };
           reader.readAsDataURL(blob);
         }
-        const overlay = DOMRefs.get(DOMRefs.crop.overlay);
-        if (overlay) overlay.classList.remove('active');
+        this._closeCropModal();
       },
       'image/webp',
       0.85
     );
   },
 
-  cancelCrop: function () {
+  _closeCropModal: function () {
     const overlay = DOMRefs.get(DOMRefs.crop.overlay);
     if (overlay) overlay.classList.remove('active');
+  },
+
+  cancelCrop: function () {
+    this._cropCallback = null;
+    this._cropAspectRatio = 1;
+    this._outputWidth = 200;
+    this._closeCropModal();
   },
 };
 

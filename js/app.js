@@ -26,6 +26,7 @@ import { UIDirectory } from './ui/components/directory/index.js';
 import { ContextMenu } from './admin/events/context-menu.js';
 import { ThemeService } from './services/theme-service.js';
 import { Texture } from './services/texture.js';
+import { initPuzzle } from './ui/components/puzzle/puzzle.js';
 
 console.log('🚀 [app] ES Module 入口已加载');
 
@@ -322,6 +323,12 @@ setTimeout(() => {
 SiteIcon.init();
 SiteIcon.playEntranceAnimation();
 
-// [REVIEW] 心跳加载动画隐藏——保证至少显示 400ms，配合 10s 超时兜底
+// 拼图组件：坐标模式 — 修改 {x, y} 即可改变视口内位置，不依赖 HTML 结构
+// 流式模式兼容：initPuzzle('.hero-section', 'afterend')
+setTimeout(() => {
+    initPuzzle({ x: 580, y: 450 });
+}, 100);
+
+// 心跳加载动画隐藏——保证至少显示 400ms，配合 10s 超时兜底
 const elapsed = Date.now() - APP_START_TIME;
 setTimeout(hideLoader, Math.max(0, MIN_LOADER_DISPLAY - elapsed));

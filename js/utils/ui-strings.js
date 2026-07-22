@@ -406,4 +406,17 @@ export const UI = {
         decoUploadFailed: (msg) => `上传失败：${msg}`,
     },
 
+    puzzle: {
+        widgetTitle: '确认您是真人！',
+        title: '自定义拼图图片',
+        hint: '拖动滑块完成拼图——如果你想',
+        completed: '✨ 拼图完成！',
+        uploadBtn: '📤 上传图片',
+        resetBtn: '🔄 恢复默认',
+        adminHint: '上传后拖拽滑块完成拼图；恢复默认则使用主题纯色背景',
+        invalidFormat: '请选择图片文件',
+        imageUpdated: '拼图图片已更新',
+        resetToDefault: '拼图已恢复为默认背景',
+    },
+
 };
