@@ -4,13 +4,14 @@ const MASK_ALPHA = 0.4;
 
 export class PuzzleRenderer {
     /**
-     * @param {object} config — { width, height, gapSize, gapRadius, enableSeam }
+     * @param {object} config — { width, height, blockSize, gapRadius, enableSeam }
      */
     constructor(config = {}) {
         this._canvasW = config.width || 480;
         this._canvasH = config.height || 180;
-        this._gapW = config.gapSize || 72;
-        this._gapH = config.gapSize || 72;
+        const bs = config.blockSize || 72;       // 块大小 = 缺口大小，统一数据源
+        this._gapW = bs;
+        this._gapH = bs;
         this._gapRadius = config.gapRadius || 8;
         this._gapY = (this._canvasH - this._gapH) / 2;
 
@@ -156,14 +157,14 @@ export class PuzzleRenderer {
         // ---- 下边（右→左），凸起在 65% 位置，向下 ----
         const bottomTabCx = x + w * 0.65;
         ctx.lineTo(bottomTabCx + tabR, y + h);
-        ctx.arc(bottomTabCx, y + h, tabR, 0, Math.PI, true);
+        ctx.arc(bottomTabCx, y + h, tabR, 0, Math.PI, false);   // CW：经 π/2(下)，向外凸出
         ctx.lineTo(x + rr, y + h);
         ctx.arcTo(x, y + h, x, y + h - rr, rr);
 
         // ---- 左边（下→上），凸起在 35% 位置，向左 ----
         const leftTabCy = y + h * 0.35;
         ctx.lineTo(x, leftTabCy + tabR);
-        ctx.arc(x, leftTabCy, tabR, Math.PI / 2, -Math.PI / 2, true);
+        ctx.arc(x, leftTabCy, tabR, Math.PI / 2, -Math.PI / 2, false);  // CW：经 π(左)，向外凸出
         ctx.lineTo(x, y + rr);
         ctx.arcTo(x, y, x + rr, y, rr);
     }
@@ -253,11 +254,11 @@ export class PuzzleRenderer {
             `L ${ox + w} ${oy + h - rr}`,
             `A ${rr} ${rr} 0 0 1 ${ox + w - rr} ${oy + h}`,
             `L ${bottomCx + tabR} ${oy + h}`,
-            `A ${tabR} ${tabR} 0 0 0 ${bottomCx - tabR} ${oy + h}`,
+            `A ${tabR} ${tabR} 0 0 1 ${bottomCx - tabR} ${oy + h}`,
             `L ${ox + rr} ${oy + h}`,
             `A ${rr} ${rr} 0 0 1 ${ox} ${oy + h - rr}`,
             `L ${ox} ${leftCy + tabR}`,
-            `A ${tabR} ${tabR} 0 0 0 ${ox} ${leftCy - tabR}`,
+            `A ${tabR} ${tabR} 0 0 1 ${ox} ${leftCy - tabR}`,
             `L ${ox} ${oy + rr}`,
             `A ${rr} ${rr} 0 0 1 ${ox + rr} ${oy}`,
             `Z`,
@@ -275,6 +276,15 @@ export class PuzzleRenderer {
     //  尺寸更新 / 销毁
     // ========================
 
+    /** 更新块/缺口大小（画布尺寸不变，仅缺口变化，需重置缺口位置） */
+    setBlockSize(blockSize) {
+        this._gapW = blockSize;
+        this._gapH = blockSize;
+        this._gapY = (this._canvasH - this._gapH) / 2;
+        this._resetGapX();
+    }
+
+    /** 更新画布尺寸（块大小保持不变，仅缺口 Y 重新居中 + 缺口 X 重新随机） */
     updateSize(width, height) {
         this._canvasW = width;
         this._canvasH = height;

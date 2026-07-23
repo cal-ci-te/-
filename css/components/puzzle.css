@@ -61,16 +61,16 @@
 /* ===== DOM 拼图块（替代 Canvas 绘制，支持 CSS overflow） ===== */
 .puzzle-block {
   position: absolute;
-  width: 72px;                /* = GAP_W */
-  height: 72px;               /* = GAP_H */
-  border-radius: 8px;         /* = GAP_RADIUS */
-  border: 1px solid rgba(255,255,255,0.5);
+  /* width/height/clipPath 由 JS _render() 动态控制，CSS 不预设尺寸 */
+  border-radius: 0;            /* clip-path 已包含圆角，CSS 不重复 */
+  border: none;                /* 边框会改变盒模型，JS 控制尺寸 */
   box-shadow: 0 2px 8px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.15);
   background-size: cover;
   background-position: center;
   z-index: 3;
   pointer-events: none;       /* 不阻挡 Canvas 交互 */
   transition: box-shadow 0.2s;
+  box-sizing: border-box;     /* 确保 width/height 即最终渲染尺寸 */
 }
 
 .puzzle-block.puzzle-block-aligned {

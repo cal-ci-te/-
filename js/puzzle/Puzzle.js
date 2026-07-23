@@ -14,7 +14,6 @@ export class Puzzle {
      * @param {number}  [options.width=480]
      * @param {number}  [options.height=180]
      * @param {number}  [options.blockSize=72]
-     * @param {number}  [options.gapSize=72]
      * @param {number}  [options.overhang=200]
      * @param {object|null} [options.position=null] — { x, y } | null = 流式模式
      * @param {string}  [options.image] — dataUrl
@@ -37,7 +36,6 @@ export class Puzzle {
             width: options.width,
             height: options.height,
             blockSize: options.blockSize,
-            gapSize: options.gapSize,
             overhang: options.overhang,
             position: options.position,
             image: options.image,
@@ -48,7 +46,7 @@ export class Puzzle {
         this._renderer = new PuzzleRenderer({
             width: this._state.getConfig().width,
             height: this._state.getConfig().height,
-            gapSize: this._state.getConfig().gapSize,
+            blockSize: this._state.getConfig().blockSize,
             gapRadius: GAP_RADIUS,
         });
 
@@ -116,7 +114,9 @@ export class Puzzle {
                     this._state.setPosition(525, 450);
                 }
                 this._renderer.updateSize(cfg.width, cfg.height);
+                this._renderer.setBlockSize(cfg.blockSize);   // 同步块大小到渲染器
                 this._drag.setCanvasW(cfg.width);
+                this._drag.setBlockW(cfg.blockSize);           // 同步块大小到拖拽模块
                 this._drag.setOverhang(cfg.overhang);
             }
         }
@@ -217,7 +217,20 @@ export class Puzzle {
         if (this._canvas) {
             this._canvas.width = width;
             this._canvas.height = height;
+            // 同步 CSS 显示尺寸，避免 Canvas CSS 与内部分辨率宽高比不一致
+            const wrapper = this._canvas.parentElement;
+            const maxW = wrapper ? wrapper.clientWidth : window.innerWidth;
+            if (maxW < width) {
+                const s = maxW / width;
+                this._canvas.style.width = maxW + 'px';
+                this._canvas.style.height = (height * s) + 'px';
+            } else {
+                this._canvas.style.width = width + 'px';
+                this._canvas.style.height = height + 'px';
+            }
+            this._drag.setScale((this._canvas.clientWidth / width) || 1);
         }
+        this._updateTrackLayout();   // 画布宽度变化时轨道宽度同步更新
         this._render();
         return this;
     }
@@ -252,11 +265,29 @@ export class Puzzle {
                 partial.height ?? this._state.getConfig().height
             );
         }
-        if (partial.overhang !== undefined) this.setOverhang(partial.overhang);
+        if (partial.overhang !== undefined) {
+            this.setOverhang(partial.overhang);
+            this._updateTrackLayout();
+        }
         if (partial.blockSize !== undefined) {
             this._state.updateConfig({ blockSize: partial.blockSize });
+            this._renderer.setBlockSize(partial.blockSize);
+            this._drag.setBlockW(partial.blockSize);
+            this._drag.setGapX(this._renderer.gapX);
+            this._updateTrackLayout();
         }
         return this;
+    }
+
+    /** 更新滑块轨道 DOM 宽度（blockSize/overhang 变化后调用） */
+    _updateTrackLayout() {
+        if (!this._track) return;
+        const config = this._state.getConfig();
+        const { width, blockSize, overhang } = config;
+        const THUMB_W = 32;
+        const minThumbX = -overhang + blockSize / 2 - THUMB_W / 2;
+        const maxThumbX = width - blockSize + overhang + blockSize / 2 + THUMB_W / 2;
+        this._track.style.width = (maxThumbX - minThumbX) + 'px';
     }
 
     // ---- 图片 ----
@@ -283,10 +314,8 @@ export class Puzzle {
     load() {
         const data = this._storage.load();
         if (data) {
-            this._state.importState(data);
-            this._renderer.resetGap();
-            this._drag.setGapX(this._renderer.gapX);
-            this._render();
+            this.importState(data);      // Puzzle 层 importState：同步 blockSize 到 renderer + drag
+            this._drag.reset();          // 滑块归零
         }
         return this;
     }
@@ -294,6 +323,13 @@ export class Puzzle {
     exportState() { return this._state.exportState(); }
     importState(data) {
         this._state.importState(data);
+        // 同步块大小到渲染器和拖拽模块（PuzzleState.importState 仅更新 state，不通知外层）
+        const cfg = this._state.getConfig();
+        if (cfg.blockSize !== undefined) {
+            this._renderer.setBlockSize(cfg.blockSize);
+            this._drag.setBlockW(cfg.blockSize);
+            this._drag.setGapX(this._renderer.gapX);
+        }
         this._render();
         return this;
     }
@@ -676,9 +712,10 @@ export class Puzzle {
         const bgColor = this._getBgColor();
         const completed = this._state.isCompleted();
         const config = this._state.getConfig();
-        const { blockSize } = config;
         const gapY = this._renderer.gapY;   // 直接取自 renderer，确保与 Canvas 缺口位置一致
-        const scale = (this._canvas.clientWidth / config.width) || 1;
+        // 独立 X/Y 缩放：Canvas CSS 尺寸可能因 max-width 或 setSize 未调 scaleCanvas 而偏离内部分辨率
+        const scaleX = (this._canvas.clientWidth / config.width) || 1;
+        const scaleY = (this._canvas.clientHeight / config.height) || 1;
 
         // Canvas 绘制
         this._renderer.render(ctx, imageSrc, bgColor);
@@ -694,17 +731,22 @@ export class Puzzle {
             // 块扩展了 tabR 以容纳凸起，位置需向负方向偏移
             const shape = this._renderer.getBlockShape();
             const tabR = shape.tabR;
-            this._block.style.left = ((blockX - tabR) * scale) + 'px';
-            this._block.style.top  = ((gapY - tabR) * scale) + 'px';
+            // 尺寸和位置统一使用独立 X/Y 缩放，确保 Canvas CSS≠内部尺寸时块与缺口同步
+            this._block.style.width  = (shape.w * scaleX) + 'px';
+            this._block.style.height = (shape.h * scaleY) + 'px';
+            this._block.style.clipPath = shape.clipPath;
+            this._block.style.webkitClipPath = shape.clipPath;
+            this._block.style.left = ((blockX - tabR) * scaleX) + 'px';
+            this._block.style.top  = ((gapY - tabR) * scaleY) + 'px';
 
             if (imageSrc) {
                 const info = this._renderer.getImageInfo();
                 const gapX = this._renderer.gapX;
                 if (info) {
                     this._block.style.backgroundImage = 'url(' + imageSrc + ')';
-                    this._block.style.backgroundSize = (info.sw * scale) + 'px ' + (info.sh * scale) + 'px';
+                    this._block.style.backgroundSize = (info.sw * scaleX) + 'px ' + (info.sh * scaleY) + 'px';
                     this._block.style.backgroundPosition =
-                        ((info.sx - gapX + tabR) * scale) + 'px ' + ((info.sy - gapY + tabR) * scale) + 'px';
+                        ((info.sx - gapX + tabR) * scaleX) + 'px ' + ((info.sy - gapY + tabR) * scaleY) + 'px';
                     this._block.style.backgroundColor = 'transparent';
                 } else {
                     this._block.style.backgroundImage = '';

@@ -5,8 +5,7 @@ import { EventEmitter } from './EventEmitter.js';
 const DEFAULTS = {
     width: 480,
     height: 180,
-    blockSize: 72,
-    gapSize: 72,
+    blockSize: 72,          // 块大小 = 缺口大小，统一由此字段控制
     overhang: 200,
     position: null,        // { x, y } | null = 流式模式
     image: null,           // dataUrl | null
@@ -75,7 +74,7 @@ export class PuzzleState {
 
     resetGapX() {
         const w = this._config.width;
-        const gapW = this._config.gapSize;
+        const gapW = this._config.blockSize;   // 缺口大小 = 块大小，统一数据源
         // 缺口随机范围：避开两端各 100px
         this._gapX = 100 + Math.random() * (w - gapW - 200);
         if (this._gapX < 100) this._gapX = 100;

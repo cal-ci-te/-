@@ -40,9 +40,15 @@ export class PuzzleDrag {
 
     setScale(s) { this._scale = s || 1; }
     setMinThumbX(x) { this._minThumbX = x; }
-    setOverhang(px) { this._overhang = px || 0; }
+    setOverhang(px) { this._overhang = px || 0; this._recalcMinThumbX(); }
     setGapX(gapX) { this._gapX = gapX; }
     setCanvasW(w) { this._canvasW = w; }
+    setBlockW(w) { this._blockW = w; this._recalcMinThumbX(); }
+
+    /** 当 blockSize 或 overhang 变化时重算滑块最小 X 位置 */
+    _recalcMinThumbX() {
+        this._minThumbX = -this._overhang + this._blockW / 2 - this._thumbW / 2;
+    }
 
     /**
      * @param {HTMLElement} track

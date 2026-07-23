@@ -520,7 +520,7 @@ export const DecoShelf = {
     const existing = document.getElementById('deco-' + id);
 
     if (!item.position) {
-      // 无位置 → 移除已存在的元素
+      // 无位置 → 仅保留在贴图库中，不渲染到页面
       if (existing) {
         if (existing._longPressCleanup) {
           existing._longPressCleanup();
@@ -573,7 +573,14 @@ export const DecoShelf = {
     el.style.pointerEvents = 'auto';
     el.dataset.decoId = id;
     el.title = item.name + ' (' + posStyle + ')';
-    document.body.appendChild(el);
+    // 确保 DOM body 可用（模块脚本可能在 body 就绪前执行）
+    if (document.body) {
+      document.body.appendChild(el);
+    } else {
+      document.addEventListener('DOMContentLoaded', function () {
+        document.body.appendChild(el);
+      });
+    }
 
     // 右键菜单（PC）
     el.addEventListener('contextmenu', function (e) {

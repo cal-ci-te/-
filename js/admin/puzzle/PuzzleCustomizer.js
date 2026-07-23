@@ -32,7 +32,7 @@ export const PuzzleCustomizer = {
         this._lockScroll();
 
         const puzzle = getPuzzleInstance();
-        const config = puzzle ? puzzle.getConfig() : { width: 480, height: 180, blockSize: 72, gapSize: 72, overhang: 200, position: null };
+        const config = puzzle ? puzzle.getConfig() : { width: 480, height: 180, blockSize: 72, overhang: 200, position: null };
         this._draft = { ...config, position: config.position ? { ...config.position } : null };
         // 保存快照，用于取消时恢复
         this._snapshot = { ...this._draft, position: this._draft.position ? { ...this._draft.position } : null };
@@ -280,7 +280,7 @@ export const PuzzleCustomizer = {
         this._preview();
     },
 
-    /** 将草稿应用到拼图实例（实时预览） */
+    /** 将草稿应用到拼图实例（实时预览），每次调整后刷新拼图 */
     _preview() {
         const puzzle = getPuzzleInstance();
         if (!puzzle) return;
@@ -294,8 +294,10 @@ export const PuzzleCustomizer = {
             } else {
                 puzzle.setPosition(null, null);
             }
-            // blockSize 更新通过 updateConfig
+            // blockSize 更新通过 updateConfig（已同步渲染器 + 拖拽模块）
             puzzle.updateConfig({ blockSize: d.blockSize });
+            // 每次调整后刷新拼图：重新随机缺口位置 + 滑块归零
+            puzzle.reset();
 
             // 更新面板预览
             updatePuzzlePreview();
@@ -310,6 +312,8 @@ export const PuzzleCustomizer = {
         const puzzle = getPuzzleInstance();
         if (puzzle) {
             puzzle.save();
+            // 应用后刷新拼图
+            puzzle.reset();
         }
         Utils.showToast('拼图配置已应用', false);
         updatePuzzlePreview();
@@ -319,7 +323,7 @@ export const PuzzleCustomizer = {
     /** 重置为默认值 */
     _reset() {
         const puzzle = getPuzzleInstance();
-        this._draft = { width: 480, height: 180, blockSize: 72, gapSize: 72, overhang: 200, position: null };
+        this._draft = { width: 480, height: 180, blockSize: 72, overhang: 200, position: null };
         this._syncInputs();
         if (puzzle) {
             try {
@@ -327,6 +331,7 @@ export const PuzzleCustomizer = {
                 puzzle.setOverhang(200);
                 puzzle.setPosition(null, null);
                 puzzle.updateConfig({ blockSize: 72 });
+                puzzle.reset();
             } catch (e) { /* 忽略 */ }
         }
         // 重置图片

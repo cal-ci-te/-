@@ -32,8 +32,18 @@ export function registerAllModules() {
             if (DecoShelf && typeof DecoShelf.loadLibrary === 'function') {
                 (async () => {
                     try {
-                        await DecoShelf.loadLibrary();
-                        console.log('[bootstrap] Deco 贴图库加载完成');
+                        const items = await DecoShelf.loadLibrary();
+                        console.log('[bootstrap] Deco 贴图库加载完成，共', items ? items.length : 0, '项，位置信息:', items ? items.map(function(i) { return i.id + ':' + (i.position ? '有' : '无'); }) : []);
+                        // 先渲染一次（处理 APP_STARTED 已发出的情况）
+                        DecoShelf._renderAllDecos();
+                        console.log('[bootstrap] Deco 首次渲染完成，DOM 元素数:', document.querySelectorAll('[id^="deco-"]').length);
+                        // 再等 APP_STARTED 后渲染一次（处理 DOM 尚未就绪的情况）
+                        if (!AppInitializer._initialized) {
+                            EventBus.once(EVENTS.APP_STARTED, function () {
+                                DecoShelf._renderAllDecos();
+                                console.log('[bootstrap] Deco APP_STARTED 后渲染完成');
+                            });
+                        }
                     } catch (e) {
                         console.warn('[bootstrap] Deco 贴图库加载失败:', e);
                     }
