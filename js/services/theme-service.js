@@ -1,5 +1,5 @@
-// 动态替换 <link> 标签加载主题 CSS（而非切换 CSS 变量），因三套主题的颜色值差异过大，
-// 使用变量回退会导致开发和调试成本高于直接维护三份独立样式文件。
+// 预加载三套主题 CSS，通过 disabled toggle 零网络请求即时切换。
+// 三套主题的颜色值差异过大，使用变量回退的调试成本高于维护独立文件。
 import { Utils } from '../utils.js';
 import { EventBus } from '../core/event-bus.js';
 import { EVENTS } from '../core/event-constants.js';
@@ -35,7 +35,6 @@ const THEMES = {
 
 const STORAGE_KEY = 'selected_theme';
 let currentTheme = 'dark';
-let styleElement = null;
 
 export const ThemeService = {
     getThemes() {
@@ -59,8 +58,58 @@ export const ThemeService = {
     loadTheme() {
         const saved = Utils.storage.get(STORAGE_KEY);
         const themeId = (saved && THEMES[saved]) ? saved : 'dark';
+        this._syncLinkWithTheme(themeId);
         this.applyTheme(themeId, true);
         console.log('[ThemeService] 加载主题:', themeId);
+    },
+
+    /**
+     * 切换激活的主题 CSS link（预加载三套，切换仅 toggle disabled 属性，零网络请求）。
+     * 替代旧版动态创建/销毁 <link> 的方案，消除 @import 链异步加载导致的变量缺失。
+     */
+    _switchThemeLink(themeId) {
+        const ids = ['dark', 'light', 'lofi'];
+        ids.forEach(id => {
+            const link = document.getElementById('theme-stylesheet-' + id);
+            if (link) link.disabled = (id !== themeId);
+        });
+    },
+
+    /**
+     * 页面初始加载时同步：确保 HTML 中预加载的 disabled 状态与保存的主题一致。
+     * 若 HTML 中的 link 尚未就绪（极少情况），回退到手动切换。
+     */
+    _syncLinkWithTheme(themeId) {
+        const activeLink = document.getElementById('theme-stylesheet-' + themeId);
+        if (activeLink) {
+            this._switchThemeLink(themeId);
+        } else {
+            // HTML link 尚未就绪，先加载 CSS 文件再等 DOM 就绪后切换
+            this._preloadThemeCSS(themeId);
+            const self = this;
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', function () {
+                    self._switchThemeLink(themeId);
+                });
+            } else {
+                self._switchThemeLink(themeId);
+            }
+        }
+    },
+
+    /** 回退方案：动态注入未预加载的 CSS link（仅在 HTML link 缺失时使用） */
+    _preloadThemeCSS(themeId) {
+        const ids = ['dark', 'light', 'lofi'];
+        ids.forEach(id => {
+            if (!document.getElementById('theme-stylesheet-' + id)) {
+                const link = document.createElement('link');
+                link.rel = 'stylesheet';
+                link.href = THEMES[id].cssFile;
+                link.id = 'theme-stylesheet-' + id;
+                link.disabled = (id !== themeId);
+                document.head.appendChild(link);
+            }
+        });
     },
 
     applyTheme(themeId, isRestore = false) {
@@ -73,8 +122,8 @@ export const ThemeService = {
         const theme = THEMES[themeId];
         this._switchFavicon(themeId);
 
-        // 移除旧的主题样式
-        this._loadStylesheet(theme.cssFile);
+        // 切换激活的 CSS link（disabled toggle，零网络请求）
+        this._switchThemeLink(themeId);
 
         // 保存偏好
         Utils.storage.set(STORAGE_KEY, themeId);
@@ -152,20 +201,6 @@ export const ThemeService = {
             });
     },
 
-    _loadStylesheet(href) {
-        // 移除所有旧的 id="theme-stylesheet" 的 link
-        document.querySelectorAll('#theme-stylesheet').forEach(el => el.remove());
-        if (styleElement) {
-            styleElement.remove();
-            styleElement = null;
-        }
-        styleElement = document.createElement('link');
-        styleElement.rel = 'stylesheet';
-        styleElement.href = href;
-        styleElement.id = 'theme-stylesheet';
-        document.head.appendChild(styleElement);
-        console.log('[ThemeService] 加载样式:', href);
-    },
 
     _updateThemeButtons(themeId) {
         document.querySelectorAll('.theme-btn').forEach(btn => {

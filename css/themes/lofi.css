@@ -1,6 +1,278 @@
 /* ========== 低保真 / 梦核 / 阈限空间 主题 ========== */
-@import url('lofi/_variables.css');
-@import url('lofi/_layout.css');
-@import url('lofi/_content.css');
-@import url('lofi/_sidebar.css');
-@import url('lofi/_interactive.css');
+/* 合并自 lofi/_variables.css + _layout.css + _content.css + _sidebar.css + _interactive.css */
+/* v1.11 — 消除 @import 链，单文件加载，确保 CSS 变量同步就绪 */
+
+/* 字体已在 index.html 中全局加载，此处不再重复 @import */
+
+:root {
+  /* 变量定义 */
+  --color-bg-primary: #f0ebe0;
+  --color-bg-secondary: #e8dfd0;
+  --color-bg-tertiary: #dacfc0;
+  --color-bg-card: #fff9f0;
+  --color-bg-card-start: #fffaf2;
+  --color-bg-card-end: #f5ede0;
+  --color-bg-overlay: rgba(240, 235, 224, 0.92);
+
+  --color-border: #c0b0a0;
+  --color-border-light: rgba(160, 140, 120, 0.2);
+  --color-border-dashed: rgba(180, 120, 80, 0.15);
+  --color-border-highlight: #b08050;
+
+  --color-text-primary: #8a7a6a;
+  --color-text-secondary: #9a8a7a;
+  --color-text-muted: #b0a090;
+  --color-text-heading: #7a6a5a;
+  --color-text-light: #c0b0a0;
+  --color-text-accent: #6a5a4a;
+
+  --color-accent: #b09070;
+  --color-accent-dark: #8a7a60;
+  --color-accent-light: #d0c0a8;
+  --color-accent-gold: #c8b898;
+
+  --color-folder-1: #b8a88a;
+  --color-folder-2: #c8b898;
+  --color-folder-3: #d8c8a8;
+  --color-folder-4: #e8d8b8;
+
+  --color-hover: rgba(180, 120, 80, 0.1);
+  --color-active: rgba(200, 100, 50, 0.08);
+  --color-success: #6a8a4a;
+  --color-error: #b04030;
+
+  --shadow-sm: 6px 6px 0 rgba(0, 0, 0, 0.04);
+  --shadow-md: 8px 8px 0 rgba(0, 0, 0, 0.04);
+  --shadow-lg: 12px 12px 0 rgba(0, 0, 0, 0.03);
+  --shadow-xl: 0 0 40px rgba(0, 0, 0, 0.02);
+  --shadow-focus: 0 0 20px rgba(180, 120, 80, 0.08);
+  --shadow-glow: 0 0 40px rgba(200, 160, 120, 0.05);
+
+  --font-family-serif: 'Patrick Hand', 'Comic Sans MS', cursive;
+  --font-family-display: 'Press Start 2P', 'Courier New', monospace;
+  --font-family-mono: 'Press Start 2P', 'Courier New', monospace;
+  --font-family-base: 'Patrick Hand', 'Comic Sans MS', cursive;
+}
+
+/* ========== 低保真主题 · 布局与装饰 ========== */
+html[data-theme="lofi"] body {
+    background-color: #e5d9c8 !important;
+    background-image:
+        repeating-linear-gradient(45deg, rgba(160, 140, 120, 0.08) 0px, rgba(160, 140, 120, 0.08) 1px, transparent 1px, transparent 5px),
+        repeating-linear-gradient(-45deg, rgba(160, 140, 120, 0.06) 0px, rgba(160, 140, 120, 0.06) 1px, transparent 1px, transparent 7px),
+        repeating-linear-gradient(0deg, rgba(180, 160, 140, 0.05) 0px, rgba(180, 160, 140, 0.05) 2px, transparent 2px, transparent 15px),
+        radial-gradient(circle at 15% 25%, rgba(140, 110, 80, 0.08) 0%, transparent 15%),
+        radial-gradient(circle at 75% 65%, rgba(120, 90, 60, 0.06) 0%, transparent 20%),
+        radial-gradient(circle at 40% 85%, rgba(160, 130, 100, 0.05) 0%, transparent 12%),
+        radial-gradient(circle at 90% 15%, rgba(100, 70, 40, 0.07) 0%, transparent 18%),
+        radial-gradient(ellipse at 30% 50%, rgba(200, 180, 160, 0.12) 0%, transparent 40%),
+        radial-gradient(ellipse at 70% 30%, rgba(200, 180, 160, 0.08) 0%, transparent 35%);
+    background-blend-mode: overlay, overlay, overlay, normal, normal, normal, normal, normal, normal !important;
+}
+
+html[data-theme="lofi"] body::before { content: none !important; display: none !important; background-image: none !important; }
+
+html[data-theme="lofi"] body::after {
+  content: '';
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none; z-index: 9999;
+  background: repeating-linear-gradient(0deg, rgba(0,0,0,0.03) 0px, rgba(0,0,0,0.03) 2px, transparent 2px, transparent 6px);
+  mix-blend-mode: overlay;
+}
+
+html[data-theme="lofi"] body, html[data-theme="lofi"] p, html[data-theme="lofi"] div,
+html[data-theme="lofi"] span, html[data-theme="lofi"] a, html[data-theme="lofi"] button,
+html[data-theme="lofi"] input, html[data-theme="lofi"] textarea {
+  color: var(--color-text-primary); letter-spacing: 2px; line-height: 2;
+}
+
+html[data-theme="lofi"] h1, html[data-theme="lofi"] h2, html[data-theme="lofi"] h3,
+html[data-theme="lofi"] h4, html[data-theme="lofi"] h5, html[data-theme="lofi"] h6,
+html[data-theme="lofi"] .folder-title {
+  font-family: var(--font-family-display); letter-spacing: 4px; word-spacing: 6px;
+  color: var(--color-text-heading); font-weight: 400; text-align: right; transform: rotate(-0.2deg);
+}
+html[data-theme="lofi"] .articles-grid { gap: 60px; padding: 10px 0 40px; }
+html[data-theme="lofi"] .group-header .folder-title { font-size: 1.8rem; letter-spacing: 10px; text-align: right; border-bottom: 1px dotted var(--color-border-light); padding-bottom: 8px; margin-bottom: 20px; }
+html[data-theme="lofi"] .group-header .folder-title.level-1 { transform: rotate(-0.3deg); }
+html[data-theme="lofi"] .group-header .folder-title.level-2 { transform: rotate(0.5deg); padding-left: 24px; }
+html[data-theme="lofi"] .group-header .folder-title.level-3 { transform: rotate(-0.1deg); padding-left: 48px; }
+
+html[data-theme="lofi"] ::-webkit-scrollbar { width: 10px; height: 10px; }
+html[data-theme="lofi"] ::-webkit-scrollbar-track { background: var(--color-bg-secondary); border: 1px solid var(--color-border); }
+html[data-theme="lofi"] ::-webkit-scrollbar-thumb { background: var(--color-accent); border: 1px solid var(--color-border); border-radius: 0; }
+html[data-theme="lofi"] ::-webkit-scrollbar-thumb:hover { background: var(--color-accent-dark); }
+
+/* ========== 低保真主题 · 内容展示 ========== */
+/* ===== 卡片 ===== */
+html[data-theme="lofi"] .card {
+  position: relative; background: transparent; backdrop-filter: blur(1px);
+  border: 1px solid rgba(180, 150, 120, 0.25); border-radius: 0;
+  padding: 2rem 2rem 3.5rem 2rem; margin-bottom: 88px; max-width: 100%; overflow: visible;
+  transition: transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 1.2s ease;
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04), inset 0 0 50px rgba(160, 130, 100, 0.12);
+}
+html[data-theme="lofi"] .card::before {
+  content: ''; position: absolute; top: -6px; left: -6px;
+  width: calc(100% + 12px); height: calc(100% + 12px); z-index: -1;
+  background-color: rgba(252, 248, 242, 0.58); border-radius: 0; pointer-events: none;
+}
+@supports (backdrop-filter: blur(1px)) {
+  html[data-theme="lofi"] .card { border: none; padding: 2.5rem 2.5rem 4rem 2.5rem; }
+  html[data-theme="lofi"] .card::before { filter: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='tear' x='-10%25' y='-10%25' width='120%25' height='120%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.035' numOctaves='4' result='noise'/%3E%3CfeDisplacementMap in='SourceGraphic' in2='noise' scale='4' xChannelSelector='R' yChannelSelector='G'/%3E%3C/filter%3E%3C/svg%3E#tear"); }
+}
+html[data-theme="lofi"] .card::after {
+  content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(139, 119, 90, 0.025) 2px, rgba(139, 119, 90, 0.025) 4px),
+              radial-gradient(ellipse at 30% 70%, rgba(180, 150, 120, 0.06) 0%, transparent 60%),
+              radial-gradient(ellipse at 80% 20%, rgba(200, 170, 140, 0.04) 0%, transparent 50%);
+}
+html[data-theme="lofi"] .card > * { position: relative; z-index: 1; }
+
+/* 6 种不规则裁剪 + 独立旋转角度 */
+html[data-theme="lofi"] .card:nth-child(6n+1) { clip-path: polygon(0% 0%, 95% 0%, 100% 5%, 100% 90%, 94% 100%, 0% 100%); transform: perspective(600px) rotateX(1.2deg) rotateY(-1.8deg); }
+html[data-theme="lofi"] .card:nth-child(6n+2) { clip-path: polygon(0% 3%, 97% 0%, 100% 2%, 98% 97%, 100% 100%, 2% 100%, 0% 94%); transform: perspective(600px) rotateX(-0.8deg) rotateY(1.6deg); }
+html[data-theme="lofi"] .card:nth-child(6n+3) { clip-path: polygon(3% 0%, 100% 0%, 100% 93%, 96% 100%, 0% 100%, 0% 5%); transform: perspective(600px) rotateX(1.8deg) rotateY(0.8deg); }
+html[data-theme="lofi"] .card:nth-child(6n+4) { clip-path: polygon(0% 0%, 98% 2%, 100% 0%, 100% 98%, 94% 100%, 0% 96%); transform: perspective(600px) rotateX(-1.4deg) rotateY(-1.2deg); }
+html[data-theme="lofi"] .card:nth-child(6n+5) { clip-path: polygon(2% 0%, 96% 0%, 100% 6%, 100% 95%, 97% 100%, 0% 98%, 0% 3%); transform: perspective(600px) rotateX(0.4deg) rotateY(-2.2deg); }
+html[data-theme="lofi"] .card:nth-child(6n+6) { clip-path: polygon(0% 2%, 99% 0%, 100% 0%, 100% 96%, 93% 100%, 2% 100%, 0% 94%); transform: perspective(600px) rotateX(-1.8deg) rotateY(0.4deg); }
+
+html[data-theme="lofi"] .card:hover { transform: perspective(600px) rotateX(0.3deg) rotateY(-0.3deg) scale(1.015) !important; box-shadow: 0 18px 40px -12px rgba(0, 0, 0, 0.14), 0 2px 6px rgba(0, 0, 0, 0.06), inset 0 0 60px rgba(160, 130, 100, 0.18); }
+html[data-theme="lofi"] .card h3 { font-size: 1.4rem; letter-spacing: 6px; text-align: right; border-bottom: 1px dashed rgba(180, 150, 120, 0.4); padding-bottom: 8px; margin-bottom: 12px; color: var(--color-text-heading); }
+html[data-theme="lofi"] .card-content { font-family: var(--font-family-serif); font-size: 1rem; line-height: 2.2; color: var(--color-text-secondary); text-align: left; }
+html[data-theme="lofi"] .card-meta { font-size: 0.8rem; color: var(--color-text-muted); letter-spacing: 3px; text-align: right; border-top: 1px dotted rgba(180, 150, 120, 0.3); padding-top: 12px; margin-top: 16px; }
+
+/* ===== 详情页 ===== */
+html[data-theme="lofi"] .detail-container { border-radius: 2px !important; }
+html[data-theme="lofi"] .detail-topbar { background: var(--color-bg-secondary) !important; border-bottom: 1px solid var(--color-border) !important; height: 34px !important; }
+html[data-theme="lofi"] .detail-tab { font-family: var(--font-family-display) !important; font-size: 9px !important; letter-spacing: 2px !important; border-radius: 2px 2px 0 0 !important; height: 26px !important; padding: 2px 10px !important; }
+html[data-theme="lofi"] .detail-tab .tab-close { font-size: 11px !important; }
+html[data-theme="lofi"] .detail-topbar-controls button { font-family: var(--font-family-display) !important; font-size: 12px !important; width: 26px !important; height: 26px !important; }
+html[data-theme="lofi"] .detail-body { font-family: var(--font-family-serif) !important; line-height: 2.2 !important; }
+html[data-theme="lofi"] .detail-body h1, html[data-theme="lofi"] .detail-body h2, html[data-theme="lofi"] .detail-body h3 { font-family: var(--font-family-display) !important; letter-spacing: 4px !important; }
+html[data-theme="lofi"] .detail-body code, html[data-theme="lofi"] .detail-body pre { font-family: var(--font-family-mono) !important; }
+
+/* ===== 卡片高亮辉光 ===== */
+html[data-theme="lofi"] .card.card-highlight::before { filter: drop-shadow(0 0 6px var(--color-accent)); }
+@supports (backdrop-filter: blur(1px)) {
+  html[data-theme="lofi"] .card.card-highlight::before { filter: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='tear' x='-10%25' y='-10%25' width='120%25' height='120%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.035' numOctaves='4' result='noise'/%3E%3CfeDisplacementMap in='SourceGraphic' in2='noise' scale='4' xChannelSelector='R' yChannelSelector='G'/%3E%3C/filter%3E%3C/svg%3E#tear") drop-shadow(0 0 6px var(--color-accent)); }
+}
+
+/* ========== 低保真主题 · 侧边栏与目录树 ========== */
+html[data-theme="lofi"] .sidebar { border: 1px solid var(--color-border); background: var(--color-bg-secondary); box-shadow: var(--shadow-lg); backdrop-filter: blur(2px); border-radius: 2px; }
+html[data-theme="lofi"] .sidebar-header { background: var(--color-bg-tertiary); border-bottom: 1px solid var(--color-border); padding: 10px 12px; }
+html[data-theme="lofi"] .sidebar-header h3 { font-size: 1.2rem; letter-spacing: 6px; text-align: right; transform: rotate(0deg); }
+html[data-theme="lofi"] .tree-node-content { padding: 6px 10px; border-left: 1px solid transparent; }
+html[data-theme="lofi"] .tree-node-content:hover { background: var(--color-hover); border-left-color: var(--color-border-highlight); transform: translateX(4px); }
+html[data-theme="lofi"] .tree-node-content.active { background: var(--color-active); border-left: 3px solid var(--color-border-highlight); }
+html[data-theme="lofi"] .node-title { font-family: var(--font-family-display); font-size: 11px; letter-spacing: 2px; color: var(--color-text-secondary); }
+html[data-theme="lofi"] .tree-node.dragging { opacity: 0.4; }
+html[data-theme="lofi"] .tree-node.drag-over { border-left: 3px solid var(--color-border-highlight) !important; background: var(--color-hover) !important; }
+html[data-theme="lofi"] .tree-node.dropzone-sibling-highlight { border-bottom: 2px dashed var(--color-border-highlight) !important; background: var(--color-active) !important; }
+
+/* ===== 右键菜单 ===== */
+html[data-theme="lofi"] #directory-context-menu, html[data-theme="lofi"] #deco-context-menu { background: var(--color-bg-secondary) !important; border-color: var(--color-border) !important; border-radius: 2px !important; }
+html[data-theme="lofi"] #directory-context-menu .ctx-item, html[data-theme="lofi"] #deco-context-menu .ctx-item { font-family: var(--font-family-display) !important; font-size: 10px !important; letter-spacing: 3px !important; color: var(--color-text-primary) !important; }
+html[data-theme="lofi"] #directory-context-menu .ctx-item:hover, html[data-theme="lofi"] #deco-context-menu .ctx-item:hover { background: var(--color-hover) !important; }
+
+/* ===== 位置管理模式按钮 ===== */
+html[data-theme="lofi"] .pos-mode-btn { font-family: var(--font-family-display) !important; font-size: 10px !important; letter-spacing: 3px !important; border: 1px solid var(--color-border) !important; border-radius: 2px !important; color: var(--color-text-muted) !important; padding: 6px 14px !important; }
+html[data-theme="lofi"] .pos-mode-enter, html[data-theme="lofi"] .pos-mode-save, html[data-theme="lofi"] .pos-mode-cancel { background: var(--color-bg-card) !important; }
+html[data-theme="lofi"] .pos-mode-btn:hover { background: var(--color-bg-secondary) !important; color: var(--color-text-primary) !important; filter: none !important; }
+html[data-theme="lofi"] .pos-mode-hint, html[data-theme="lofi"] .pos-hint { font-family: var(--font-family-display) !important; font-size: 8px !important; color: var(--color-text-muted) !important; letter-spacing: 2px !important; }
+
+/* ===== 拖拽空白放置区 ===== */
+html[data-theme="lofi"] .dropzone-background { border-color: var(--color-border) !important; color: var(--color-text-muted) !important; background: rgba(200, 180, 160, 0.08) !important; font-family: var(--font-family-display) !important; font-size: 10px !important; letter-spacing: 3px !important; }
+
+/* ===== 心跳加载动画 ===== */
+html[data-theme="lofi"] .heartbeat-loader { background: var(--color-bg-primary) !important; }
+
+/* ========== 低保真主题 · 交互控件 ========== */
+html[data-theme="lofi"] button, html[data-theme="lofi"] .btn, html[data-theme="lofi"] .theme-btn,
+html[data-theme="lofi"] .avatar-upload-btn, html[data-theme="lofi"] .login-submit-btn {
+  font-family: var(--font-family-display); font-size: 10px; letter-spacing: 4px; text-transform: uppercase;
+  border: 1px solid var(--color-border); border-radius: 2px; background: var(--color-bg-card); color: var(--color-text-muted);
+  box-shadow: 2px 2px 0 rgba(0,0,0,0.03), -1px -1px 0 rgba(255,255,255,0.05);
+  padding: 8px 16px; transition: all 0.15s ease; cursor: pointer; text-align: center; min-height: 32px; touch-action: manipulation;
+}
+html[data-theme="lofi"] button:hover, html[data-theme="lofi"] .btn:hover, html[data-theme="lofi"] .theme-btn:hover {
+  transform: translate(-2px, -2px); box-shadow: 4px 4px 0 rgba(0,0,0,0.03), -2px -2px 0 rgba(255,255,255,0.02);
+  background: var(--color-bg-secondary); color: var(--color-text-primary);
+}
+html[data-theme="lofi"] button:active, html[data-theme="lofi"] .btn:active, html[data-theme="lofi"] .theme-btn:active {
+  transform: translate(2px, 2px); box-shadow: 0 0 0 rgba(0,0,0,0);
+}
+html[data-theme="lofi"] .admin-panel button, html[data-theme="lofi"] .admin-panel .btn, html[data-theme="lofi"] .admin-panel .theme-btn { pointer-events: auto !important; cursor: pointer !important; opacity: 1 !important; }
+
+html[data-theme="lofi"] input[type="text"], html[data-theme="lofi"] input[type="password"], html[data-theme="lofi"] textarea {
+  font-family: var(--font-family-mono); font-size: 13px; letter-spacing: 2px; background: var(--color-bg-card);
+  border: 1px solid var(--color-border); border-radius: 2px; box-shadow: inset 2px 2px 0 rgba(0, 0, 0, 0.02);
+  padding: 8px 12px; color: var(--color-text-secondary); line-height: 1.8;
+}
+
+html[data-theme="lofi"] .admin-panel { border: 1px solid var(--color-border); background: var(--color-bg-secondary); box-shadow: var(--shadow-lg); border-radius: 2px; max-height: 70vh; overflow: hidden; }
+html[data-theme="lofi"] .panel-header { background: var(--color-bg-tertiary); border-bottom: 1px solid var(--color-border); padding: 8px 12px; }
+html[data-theme="lofi"] .panel-header h4 { font-size: 1rem; letter-spacing: 6px; text-align: left; transform: rotate(0deg); }
+html[data-theme="lofi"] .panel-content { padding: 12px 16px; max-height: calc(70vh - 50px); overflow-y: auto; background: var(--color-bg-primary); }
+html[data-theme="lofi"] .panel-content .control-group { margin-bottom: 16px; }
+html[data-theme="lofi"] .panel-content label { font-size: 10px; letter-spacing: 2px; color: var(--color-text-muted); display: block; margin-bottom: 4px; }
+html[data-theme="lofi"] .panel-content input[type="range"] { width: 100%; height: 6px; background: var(--color-border-light); border: none; border-radius: 2px; appearance: none; }
+html[data-theme="lofi"] .panel-content input[type="range"]::-webkit-slider-thumb { appearance: none; width: 12px; height: 12px; background: var(--color-border); border-radius: 0; cursor: pointer; }
+html[data-theme="lofi"] .panel-content .theme-btn { margin: 4px 0; flex: 1; min-width: 60px; }
+
+html[data-theme="lofi"] .login-modal { border: 1px solid var(--color-border); border-radius: 2px; background: var(--color-bg-card); box-shadow: var(--shadow-xl); }
+html[data-theme="lofi"] .login-modal .modal-header { background: var(--color-bg-tertiary); border-bottom: 1px solid var(--color-border); }
+html[data-theme="lofi"] .login-modal .modal-body { padding: 20px; }
+html[data-theme="lofi"] .login-submit-btn { width: 100%; margin-top: 8px; }
+
+/* ===== 低保真按钮全覆盖 ===== */
+html[data-theme="lofi"] .save-btn, html[data-theme="lofi"] .cancel-btn, html[data-theme="lofi"] .close-btn,
+html[data-theme="lofi"] .toggle-btn, html[data-theme="lofi"] .collapse-btn, html[data-theme="lofi"] .sidebar-collapse-btn,
+html[data-theme="lofi"] .history-preview-btn, html[data-theme="lofi"] .history-restore-btn, html[data-theme="lofi"] .history-delete-btn,
+html[data-theme="lofi"] .history-toggle-btn, html[data-theme="lofi"] .modal-close, html[data-theme="lofi"] .crop-cancel-btn,
+html[data-theme="lofi"] .crop-confirm-btn, html[data-theme="lofi"] .visibility-toggle {
+  font-family: var(--font-family-display); font-size: 10px; letter-spacing: 4px; text-transform: uppercase;
+  border: 1px solid var(--color-border); border-radius: 2px; background: var(--color-bg-card); color: var(--color-text-muted);
+  box-shadow: 2px 2px 0 rgba(0,0,0,0.03), -1px -1px 0 rgba(255,255,255,0.05);
+  padding: 8px 16px; transition: all 0.15s ease; cursor: pointer; text-align: center; min-height: 32px;
+}
+html[data-theme="lofi"] .admin-panel button[style] {
+  font-family: var(--font-family-display) !important; font-size: 10px !important; letter-spacing: 4px !important;
+  text-transform: uppercase !important; border: 1px solid var(--color-border) !important; border-radius: 2px !important;
+  background: var(--color-bg-card) !important; color: var(--color-text-muted) !important;
+  box-shadow: 2px 2px 0 rgba(0,0,0,0.03), -1px -1px 0 rgba(255,255,255,0.05) !important; padding: 8px 16px !important;
+}
+
+/* ===== 低保真主页面标题居中 ===== */
+html[data-theme="lofi"] .toolbar h1 { text-align: center !important; transform: none !important; }
+
+/* ===== 低保真登录入口适配 ===== */
+html[data-theme="lofi"] .login-trigger { background: var(--color-bg-secondary) !important; border-color: var(--color-border) !important; padding: 8px 18px 8px 12px !important; }
+html[data-theme="lofi"] .login-avatar { width: 44px !important; height: 44px !important; border-color: var(--color-border) !important; background: var(--color-bg-tertiary) !important; }
+html[data-theme="lofi"] .login-label { font-family: var(--font-family-display) !important; font-size: 10px !important; letter-spacing: 3px !important; color: var(--color-text-heading) !important; }
+html[data-theme="lofi"] .welcome-text { font-family: var(--font-family-display) !important; font-size: 8px !important; letter-spacing: 2px !important; color: var(--color-text-muted) !important; }
+
+/* ===== 管理面板文件上传控件 ===== */
+html[data-theme="lofi"] .admin-panel input[type="file"] { font-family: var(--font-family-display) !important; font-size: 10px !important; letter-spacing: 2px !important; color: var(--color-text-muted) !important; background: var(--color-bg-card) !important; border: 1px solid var(--color-border) !important; border-radius: 2px !important; padding: 6px 10px !important; }
+
+/* ===== 工具栏 ===== */
+html[data-theme="lofi"] .side-toolbar { background: var(--color-bg-secondary) !important; border-color: var(--color-border) !important; border-radius: 4px !important; }
+html[data-theme="lofi"] .toolbar-toggle { border-right-color: var(--color-border) !important; }
+html[data-theme="lofi"] .toolbar-toggle:hover { background: var(--color-hover) !important; }
+html[data-theme="lofi"] .toolbar-tools { border-right-color: var(--color-border) !important; }
+html[data-theme="lofi"] .tool-item { font-family: var(--font-family-display) !important; font-size: 14px !important; color: var(--color-text-muted) !important; }
+html[data-theme="lofi"] .tool-item:hover { background: var(--color-hover) !important; color: var(--color-text-primary) !important; }
+html[data-theme="lofi"] .tool-item.active { background: var(--color-active) !important; color: var(--color-text-heading) !important; }
+html[data-theme="lofi"] .toolbar-content { font-family: var(--font-family-serif) !important; color: var(--color-text-secondary) !important; line-height: 2 !important; }
+html[data-theme="lofi"] .toolbar-content h3, html[data-theme="lofi"] .toolbar-content strong { font-family: var(--font-family-display) !important; letter-spacing: 2px !important; color: var(--color-text-heading) !important; }
+
+/* ===== 最小化标签页 ===== */
+html[data-theme="lofi"] .minimized-bar { background: var(--color-bg-secondary) !important; border: 1px solid var(--color-border) !important; border-radius: 0 !important; box-shadow: none !important; scrollbar-color: var(--color-border) var(--color-bg-secondary) !important; }
+html[data-theme="lofi"] .minimized-bar::-webkit-scrollbar-track { background: var(--color-bg-secondary) !important; }
+html[data-theme="lofi"] .minimized-bar::-webkit-scrollbar-thumb { background: var(--color-border) !important; border-radius: 0 !important; }
+html[data-theme="lofi"] .minimized-item { background: var(--color-bg-card) !important; border: 1px solid var(--color-border) !important; border-radius: 0 !important; }
+html[data-theme="lofi"] .minimized-item:hover { background: var(--color-hover) !important; }
+html[data-theme="lofi"] .minimized-item .minimized-title { font-family: var(--font-family-display) !important; font-size: 10px !important; letter-spacing: 2px !important; color: var(--color-text-heading) !important; }
+html[data-theme="lofi"] .minimized-item .minimized-restore, html[data-theme="lofi"] .minimized-item .minimized-close { color: var(--color-text-muted) !important; font-family: var(--font-family-display) !important; }
+html[data-theme="lofi"] .minimized-item .minimized-restore:hover { color: var(--color-text-heading) !important; }
+html[data-theme="lofi"] .minimized-item .minimized-close:hover { color: var(--color-accent) !important; }

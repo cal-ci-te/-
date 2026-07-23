@@ -3,8 +3,6 @@ import { ActionDelegator } from '../action-delegator.js';
 import { DecoShelf } from '../../../services/deco.js';
 import { Utils } from '../../../utils.js';
 import { UI } from '../../../utils/ui-strings.js';
-import { AppState } from '../../../core/app-state.js';
-import { MUTATIONS } from '../../../core/state-mutations.js';
 
 // 导入所有处理器
 import * as authHandlers from '../handlers/auth.js';
@@ -40,13 +38,9 @@ const handlerMap = {
   'theme-switch': themeHandlers.themeSwitchHandler,
 
   // 拼图自定义
-  'upload-puzzle-image': function () {
-    const input = document.getElementById('puzzleFileInput');
-    if (input) input.click();
-  },
-  'reset-puzzle-image': function () {
-    AppState.commit(MUTATIONS.SET_PUZZLE_IMAGE, null);
-    Utils.showToast(UI.puzzle.resetToDefault, false);
+  'open-puzzle-customizer': async function () {
+    const { handleOpenPuzzleCustomizer } = await import('../../puzzle/PuzzleCustomizer.js');
+    handleOpenPuzzleCustomizer();
   },
 };
 

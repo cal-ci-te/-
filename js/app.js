@@ -26,7 +26,7 @@ import { UIDirectory } from './ui/components/directory/index.js';
 import { ContextMenu } from './admin/events/context-menu.js';
 import { ThemeService } from './services/theme-service.js';
 import { Texture } from './services/texture.js';
-import { initPuzzle } from './ui/components/puzzle/puzzle.js';
+import { initPuzzle } from './puzzle/Puzzle.js';
 
 console.log('🚀 [app] ES Module 入口已加载');
 
@@ -323,10 +323,11 @@ setTimeout(() => {
 SiteIcon.init();
 SiteIcon.playEntranceAnimation();
 
-// 拼图组件：坐标模式 — 修改 {x, y} 即可改变视口内位置，不依赖 HTML 结构
-// 流式模式兼容：initPuzzle('.hero-section', 'afterend')
+// 拼图组件 — 坐标模式 {x, y} 决定视口内位置，流式模式兼容 initPuzzle('.hero-section', 'afterend')
 setTimeout(() => {
-    initPuzzle({ x: 580, y: 450 });
+    initPuzzle({ x: 525, y: 450 }).catch(err => {
+        console.error('[app] 拼图初始化失败:', err);
+    });
 }, 100);
 
 // 心跳加载动画隐藏——保证至少显示 400ms，配合 10s 超时兜底

@@ -100,42 +100,79 @@
   100% { opacity: 0; }
 }
 
-/* ===== 自定义滑块（纯 DOM track + thumb，自由溢出） ===== */
-.puzzle-slider-container {
-  padding: 12px 0 14px;
+/* ===== 独立滑块容器（绝对定位，JS 动态设置 left/top） ===== */
+.puzzle-slider {
   overflow: visible;
+  z-index: 90;
 }
 
+/* ===== 独立轨道（宽度由 JS 动态设为手柄完整滑动距离） ===== */
 .puzzle-track {
   position: relative;
-  width: 480px;
-  max-width: 100%;             /* 与 Canvas 同步缩放 */
-  height: 6px;
-  border-radius: 3px;
-  background: var(--color-bg-tertiary, #1a1612);
+  width: 480px;                  /* 初始占位，JS 覆盖 */
+  height: 18px;
+  border-radius: 9px;
+  /* 独立视觉：深色凹槽，与部件框形成对比 */
+  background:
+    linear-gradient(180deg, rgba(0,0,0,0.35) 0%, transparent 30%, transparent 70%, rgba(0,0,0,0.35) 100%),
+    var(--color-bg-tertiary, #1a1612);
   border: 1px solid var(--color-border, #3a3028);
+  box-shadow:
+    inset 0 3px 6px rgba(0,0,0,0.6),
+    inset 0 1px 0 rgba(255,255,255,0.03);
   cursor: pointer;
-  /* 左对齐，与 Canvas 共享同一坐标系原点 */
+  box-sizing: border-box;
 }
 
+/* 轨道两端装饰性限位块，强化"独立槽"的工业感 */
+.puzzle-track::before,
+.puzzle-track::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 5px;
+  height: 14px;
+  border-radius: 2px;
+  background: var(--color-border, #3a3028);
+  transform: translateY(-50%);
+  z-index: 1;
+}
+.puzzle-track::before { left: 4px; }
+.puzzle-track::after  { right: 4px; }
+
+/* ===== 滑块手柄（独立长方形，收纳入轨槽内） ===== */
 .puzzle-thumb {
   position: absolute;
   top: 50%;
-  width: 72px;                /* = GAP_W = BLOCK_W，与拼图块同尺寸 */
-  height: 72px;               /* = GAP_H */
-  border-radius: 8px;
-  background: var(--color-accent, #c9a87c);
-  border: 2px solid var(--color-bg-primary, #1a1612);
+  width: 32px;
+  height: 16px;
+  border-radius: 4px;
+  /* 金属质感手柄 */
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 50%, rgba(0,0,0,0.2) 100%),
+    var(--color-accent, #c9a87c);
+  border: 1px solid rgba(255,255,255,0.3);
   cursor: grab;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255,255,255,0.15);
+  box-shadow:
+    0 2px 6px rgba(0,0,0,0.5),
+    0 0 8px rgba(201,168,124,0.3);
   transform: translateY(-50%);
-  transition: box-shadow 0.2s;
-  z-index: 2;
+  transition: box-shadow 0.2s, background 0.15s;
+  z-index: 3;
+}
+
+.puzzle-thumb:hover {
+  box-shadow:
+    0 2px 8px rgba(0,0,0,0.55),
+    0 0 14px rgba(201,168,124,0.45);
 }
 
 .puzzle-thumb.puzzle-slider-thumb-active {
   cursor: grabbing;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5), 0 0 12px rgba(255, 215, 0, 0.3);
+  box-shadow:
+    0 3px 10px rgba(0,0,0,0.65),
+    0 0 18px rgba(255,215,0,0.5),
+    0 0 30px rgba(255,215,0,0.2);
 }
 
 /* ===== 提示文字 ===== */
@@ -148,31 +185,28 @@
   transition: color 0.3s;
 }
 
-/* ===== 响应式：小屏手机 ===== */
-@media (max-width: 600px) {
-  .puzzle-widget {
-    margin: 16px 8px;
-    border-radius: 6px;
-    overflow: hidden;          /* 移动端禁用溢出 */
-    max-width: calc(100vw - 16px);
-  }
-  .puzzle-canvas-wrapper {
-    overflow: hidden;          /* 拼图块不超出 Canvas */
-  }
-  #puzzleCanvas {
-    width: 100%;
-    height: auto;
-  }
-  .puzzle-block {
-    width: 72px;               /* 块宽度不变，但 overflow:hidden 阻止溢出显示 */
-    height: 72px;
-  }
-  .puzzle-track {
-    width: 100%;
-  }
-  .puzzle-thumb {
-    width: 36px;
-    height: 36px;
-    border-radius: 4px;
-  }
+
+
+/* ===== 拖拽手柄（坐标模式下整体移动拼图） ===== */
+.puzzle-drag-handle {
+  display: inline-block;
+  width: 18px; height: 18px;
+  line-height: 18px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--color-text-muted, #7a6a58);
+  cursor: grab;
+  user-select: none;
+  border-radius: 3px;
+  margin-right: 6px;
+  transition: color 0.15s, background 0.15s;
+}
+.puzzle-drag-handle:hover {
+  color: var(--color-accent, #c47a44);
+  background: var(--color-hover, rgba(90,62,43,0.4));
+}
+.puzzle-drag-handle.puzzle-drag-handle-active {
+  cursor: grabbing;
+  color: var(--color-accent, #c47a44);
+  background: var(--color-active, rgba(196,122,68,0.25));
 }
