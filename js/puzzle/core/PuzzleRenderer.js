@@ -1,5 +1,6 @@
-// 拼图 Canvas 绘制器 — 每实例独立，无共享状态。
-// v2: 拼图凸起咬合形状 + 接缝线（双路径外亮内暗，任何背景下清晰可见）
+// 拼图形状 & Canvas 工具类 — 每实例独立，无共享状态。
+// 提供拼图路径 (puzzlePath)、形状数据 (getBlockShape)、接缝线、遮罩等。
+// Canvas 背景绘制和 DOM 块/缺口渲染共用同一数据源。
 const MASK_ALPHA = 0.4;
 
 export class PuzzleRenderer {
@@ -29,34 +30,8 @@ export class PuzzleRenderer {
     get gapH() { return this._gapH; }
 
     // ========================
-    //  主渲染入口
+    //  形状数据 & Canvas 绘制工具
     // ========================
-
-    /**
-     * 绘制完整拼图画面
-     */
-    render(ctx, imageSrc, bgColor) {
-        const img = imageSrc || null;
-        if (!this._gapX) this._resetGapX();
-
-        if (img) {
-            // ---- 图片模式 ----
-            this._drawBackgroundFromImage(ctx, img);
-            // 用主题背景色填充缺口 → 视觉上"挖掉"图片
-            ctx.fillStyle = bgColor;
-            this._drawPuzzleHole(ctx, this._gapX, this._gapY, this._gapW, this._gapH, this._gapRadius);
-        } else {
-            // ---- 纯色模式：遮罩 + destination-out 镂空 ----
-            ctx.fillStyle = bgColor;
-            ctx.fillRect(0, 0, this._canvasW, this._canvasH);
-            this._drawMask(ctx);
-        }
-
-        // ---- 拼图缺口接缝线（双路径：外亮内暗，任何背景均清晰可见） ----
-        if (this._enableSeam) {
-            this._drawPuzzleSeam(ctx, this._gapX, this._gapY, this._gapW, this._gapH, this._gapRadius);
-        }
-    }
 
     resetGap() { this._resetGapX(); }
 
@@ -88,8 +63,24 @@ export class PuzzleRenderer {
     // ========================
 
     _resetGapX() {
-        this._gapX = 100 + Math.random() * (this._canvasW - this._gapW - 200);
-        if (this._gapX < 100) this._gapX = 100;
+        // 缺口含凸起 (tabR) 的扩展区域必须完全在画布内
+        const tabR = Math.min(this._gapW * 0.18, this._gapH * 0.32, 16);
+        const minGap = tabR;                             // 左凸起不超出画布左边界
+        const maxGap = this._canvasW - this._gapW - tabR; // 右凸起不超出画布右边界
+        if (maxGap <= minGap) {
+            this._gapX = Math.max(0, (this._canvasW - this._gapW) / 2);
+        } else {
+            this._gapX = minGap + Math.random() * (maxGap - minGap);
+        }
+    }
+
+    /** 计算缺口 Y 坐标，确保含凸起扩展区域不超出画布上下边界 */
+    _clampGapY() {
+        const tabR = Math.min(this._gapW * 0.18, this._gapH * 0.32, 16);
+        const idealY = (this._canvasH - this._gapH) / 2;
+        const minY = tabR;
+        const maxY = this._canvasH - this._gapH - tabR;
+        this._gapY = Math.max(minY, Math.min(idealY, maxY));
     }
 
     _drawBackgroundFromImage(ctx, imageSrc) {
@@ -101,6 +92,14 @@ export class PuzzleRenderer {
                 if (self._onRedraw) self._onRedraw();
             };
             this._cachedImg.src = imageSrc;
+        } else if (!this._cachedImg.complete) {
+            // 复用已存在的缓存图像对象，但 onload 可能未绑定最新的 _onRedraw
+            const self = this;
+            const prevOnload = this._cachedImg.onload;
+            this._cachedImg.onload = () => {
+                if (prevOnload) prevOnload();
+                if (self._onRedraw) self._onRedraw();
+            };
         }
         if (this._cachedImg.complete && this._cachedImg.naturalWidth > 0) {
             const scale = Math.max(
@@ -248,19 +247,19 @@ export class PuzzleRenderer {
             `L ${topCx - tabR} ${oy}`,
             `A ${tabR} ${tabR} 0 0 1 ${topCx + tabR} ${oy}`,       // 上边凸起（CW=向上凸出）
             `L ${ox + w - rr} ${oy}`,
-            `A ${rr} ${rr} 0 0 1 ${ox + w} ${oy + rr}`,
+            `A ${rr} ${rr} 0 0 1 ${ox + w} ${oy + rr}`,            // 右上角：sweep=1，顺时针经外侧
             `L ${ox + w} ${rightCy - tabR}`,
-            `A ${tabR} ${tabR} 0 0 1 ${ox + w} ${rightCy + tabR}`,
+            `A ${tabR} ${tabR} 0 0 1 ${ox + w} ${rightCy + tabR}`, // 右边凸起
             `L ${ox + w} ${oy + h - rr}`,
-            `A ${rr} ${rr} 0 0 1 ${ox + w - rr} ${oy + h}`,
+            `A ${rr} ${rr} 0 0 0 ${ox + w - rr} ${oy + h}`,        // 右下角
             `L ${bottomCx + tabR} ${oy + h}`,
-            `A ${tabR} ${tabR} 0 0 1 ${bottomCx - tabR} ${oy + h}`,
+            `A ${tabR} ${tabR} 0 0 1 ${bottomCx - tabR} ${oy + h}`,// 下边凸起
             `L ${ox + rr} ${oy + h}`,
-            `A ${rr} ${rr} 0 0 1 ${ox} ${oy + h - rr}`,
+            `A ${rr} ${rr} 0 0 1 ${ox} ${oy + h - rr}`,            // 左下角：sweep=1，顺时针经外侧
             `L ${ox} ${leftCy + tabR}`,
-            `A ${tabR} ${tabR} 0 0 1 ${ox} ${leftCy - tabR}`,
+            `A ${tabR} ${tabR} 0 0 1 ${ox} ${leftCy - tabR}`,      // 左边凸起
             `L ${ox} ${oy + rr}`,
-            `A ${rr} ${rr} 0 0 1 ${ox + rr} ${oy}`,
+            `A ${rr} ${rr} 0 0 0 ${ox + rr} ${oy}`,                // 左上角
             `Z`,
         ].join(' ');
 
@@ -280,7 +279,7 @@ export class PuzzleRenderer {
     setBlockSize(blockSize) {
         this._gapW = blockSize;
         this._gapH = blockSize;
-        this._gapY = (this._canvasH - this._gapH) / 2;
+        this._clampGapY();
         this._resetGapX();
     }
 
@@ -288,7 +287,7 @@ export class PuzzleRenderer {
     updateSize(width, height) {
         this._canvasW = width;
         this._canvasH = height;
-        this._gapY = (height - this._gapH) / 2;
+        this._clampGapY();
         this._resetGapX();
     }
 

@@ -6,7 +6,7 @@ const DEFAULTS = {
     width: 480,
     height: 180,
     blockSize: 72,          // 块大小 = 缺口大小，统一由此字段控制
-    overhang: 200,
+    overhang: 100,          // 块超出画布边缘的像素（过大则滑块精度降低）
     position: null,        // { x, y } | null = 流式模式
     image: null,           // dataUrl | null
     autoSave: true,
@@ -63,7 +63,9 @@ export class PuzzleState {
     }
 
     setImage(dataUrl) {
-        this._image = dataUrl || null;
+        const newVal = dataUrl || null;
+        if (this._image === newVal) return;
+        this._image = newVal;
         this.emit('image:changed', this._image);
     }
 

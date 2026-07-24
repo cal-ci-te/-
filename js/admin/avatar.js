@@ -6,6 +6,7 @@ import { UI } from '../utils/ui-strings.js';
 export const AdminAvatar = {
   originalImage: null,
   _cropCallback: null,      // 裁剪确认后的回调 (dataUrl) => void
+  _cropCancelCallback: null, // 裁剪取消后的回调
   _cropAspectRatio: 1,      // 裁剪框宽高比，1=正方形(头像)，8/3=拼图
   _outputWidth: 200,        // 输出图片宽度（高度 = width / ratio）
   cropSelection: {
@@ -59,10 +60,12 @@ export const AdminAvatar = {
   },
 
   /** 通用裁剪入口：复用头像裁剪 UI，支持自定义宽高比和回调 */
-  openCustomCrop: function (file, aspectRatio, outputWidth, callback) {
+  openCustomCrop: function (file, aspectRatio, outputWidth, onConfirm, onCancel) {
     this._cropAspectRatio = aspectRatio || 1;
     this._outputWidth = outputWidth || 200;
-    this._cropCallback = callback || null;
+    this._cropCallback = onConfirm || null;
+    this._cropCancelCallback = onCancel || null;
+    this._lockCropOverlay = true;   // 拼图模式：点击遮罩不退出裁剪
     this.initCropModal(file);
   },
 
@@ -106,7 +109,7 @@ export const AdminAvatar = {
     if (overlay) {
       overlay.removeEventListener('click', this._overlayHandler);
       this._overlayHandler = function (e) {
-        if (e.target === overlay) {
+        if (e.target === overlay && !AdminAvatar._lockCropOverlay) {
           AdminAvatar.cancelCrop();
         }
       };
@@ -291,7 +294,6 @@ export const AdminAvatar = {
 
         const ratio = self._cropAspectRatio || 1;
         if (ratio !== 1) {
-          // 非正方形：以宽度为基准锁定宽高比
           sel.w = Math.max(20, Math.min(newW, canvasWidth - newX2));
           sel.h = Math.max(20, sel.w / ratio);
           if (sel.h > canvasHeight - newY2) {
@@ -346,9 +348,14 @@ export const AdminAvatar = {
     const sw = sel.w * scaleX;
     const sh = sel.h * scaleY;
 
-    previewCanvas.width = 80;
-    previewCanvas.height = 80;
-    ctx.drawImage(this.originalImage, sx, sy, sw, sh, 0, 0, 80, 80);
+    const ratio = this._cropAspectRatio || 1;
+    const pw = 120;
+    const ph = Math.round(pw / ratio);
+    previewCanvas.width = pw;
+    previewCanvas.height = ph;
+    previewCanvas.style.width = pw + 'px';
+    previewCanvas.style.height = ph + 'px';
+    ctx.drawImage(this.originalImage, sx, sy, sw, sh, 0, 0, pw, ph);
   },
 
   confirmCrop: function () {
@@ -400,10 +407,13 @@ export const AdminAvatar = {
   },
 
   cancelCrop: function () {
+    const onCancel = this._cropCancelCallback;
     this._cropCallback = null;
+    this._cropCancelCallback = null;
     this._cropAspectRatio = 1;
     this._outputWidth = 200;
+    this._lockCropOverlay = false;
     this._closeCropModal();
+    if (onCancel) onCancel();
   },
 };
-

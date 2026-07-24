@@ -2,7 +2,7 @@
 
 原创角色档案馆，一个带内容管理、贴纸装饰、水印保护、多主题切换的 Web 应用。
 
-当前版本：v1.12.1
+当前版本：v1.12.2
 
 ---
 
@@ -146,6 +146,41 @@ Docker 安全部署：进程降权（非 root）、端口默认仅绑定 localho
 多主题系统：CSS 变量驱动，三套主题动态加载。
 
 ## 更新日志
+
+### v1.12.2
+
+**拼图核心渲染重构 — 块背景像素直读 + 坐标系统一 + 缺口边界修复**：
+
+拼图块背景重构为 `ctx.getImageData` 直接从主 Canvas 读取缺口区域像素（替代之前三版方案：CSS `backgroundPosition` 符号/竞态、离屏 Canvas 坐标变换），**零计算偏差**。缺口/块的 CSS 位置改为与滑块相同的 `getBoundingClientRect` + `canvasScale` 方案，消除 Canvas 缩放或偏移时的坐标不一致。缺口边界计算改为 tabR 感知，防止小画布/大块时缺口溢出。
+
+- **块背景重建**：`_render()` 块层从「计算 imageSource → 离屏裁剪」改为 `ctx.getImageData(gx-tabR, gy-tabR)` 直读主 Canvas 已绘制的像素，`putImageData` 写入离屏 Canvas 后 `toDataURL` 作为 `backgroundImage`，`background-size: 100% 100%` 无对齐计算
+- **坐标系统一**：新增 `canvasOffLeft/Top`（`getBoundingClientRect` 差异）+ `canvasScale`（`clientWidth / canvas.width`），缺口/块的位置和尺寸统一乘以 `canvasScale`，与 `positionSlider` 完全一致
+- **缺口边界修复**：`_resetGapX` 动态计算 `tabR` 作为最小边距，`maxGap = canvasW - gapW - tabR`（替代硬编码 `100`/`200`）；新增 `_clampGapY` 确保缺口垂直不溢出
+- **_onRedraw 时序修复**：`_onRedraw` 移至 `importState` 之前设置，避免异步图片加载后重绘回调为 null
+- **_cachedImg onload 加固**：复用缓存 Image 对象时刷新 `onload` 绑定，确保 `_onRedraw` 始终被调用
+- **overhang 默认值**：`200` → `100`，滑块有效行程占比从 26% 提升至 34%，精度从 7.3px/单位降至 5.5px/单位
+
+### v1.12.1
+
+**拼图形状修复 + 贴纸持久化（修复 v1.10 Token 认证迁移引发的数据丢失）**：
+
+- **根因**：v1.10 将管理员认证从硬编码密码改为 Token 机制后，`auth_token` 存储在 `localStorage` 中。硬刷新（Ctrl+Shift+R）清空 `localStorage` → `requireAuth` 拦截 `PUT /api/decos/:id` → 贴纸位置数据永不到达服务器 → 再次硬刷新永久丢失
+- **贴纸持久化修复**：
+  - `DecoRepository.load()` 修复空数组 `[]`（truthy）误判为有效缓存，导致跳过服务器请求（`_cache.length > 0`）
+  - `_syncFromServerSilently()` 实际执行服务器数据合并：服务器有有效位置时采用，本地有位置但服务器为 null 时加入重试队列
+  - 新增 `_retryFailedSyncs()`：每次 `load()` 重试之前失败的 PUT
+  - `save()` 失败时将贴纸 ID 写入 `deco_sync_fail_queue`
+  - 贴纸两种状态均可持久化：未放置（`position: null`）和已放置
+  - `_renderSingleDeco` 增加 `document.body` 守卫，`module-registry.js` 渲染时序修复
+- **拼图模块修复**：
+  - 统一 `blockSize` 为块大小和缺口的唯一数据源，删除独立 `gapSize`
+  - `PuzzleRenderer` 下边/左边凸起 arc 方向 CCW→CW，修复向内凹陷 bug
+  - `_render()` 使用独立 `scaleX`/`scaleY` 修复 Y 轴偏移（Canvas CSS 与内部分辨率不同比）
+  - `_render()` 动态更新 DOM 块 `width`/`height`/`clipPath` 并统一乘 scale
+  - `PuzzleDrag.setBlockW`/`setOverhang` 自动重算 `_minThumbX`
+  - `setSize()` 同步更新 Canvas CSS 尺寸和轨道宽度
+  - `init()`/`load()`/`importState()` 全路径同步 blockSize 到渲染器和拖拽模块
+- **CSS**：`.puzzle-block` 移除硬编码 `width:72px;height:72px;border-radius:8px;border:1px`，改为 `box-sizing:border-box;border:none;border-radius:0`，由 JS 全权控制
 
 ### v1.12.0
 

@@ -14,7 +14,7 @@ export class Puzzle {
      * @param {number}  [options.width=480]
      * @param {number}  [options.height=180]
      * @param {number}  [options.blockSize=72]
-     * @param {number}  [options.overhang=200]
+     * @param {number}  [options.overhang=100]
      * @param {object|null} [options.position=null] — { x, y } | null = 流式模式
      * @param {string}  [options.image] — dataUrl
      * @param {string}  [options.storageKey='rv_puzzle_state']
@@ -73,6 +73,7 @@ export class Puzzle {
         this._slider = null;
         this._canvas = null;
         this._block = null;
+        this._gap = null;
         this._flash = null;
         this._hint = null;
         this._thumb = null;
@@ -103,6 +104,12 @@ export class Puzzle {
 
         console.log('[Puzzle] 开始初始化…');
 
+        // 注册图片异步加载完成后的重绘回调（必须在 importState/_render 之前设置，
+        // 否则 _drawBackgroundFromImage 创建 _cachedImg 时 _onRedraw 为 null）
+        this._renderer._onRedraw = () => {
+            if (!this._destroyed && this._canvas) this._render();
+        };
+
         // 从存储恢复
         if (this._state.getConfig().autoSave) {
             const saved = this._storage.load();
@@ -120,11 +127,6 @@ export class Puzzle {
                 this._drag.setOverhang(cfg.overhang);
             }
         }
-
-        // 注册图片异步加载完成后的重绘回调
-        this._renderer._onRedraw = () => {
-            if (!this._destroyed && this._canvas) this._render();
-        };
 
         this._buildDOM();
         console.log('[Puzzle] DOM 已构建 — widget:', !!this._widget, 'canvas:', !!this._canvas,
@@ -217,7 +219,6 @@ export class Puzzle {
         if (this._canvas) {
             this._canvas.width = width;
             this._canvas.height = height;
-            // 同步 CSS 显示尺寸，避免 Canvas CSS 与内部分辨率宽高比不一致
             const wrapper = this._canvas.parentElement;
             const maxW = wrapper ? wrapper.clientWidth : window.innerWidth;
             if (maxW < width) {
@@ -239,6 +240,7 @@ export class Puzzle {
         this._state.setOverhang(px);
         this._drag.setOverhang(px);
         this._drag.setGapX(this._renderer.gapX);
+        this._updateTrackLayout();
         return this;
     }
 
@@ -267,7 +269,6 @@ export class Puzzle {
         }
         if (partial.overhang !== undefined) {
             this.setOverhang(partial.overhang);
-            this._updateTrackLayout();
         }
         if (partial.blockSize !== undefined) {
             this._state.updateConfig({ blockSize: partial.blockSize });
@@ -281,13 +282,22 @@ export class Puzzle {
 
     /** 更新滑块轨道 DOM 宽度（blockSize/overhang 变化后调用） */
     _updateTrackLayout() {
-        if (!this._track) return;
+        if (!this._track || !this._canvas || !this._slider) return;
         const config = this._state.getConfig();
         const { width, blockSize, overhang } = config;
         const THUMB_W = 32;
+        const scale = this._drag._scale || 1;
         const minThumbX = -overhang + blockSize / 2 - THUMB_W / 2;
         const maxThumbX = width - blockSize + overhang + blockSize / 2 + THUMB_W / 2;
-        this._track.style.width = (maxThumbX - minThumbX) + 'px';
+        this._track.style.width = ((maxThumbX - minThumbX) * scale) + 'px';
+
+        // 同步滑块在 widget 内的位置（Canvas 像素 → CSS 像素 + 相对位移）
+        const cRect = this._canvas.getBoundingClientRect();
+        const wRect = this._widget ? this._widget.getBoundingClientRect() : { left: 0, top: 0 };
+        this._slider.style.left = (cRect.left - wRect.left + minThumbX * scale) + 'px';
+        this._slider.style.top = (cRect.bottom - wRect.top + 12) + 'px';
+
+        this._drag.setMinThumbX(minThumbX);
     }
 
     // ---- 图片 ----
@@ -314,8 +324,13 @@ export class Puzzle {
     load() {
         const data = this._storage.load();
         if (data) {
-            this.importState(data);      // Puzzle 层 importState：同步 blockSize 到 renderer + drag
-            this._drag.reset();          // 滑块归零
+            this.importState(data);
+            this._drag.reset();
+            // 延迟一帧：确保 DOM 布局完成后块背景与 Canvas 精确同步
+            if (typeof requestAnimationFrame !== 'undefined') {
+                const self = this;
+                requestAnimationFrame(() => { if (!self._destroyed) self._render(); });
+            }
         }
         return this;
     }
@@ -323,13 +338,36 @@ export class Puzzle {
     exportState() { return this._state.exportState(); }
     importState(data) {
         this._state.importState(data);
-        // 同步块大小到渲染器和拖拽模块（PuzzleState.importState 仅更新 state，不通知外层）
+        // 同步所有配置到渲染器、拖拽和 Canvas DOM（PuzzleState.importState 仅更新内部 state）
         const cfg = this._state.getConfig();
+        if (cfg.width !== undefined && cfg.height !== undefined) {
+            this._renderer.updateSize(cfg.width, cfg.height);
+            this._drag.setCanvasW(cfg.width);
+            if (this._canvas) {
+                this._canvas.width = cfg.width;
+                this._canvas.height = cfg.height;
+                const wrapper = this._canvas.parentElement;
+                const maxW = wrapper ? wrapper.clientWidth : window.innerWidth;
+                if (maxW < cfg.width) {
+                    const s = maxW / cfg.width;
+                    this._canvas.style.width = maxW + 'px';
+                    this._canvas.style.height = (cfg.height * s) + 'px';
+                } else {
+                    this._canvas.style.width = cfg.width + 'px';
+                    this._canvas.style.height = cfg.height + 'px';
+                }
+                this._drag.setScale((this._canvas.clientWidth / cfg.width) || 1);
+            }
+        }
         if (cfg.blockSize !== undefined) {
             this._renderer.setBlockSize(cfg.blockSize);
             this._drag.setBlockW(cfg.blockSize);
-            this._drag.setGapX(this._renderer.gapX);
         }
+        if (cfg.overhang !== undefined) {
+            this._drag.setOverhang(cfg.overhang);
+        }
+        this._drag.setGapX(this._renderer.gapX);
+        this._updateTrackLayout();
         this._render();
         return this;
     }
@@ -526,6 +564,7 @@ export class Puzzle {
             </div>
             <div class="puzzle-canvas-wrapper">
                 <canvas id="puzzleCanvas" width="${width}" height="${height}"></canvas>
+                <div id="puzzleGap" class="puzzle-gap"></div>
                 <div id="puzzleBlock" class="puzzle-block"></div>
                 <div id="puzzleFlash" class="puzzle-flash"></div>
             </div>`;
@@ -582,18 +621,27 @@ export class Puzzle {
         // 缓存 DOM 引用
         this._canvas = widget.querySelector('#puzzleCanvas');
         this._block = widget.querySelector('#puzzleBlock');
+        this._gap   = widget.querySelector('#puzzleGap');
         this._flash = widget.querySelector('#puzzleFlash');
         this._track = slider.querySelector('#puzzleTrack');
         this._thumb = slider.querySelector('#puzzleThumb');
         this._hint = slider.querySelector('#puzzleHint');
 
-        // ---- 拼图块异形裁剪 + 扩展尺寸（容纳凸起）----
-        if (this._block) {
+        // ---- 拼图块 + 缺口：共用同一形状数据源，确保视觉一致 ----
+        if (this._block || this._gap) {
             const shape = this._renderer.getBlockShape();
-            this._block.style.width  = shape.w + 'px';
-            this._block.style.height = shape.h + 'px';
-            this._block.style.clipPath = shape.clipPath;
-            this._block.style.webkitClipPath = shape.clipPath;
+            if (this._block) {
+                this._block.style.width  = shape.w + 'px';
+                this._block.style.height = shape.h + 'px';
+                this._block.style.clipPath = shape.clipPath;
+                this._block.style.webkitClipPath = shape.clipPath;
+            }
+            if (this._gap) {
+                this._gap.style.width  = shape.w + 'px';
+                this._gap.style.height = shape.h + 'px';
+                this._gap.style.clipPath = shape.clipPath;
+                this._gap.style.webkitClipPath = shape.clipPath;
+            }
         }
 
         // 重置按钮
@@ -647,14 +695,14 @@ export class Puzzle {
         const positionSlider = () => {
             const cRect = this._canvas.getBoundingClientRect();
             const wRect = this._widget.getBoundingClientRect();
+            const scale = this._drag._scale || 1;
             const overhangVal = overhang;
             const minThumbX = -overhangVal + blockSize / 2 - THUMB_W / 2;
             const maxThumbX = width - blockSize + overhangVal + blockSize / 2 + THUMB_W / 2;
-            const trackW = maxThumbX - minThumbX;
+            const trackW = (maxThumbX - minThumbX) * scale;
 
-            // slider 相对于 widget 定位：水平对齐 canvas，垂直在 canvas 下方 12px
             this._slider.style.position = 'absolute';
-            this._slider.style.left = (cRect.left - wRect.left + minThumbX) + 'px';
+            this._slider.style.left = (cRect.left - wRect.left + minThumbX * scale) + 'px';
             this._slider.style.top = (cRect.bottom - wRect.top + 12) + 'px';
             this._slider.style.zIndex = '91';
             this._track.style.width = trackW + 'px';
@@ -670,12 +718,13 @@ export class Puzzle {
         // 初始化 Drag（gapX 由 render 后同步，此处不预设）
         this._drag.setOverhang(overhang);
         this._drag.init(this._track, this._thumb, (blockX, isAligned) => {
+            // 同步渲染：块位置与滑块同源公式，无需 rAF 节流
             if (!this._drag._rafId) {
                 this._drag._rafId = requestAnimationFrame(() => {
-                    this._render(blockX);
                     this._drag._rafId = null;
                 });
             }
+            this._render(blockX);
             if (isAligned && !this._state.isCompleted()) {
                 this._state.setCompleted(true);
                 this._triggerFlash();
@@ -703,7 +752,7 @@ export class Puzzle {
         });
     }
 
-    /** 核心渲染 */
+    /** 核心渲染 — Canvas 仅画完整背景，缺口和拼图块均由 DOM 层渲染（同一数据源，浏览器一致性） */
     _render(blockXOverride) {
         if (!this._canvas) return;
 
@@ -712,51 +761,106 @@ export class Puzzle {
         const bgColor = this._getBgColor();
         const completed = this._state.isCompleted();
         const config = this._state.getConfig();
-        const gapY = this._renderer.gapY;   // 直接取自 renderer，确保与 Canvas 缺口位置一致
-        // 独立 X/Y 缩放：Canvas CSS 尺寸可能因 max-width 或 setSize 未调 scaleCanvas 而偏离内部分辨率
-        const scaleX = (this._canvas.clientWidth / config.width) || 1;
-        const scaleY = (this._canvas.clientHeight / config.height) || 1;
 
-        // Canvas 绘制
-        this._renderer.render(ctx, imageSrc, bgColor);
+        if (!this._renderer.gapX) this._renderer._resetGapX();
 
-        // DOM 拼图块
+        const gx = this._renderer.gapX;
+        const gy = this._renderer.gapY;
+
+        const blockX = blockXOverride !== undefined ? blockXOverride
+            : this._drag._mapValueToX ? this._drag._mapValueToX(this._drag._currentValue || 0) : 0;
+
+        // ---- Canvas 层：仅绘制完整背景（不做任何缺口/块裁剪）----
+        ctx.clearRect(0, 0, config.width, config.height);
+
+        if (imageSrc) {
+            const img = this._renderer._cachedImg;
+            const isLoaded = img && img._src === imageSrc && img.complete && img.naturalWidth > 0;
+            if (isLoaded) {
+                const info = this._renderer.getImageInfo();
+                ctx.drawImage(img, info.sx, info.sy, info.sw, info.sh);
+            } else {
+                this._renderer._drawBackgroundFromImage(ctx, imageSrc);
+            }
+        } else {
+            ctx.fillStyle = bgColor;
+            ctx.fillRect(0, 0, config.width, config.height);
+            this._renderer._drawMask(ctx);
+        }
+
+        // ---- DOM 层：缺口 + 拼图块，共用 getBlockShape() 保证形状一致 ----
+        const shape = this._renderer.getBlockShape();
+        const tabR = shape.tabR;
+
+        // 计算 Canvas 在定位父容器中的偏移和缩放（与 positionSlider 方案一致）
+        const cRect = this._canvas.getBoundingClientRect();
+        const wrapperEl = this._canvas.parentElement;
+        const wRect = wrapperEl ? wrapperEl.getBoundingClientRect() :
+            (this._widget ? this._widget.getBoundingClientRect() : { left: 0, top: 0 });
+        const canvasScale = (this._canvas.clientWidth / config.width) || 1;
+        const canvasOffLeft = cRect.left - wRect.left;
+        const canvasOffTop = cRect.top - wRect.top;
+
+        // 缺口层 — 定位在缺口位置，填充背景色形成"挖空"效果
+        if (this._gap) {
+            this._gap.style.width  = (shape.w * canvasScale) + 'px';
+            this._gap.style.height = (shape.h * canvasScale) + 'px';
+            this._gap.style.clipPath = shape.clipPath;
+            this._gap.style.webkitClipPath = shape.clipPath;
+            this._gap.style.left = (canvasOffLeft + (gx - tabR) * canvasScale) + 'px';
+            this._gap.style.top  = (canvasOffTop  + (gy - tabR) * canvasScale) + 'px';
+            this._gap.style.backgroundColor = bgColor;
+            this._gap.style.display = 'block';
+        }
+
+        // 拼图块层 — 直接从已绘制的主 Canvas 读取缺口区域像素，零计算偏差
         if (this._block) {
-            const blockX = blockXOverride !== undefined
-                ? blockXOverride
-                : this._drag._mapValueToX
-                    ? this._drag._mapValueToX(this._drag._currentValue || 0)
-                    : 0;
-
-            // 块扩展了 tabR 以容纳凸起，位置需向负方向偏移
-            const shape = this._renderer.getBlockShape();
-            const tabR = shape.tabR;
-            // 尺寸和位置统一使用独立 X/Y 缩放，确保 Canvas CSS≠内部尺寸时块与缺口同步
-            this._block.style.width  = (shape.w * scaleX) + 'px';
-            this._block.style.height = (shape.h * scaleY) + 'px';
+            this._block.style.width  = (shape.w * canvasScale) + 'px';
+            this._block.style.height = (shape.h * canvasScale) + 'px';
             this._block.style.clipPath = shape.clipPath;
             this._block.style.webkitClipPath = shape.clipPath;
-            this._block.style.left = ((blockX - tabR) * scaleX) + 'px';
-            this._block.style.top  = ((gapY - tabR) * scaleY) + 'px';
+            this._block.style.left = (canvasOffLeft + (blockX - tabR) * canvasScale) + 'px';
+            this._block.style.top  = (canvasOffTop  + (gy - tabR) * canvasScale) + 'px';
+            this._block.style.display = 'block';
 
             if (imageSrc) {
-                const info = this._renderer.getImageInfo();
-                const gapX = this._renderer.gapX;
-                if (info) {
-                    this._block.style.backgroundImage = 'url(' + imageSrc + ')';
-                    this._block.style.backgroundSize = (info.sw * scaleX) + 'px ' + (info.sh * scaleY) + 'px';
-                    this._block.style.backgroundPosition =
-                        ((info.sx - gapX + tabR) * scaleX) + 'px ' + ((info.sy - gapY + tabR) * scaleY) + 'px';
-                    this._block.style.backgroundColor = 'transparent';
+                // 主 Canvas 已绘制完整背景图（含缺口位置的图像内容），直接读取像素
+                const sx = Math.max(0, Math.floor(gx - tabR));
+                const sy = Math.max(0, Math.floor(gy - tabR));
+                const sw = Math.min(shape.w, config.width - sx);
+                const sh = Math.min(shape.h, config.height - sy);
+
+                if (sw > 0 && sh > 0) {
+                    try {
+                        const imageData = ctx.getImageData(sx, sy, sw, sh);
+                        const offCanvas = document.createElement('canvas');
+                        offCanvas.width = shape.w;
+                        offCanvas.height = shape.h;
+                        const offCtx = offCanvas.getContext('2d');
+                        offCtx.putImageData(imageData, 0, 0);
+                        this._block.style.backgroundImage = `url(${offCanvas.toDataURL()})`;
+                        this._block.style.backgroundSize = '100% 100%';
+                        this._block.style.backgroundPosition = '0 0';
+                        this._block.style.backgroundColor = '';
+                    } catch (e) {
+                        console.warn('[Puzzle] 无法从 Canvas 读取缺口像素:', e.message);
+                        this._block.style.backgroundImage = 'none';
+                        this._block.style.backgroundColor = this._renderer.lighten(bgColor, 0.15);
+                    }
                 } else {
-                    this._block.style.backgroundImage = '';
+                    this._block.style.backgroundImage = 'none';
                     this._block.style.backgroundColor = this._renderer.lighten(bgColor, 0.15);
                 }
             } else {
-                this._block.style.backgroundImage = '';
+                this._block.style.backgroundImage = 'none';
                 this._block.style.backgroundColor = this._renderer.lighten(bgColor, 0.15);
             }
-            this._block.classList.toggle('puzzle-block-aligned', completed);
+
+            if (completed) {
+                this._block.classList.add('puzzle-block-aligned');
+            } else {
+                this._block.classList.remove('puzzle-block-aligned');
+            }
         }
     }
 
@@ -832,5 +936,8 @@ export async function initPuzzle(arg1, arg2) {
         });
     }
 
-    return puzzle.init();
+    puzzle.init();
+    // 从 localStorage 恢复持久化状态（宽高/块大小/溢出/图片/完成状态）
+    puzzle.load();
+    return puzzle;
 }

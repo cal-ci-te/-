@@ -73,6 +73,17 @@
   box-sizing: border-box;     /* 确保 width/height 即最终渲染尺寸 */
 }
 
+/* ===== DOM 缺口层（覆盖在背景上方，用背景色填充形成"挖空"效果） ===== */
+.puzzle-gap {
+  position: absolute;
+  border-radius: 0;
+  border: none;
+  background: var(--color-bg-primary, #1a1612);  /* JS 可动态覆盖 */
+  z-index: 1;
+  pointer-events: none;
+  box-sizing: border-box;
+}
+
 .puzzle-block.puzzle-block-aligned {
   box-shadow: 0 2px 8px rgba(0,0,0,0.4), 0 0 18px rgba(255,215,0,0.5);
 }
