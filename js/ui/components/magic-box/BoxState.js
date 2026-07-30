@@ -1,14 +1,17 @@
-// 超现实箱子状态管理 — 位置、打开计数、上次物品 ID、自定义图片。
+// 超现实箱子状态管理 — 位置、打开计数、上次物品 ID、自定义图片（箱盖/箱体双部件）。
 // 持久化到 localStorage（键名 rv_box_data），变更后自动保存。
 const STORAGE_KEY = 'rv_box_data';
 
 /** 默认配置（第一次使用时的初始值） */
 const DEFAULTS = {
-  defaultX: null,         // number | null → null 表示用 CSS 默认（右下角）
+  defaultX: null,
   defaultY: null,
+  positionStyle: 'fixed',   // 'fixed'（贴纸模式/视口固定）| 'absolute'（悬浮窗/随页面滚动）
   count: 0,
-  lastItemId: null,       // 上次弹出的物品 ID，用于防连续重复
-  customImage: null,      // 自定义箱子外观 dataUrl，null = 使用默认 CSS 样式
+  lastItemId: null,
+  customLidImage: null,
+  customBodyImage: null,
+  itemImages: {},
 };
 
 export class BoxState {
@@ -27,13 +30,17 @@ export class BoxState {
     }
   }
 
-  /** 从 localStorage 加载状态并合并默认值 */
+  /** 从 localStorage 加载状态并合并默认值（兼容旧版 customImage 字段迁移） */
   load() {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) {
         const parsed = JSON.parse(raw);
-        // 合并：确保新增字段有默认值
+        // v1.16 → v1.16.1 迁移：旧 customImage 字段转存为 customBodyImage
+        if (parsed.customImage && !parsed.customBodyImage) {
+          parsed.customBodyImage = parsed.customImage;
+        }
+        delete parsed.customImage;
         this._data = { ...DEFAULTS, ...parsed };
       } else {
         this._data = { ...DEFAULTS };
@@ -74,6 +81,15 @@ export class BoxState {
     return this._data.defaultX !== null && this._data.defaultY !== null;
   }
 
+  // ---- 定位样式（fixed / absolute）----
+
+  getPositionStyle() { return this._data.positionStyle || 'fixed'; }
+
+  setPositionStyle(style) {
+    this._data.positionStyle = style === 'absolute' ? 'absolute' : 'fixed';
+    this._save();
+  }
+
   // ---- 计数器 ----
 
   getCount() { return this._data.count; }
@@ -97,17 +113,56 @@ export class BoxState {
     this._save();
   }
 
-  // ---- 自定义图片 ----
+  // ---- 箱盖/箱体自定义贴图 ----
 
-  getCustomImage() { return this._data.customImage; }
+  getCustomLidImage()  { return this._data.customLidImage; }
+  getCustomBodyImage() { return this._data.customBodyImage; }
 
-  setCustomImage(dataUrl) {
-    this._data.customImage = dataUrl || null;
+  setCustomLidImage(dataUrl) {
+    this._data.customLidImage = dataUrl || null;
     this._save();
   }
 
-  clearCustomImage() {
-    this._data.customImage = null;
+  setCustomBodyImage(dataUrl) {
+    this._data.customBodyImage = dataUrl || null;
+    this._save();
+  }
+
+  clearCustomLidImage() {
+    this._data.customLidImage = null;
+    this._save();
+  }
+
+  clearCustomBodyImage() {
+    this._data.customBodyImage = null;
+    this._save();
+  }
+
+  /** 是否有任何自定义箱体外观 */
+  hasCustomAppearance() {
+    return !!(this._data.customLidImage || this._data.customBodyImage);
+  }
+
+  // ---- 物品自定义贴图 ----
+
+  /** 获取指定物品的自定义贴图，无则返回 null */
+  getItemImage(itemId) {
+    return this._data.itemImages[itemId] || null;
+  }
+
+  /** 设置指定物品的自定义贴图 */
+  setItemImage(itemId, dataUrl) {
+    if (dataUrl) {
+      this._data.itemImages[itemId] = dataUrl;
+    } else {
+      delete this._data.itemImages[itemId];
+    }
+    this._save();
+  }
+
+  /** 清除所有物品自定义贴图 */
+  clearAllItemImages() {
+    this._data.itemImages = {};
     this._save();
   }
 }

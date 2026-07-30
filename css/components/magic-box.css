@@ -198,6 +198,15 @@
   filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
 }
 
+/* 物品自定义贴图（替换 Emoji 显示） */
+.magic-box-item-img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+  display: none;
+}
+
 .magic-box-item-label {
   font-family: var(--font-family-serif);
   font-size: 13px;
@@ -230,21 +239,39 @@
   transition: opacity 0.3s;
 }
 
-/* ====== 自定义图片层 ====== */
-.magic-box-custom-img {
+/* ====== 自定义贴图层（箱盖/箱体双部件） ====== */
+
+/* 箱盖贴图：嵌入 .magic-box-lid 内部，随 rotateX 旋转 */
+.magic-box-lid-custom-img {
   position: absolute;
-  top: -4px;
-  left: -4px;
-  width: 128px;
-  height: 108px;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 22px;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  border-radius: 8px;
-  z-index: 1;
+  border-radius: 4px 4px 0 0;
+  z-index: 0;
   pointer-events: none;
   display: none;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.35);
+  box-shadow: inset 0 2px 0 rgba(255,255,255,0.08);
+}
+
+/* 箱体贴图：嵌入 .magic-box-body 内部 */
+.magic-box-body-custom-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 0 0 6px 6px;
+  z-index: 0;
+  pointer-events: none;
+  display: none;
 }
 
 /* ====== 拖拽状态 ====== */
@@ -289,13 +316,13 @@
     height: 57px;
   }
 
-  .magic-box-custom-img {
-    width: 98px;
-    height: 83px;
-  }
-
   .magic-box-item-emoji {
     font-size: 28px;
+  }
+
+  .magic-box-item-img {
+    width: 36px;
+    height: 36px;
   }
 
   .magic-box-item-label {

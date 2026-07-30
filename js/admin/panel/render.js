@@ -215,6 +215,51 @@ AdminPanel.renderContent = function () {
         <!-- 拼图自定义 -->
         ${renderPuzzleEntry()}
 
+        <!-- 箱子外观自定义（箱盖 + 箱体双部件） -->
+        <div class="admin-control-group" style="border-top: 1px solid var(--color-border); padding-top: 12px; margin-top: 12px;">
+            <label>🧰 箱子外观 — 箱盖</label>
+            <div class="admin-button-group" style="margin-top: 6px;">
+                <button id="boxLidImageUploadBtn" data-action="upload-lid-image" style="background:var(--color-accent-dark);">📤 上传箱盖</button>
+                <button id="boxLidImageRemoveBtn" data-action="remove-lid-image" style="background:var(--color-danger);">🗑️ 恢复默认</button>
+                <input type="file" id="boxLidImageFileInput" accept="image/*" style="display:none;">
+            </div>
+            <div class="admin-avatar-hint">建议上传 120×22px 左右的图片。支持 PNG / JPEG / WebP</div>
+        </div>
+
+        <div class="admin-control-group" style="margin-top: 4px;">
+            <label>🧰 箱子外观 — 箱体</label>
+            <div class="admin-button-group" style="margin-top: 6px;">
+                <button id="boxBodyImageUploadBtn" data-action="upload-body-image" style="background:var(--color-accent-dark);">📤 上传箱体</button>
+                <button id="boxBodyImageRemoveBtn" data-action="remove-body-image" style="background:var(--color-danger);">🗑️ 恢复默认</button>
+                <input type="file" id="boxBodyImageFileInput" accept="image/*" style="display:none;">
+            </div>
+            <div class="admin-avatar-hint">建议上传 120×78px 左右的图片。支持 PNG / JPEG / WebP</div>
+        </div>
+
+        <!-- 箱子物品贴图自定义 -->
+        <div class="admin-control-group" style="margin-top: 8px;">
+            <label>🎁 物品贴图</label>
+            <div style="display:flex; gap:6px; align-items:center; margin-top:6px;">
+                <select id="boxItemSelect" style="flex:1; background:var(--color-bg-card); border:1px solid var(--color-border); color:var(--color-text-primary); padding:4px 8px; border-radius:4px; font-family:var(--font-family-base);">
+                    <option value="">— 选择物品 —</option>
+                    <option value="feather">🪶 一根白色羽毛</option>
+                    <option value="coin">🪙 一枚旧硬币</option>
+                    <option value="key">🗝️ 一把生锈的钥匙</option>
+                    <option value="note">📄 一张字条</option>
+                    <option value="sand">⏳ 一粒沙</option>
+                    <option value="thread">🧵 一颗纽扣</option>
+                    <option value="mirror">🪞 一面小镜子</option>
+                    <option value="void">🌫️ （什么都没有）</option>
+                </select>
+            </div>
+            <div class="admin-button-group" style="margin-top:6px;">
+                <button id="boxItemImageUploadBtn" data-action="upload-item-image" style="background:var(--color-accent-dark);">📤 上传贴图</button>
+                <button id="boxItemImageRemoveBtn" data-action="remove-item-image" style="background:var(--color-danger);">🗑️ 恢复 Emoji</button>
+                <input type="file" id="boxItemImageFileInput" accept="image/*" style="display:none;">
+            </div>
+            <div class="admin-avatar-hint">选择物品后上传自定义贴图，开箱时将显示贴图而非 Emoji</div>
+        </div>
+
         <!-- 退出登录 -->
         <button id="logoutBtn" data-action="logout" style="margin-top:12px;background:var(--color-danger);">${UI.admin.logoutButton}</button>
     `;
@@ -298,6 +343,48 @@ AdminPanel.renderContent = function () {
 
     // 拼图图片上传绑定（PuzzleCustomizer）
     bindPuzzleFileUpload();
+
+    // 箱盖外观文件上传绑定
+    const lidImgInput = document.getElementById('boxLidImageFileInput');
+    if (lidImgInput) {
+      if (AdminPanel._boxLidHandler) lidImgInput.removeEventListener('change', AdminPanel._boxLidHandler);
+      AdminPanel._boxLidHandler = async function (event) {
+        const file = event.target.files[0];
+        event.target.value = '';
+        if (!file) return;
+        const { handleLidImageFile } = await import('./handlers/magic-box.js');
+        handleLidImageFile(file);
+      };
+      lidImgInput.addEventListener('change', AdminPanel._boxLidHandler);
+    }
+
+    // 箱体外观文件上传绑定
+    const bodyImgInput = document.getElementById('boxBodyImageFileInput');
+    if (bodyImgInput) {
+      if (AdminPanel._boxBodyHandler) bodyImgInput.removeEventListener('change', AdminPanel._boxBodyHandler);
+      AdminPanel._boxBodyHandler = async function (event) {
+        const file = event.target.files[0];
+        event.target.value = '';
+        if (!file) return;
+        const { handleBodyImageFile } = await import('./handlers/magic-box.js');
+        handleBodyImageFile(file);
+      };
+      bodyImgInput.addEventListener('change', AdminPanel._boxBodyHandler);
+    }
+
+    // 箱子物品贴图文件上传绑定
+    const boxItemImgInput = document.getElementById('boxItemImageFileInput');
+    if (boxItemImgInput) {
+      if (AdminPanel._boxItemImageHandler) boxItemImgInput.removeEventListener('change', AdminPanel._boxItemImageHandler);
+      AdminPanel._boxItemImageHandler = async function (event) {
+        const file = event.target.files[0];
+        event.target.value = '';
+        if (!file) return;
+        const { handleItemImageFile } = await import('./handlers/magic-box.js');
+        handleItemImageFile(file);
+      };
+      boxItemImgInput.addEventListener('change', AdminPanel._boxItemImageHandler);
+    }
 
     AdminPanel._rendered = true;
 };

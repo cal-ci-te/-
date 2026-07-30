@@ -18,6 +18,7 @@ export class BoxDrag {
     this._onDragStart = callbacks.onDragStart || null;
     this._onDragMove = callbacks.onDragMove || null;
     this._onDragEnd = callbacks.onDragEnd || null;
+    this._onContextMenu = callbacks.onContextMenu || null;
     this._isAdmin = callbacks.isAdmin || (() => false);
 
     this._enabled = false;
@@ -54,6 +55,14 @@ export class BoxDrag {
     this._el.addEventListener('mousedown', this._onMouseDown);
     this._el.addEventListener('touchstart', this._onTouchStart, { passive: true });
 
+    // 右键菜单
+    this._onContextMenuHandler = function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (self._onContextMenu) self._onContextMenu(e.clientX, e.clientY);
+    };
+    this._el.addEventListener('contextmenu', this._onContextMenuHandler);
+
     this._enabled = true;
   }
 
@@ -66,6 +75,9 @@ export class BoxDrag {
       }
       if (this._onTouchStart) {
         this._el.removeEventListener('touchstart', this._onTouchStart);
+      }
+      if (this._onContextMenuHandler) {
+        this._el.removeEventListener('contextmenu', this._onContextMenuHandler);
       }
     }
     this._enabled = false;
@@ -82,10 +94,17 @@ export class BoxDrag {
     this._startX = clientX;
     this._startY = clientY;
 
-    // 读取当前元素位置（仅读取 left/top，兼容使用 left/top 定位）
+    // 读取当前元素实际视口位置（优先内联样式，回退 getBoundingClientRect 兼容 CSS right/bottom）
     const style = this._el ? this._el.style : {};
-    this._startLeft = parseFloat(style.left) || 0;
-    this._startTop = parseFloat(style.top) || 0;
+    let left = parseFloat(style.left);
+    let top = parseFloat(style.top);
+    if (isNaN(left) || isNaN(top)) {
+      const rect = this._el ? this._el.getBoundingClientRect() : { left: 0, top: 0 };
+      if (isNaN(left)) left = rect.left;
+      if (isNaN(top)) top = rect.top;
+    }
+    this._startLeft = left;
+    this._startTop = top;
 
     this._bindDocumentEvents();
   }
@@ -154,6 +173,8 @@ export class BoxDrag {
     this._onDragStart = null;
     this._onDragMove = null;
     this._onDragEnd = null;
+    this._onContextMenu = null;
+    this._onContextMenuHandler = null;
     this._isAdmin = null;
     this._el = null;
   }

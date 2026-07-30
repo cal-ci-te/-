@@ -1,104 +1,116 @@
-// 超现实箱子渲染层 — DOM 创建、3D 动画序列控制、计数器更新、自定义图片渲染。
-// 开箱动画时序通过 async/await + delay() 控制，CSS transition 驱动视觉效果。
+// 超现实箱子渲染层 — DOM 创建、3D 动画序列控制、计数器更新、双部件自定义贴图。
+// 箱盖和箱体各自拥有独立的贴图层，贴图层嵌入对应父元素内，随 3D 变换联动。
+import { UI } from '../../../utils/ui-strings.js';
 const DELAY = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-// 动画各阶段时长（毫秒）
 const TIMING = {
-  OPEN: 400,       // 开箱
-  ITEM_POP: 600,   // 物品弹出
-  SHOW: 1500,      // 展示停留
-  ITEM_RETRACT: 400, // 物品收回
-  CLOSE: 400,      // 关箱
+  OPEN: 400,
+  ITEM_POP: 600,
+  SHOW: 1500,
+  ITEM_RETRACT: 400,
+  CLOSE: 400,
 };
 
 export class BoxRenderer {
-  /**
-   * @param {import('./BoxState.js').BoxState} state
-   * @param {object} [options]
-   * @param {number} [options.defaultRight=30] — CSS 默认 right 值
-   * @param {number} [options.defaultBottom=30] — CSS 默认 bottom 值
-   */
   constructor(state, options = {}) {
     this._state = state;
     this._defaultRight = options.defaultRight || 30;
     this._defaultBottom = options.defaultBottom || 30;
 
-    // DOM 引用
     this._container = null;
     this._boxEl = null;
     this._lidEl = null;
+    this._bodyEl = null;
     this._itemEl = null;
     this._itemEmojiEl = null;
+    this._itemImgEl = null;
     this._itemLabelEl = null;
     this._itemMessageEl = null;
     this._countEl = null;
-    this._bodyEl = null;
+    this._customLidImgEl = null;
+    this._customBodyImgEl = null;
+    this._lidTopEl = null;
+    this._hingeEl = null;
+    this._lockEl = null;
 
     this._isAnimating = false;
     this._flyTimer = null;
   }
 
-  /** 是否正在播放动画（开箱或飞回） */
   get isAnimating() { return this._isAnimating; }
 
   // ======================
   //  DOM 创建
   // ======================
 
-  /** 创建并挂载箱子 DOM */
   mount() {
-    if (this._container) return; // 已挂载
-
-    const self = this;
+    if (this._container) return;
 
     // 容器
     const container = document.createElement('div');
     container.className = 'magic-box-container';
     container.id = 'magicBox';
 
-    // 自定义图片层（默认隐藏）
-    const customImg = document.createElement('div');
-    customImg.className = 'magic-box-custom-img';
-    container.appendChild(customImg);
-
-    // 箱子主体
     const box = document.createElement('div');
     box.className = 'magic-box';
 
-    // 箱盖
+    // ---- 箱盖（内嵌自定义贴图层 + CSS 外观层）----
     const lid = document.createElement('div');
     lid.className = 'magic-box-lid';
-    lid.innerHTML = '<div class="magic-box-lid-top"></div><div class="magic-box-hinge"></div>';
+
+    const lidImg = document.createElement('div');
+    lidImg.className = 'magic-box-lid-custom-img';
+    lid.appendChild(lidImg);
+
+    const lidTop = document.createElement('div');
+    lidTop.className = 'magic-box-lid-top';
+    lid.appendChild(lidTop);
+
+    const hinge = document.createElement('div');
+    hinge.className = 'magic-box-hinge';
+    lid.appendChild(hinge);
+
     box.appendChild(lid);
 
-    // 箱子身体（正面的装饰面板）
+    // ---- 箱体（内嵌自定义贴图层 + CSS 外观层）----
     const body = document.createElement('div');
     body.className = 'magic-box-body';
-    body.innerHTML = '<div class="magic-box-lock"></div>';
+
+    const bodyImg = document.createElement('div');
+    bodyImg.className = 'magic-box-body-custom-img';
+    body.appendChild(bodyImg);
+
+    const lock = document.createElement('div');
+    lock.className = 'magic-box-lock';
+    body.appendChild(lock);
+
     box.appendChild(body);
 
-    // 物品展示区
+    // ---- 物品展示区 ----
     const item = document.createElement('div');
     item.className = 'magic-box-item';
     const emojiEl = document.createElement('span');
     emojiEl.className = 'magic-box-item-emoji';
+    const imgEl = document.createElement('img');
+    imgEl.className = 'magic-box-item-img';
+    imgEl.style.display = 'none';
     const labelEl = document.createElement('span');
     labelEl.className = 'magic-box-item-label';
     const msgEl = document.createElement('span');
     msgEl.className = 'magic-box-item-message';
     item.appendChild(emojiEl);
+    item.appendChild(imgEl);
     item.appendChild(labelEl);
     item.appendChild(msgEl);
     box.appendChild(item);
 
-    // 计数器
+    // ---- 计数器 ----
     const count = document.createElement('div');
     count.className = 'magic-box-count';
-
     box.appendChild(count);
+
     container.appendChild(box);
 
-    // 确保 body 可用
     if (document.body) {
       document.body.appendChild(container);
     } else {
@@ -110,23 +122,24 @@ export class BoxRenderer {
     this._container = container;
     this._boxEl = box;
     this._lidEl = lid;
+    this._bodyEl = body;
     this._itemEl = item;
     this._itemEmojiEl = emojiEl;
+    this._itemImgEl = imgEl;
     this._itemLabelEl = labelEl;
     this._itemMessageEl = msgEl;
     this._countEl = count;
-    this._bodyEl = body;
-    this._customImgEl = customImg;
+    this._customLidImgEl = lidImg;
+    this._customBodyImgEl = bodyImg;
+    this._lidTopEl = lidTop;
+    this._hingeEl = hinge;
+    this._lockEl = lock;
 
-    // 应用初始位置
     this._applyInitialPosition();
-    // 应用自定义图片
-    this._applyCustomImage();
-    // 更新计数器文字
+    this._applyCustomImages();
     this._updateCountDisplay();
   }
 
-  /** 返回箱子根容器元素 */
   getElement() {
     return this._container;
   }
@@ -135,7 +148,6 @@ export class BoxRenderer {
   //  位置管理
   // ======================
 
-  /** 应用初始位置（从 state 读取，无自定义则用 CSS 右下角） */
   _applyInitialPosition() {
     if (!this._container) return;
     const x = this._state.getDefaultX();
@@ -146,10 +158,8 @@ export class BoxRenderer {
       this._container.style.right = 'auto';
       this._container.style.bottom = 'auto';
     }
-    // 否则保持 CSS 默认（right: 30px, bottom: 30px）
   }
 
-  /** 将箱子移动到指定位置（left/top），清除 transition 避免拖拽时触发动画 */
   moveTo(left, top) {
     if (!this._container) return;
     this._container.style.transition = 'none';
@@ -159,14 +169,12 @@ export class BoxRenderer {
     this._container.style.bottom = 'auto';
   }
 
-  /** 获取当前 left 和 top 像素值 */
   getCurrentPosition() {
     if (!this._container) return { left: 0, top: 0 };
     const rect = this._container.getBoundingClientRect();
     return { left: rect.left, top: rect.top };
   }
 
-  /** 获取 CSS 右下角默认位置对应的 left/top 坐标 */
   _getDefaultLeftTop() {
     if (!this._container) return { left: 0, top: 0 };
     const w = this._container.offsetWidth || 120;
@@ -177,12 +185,10 @@ export class BoxRenderer {
     };
   }
 
-  /** 飞回到默认位置（含弹簧动画），duration 后恢复交互 */
   flyToDefault(duration = 500) {
     if (!this._container) return;
     const self = this;
 
-    // 确定目标位置
     let targetLeft, targetTop;
     if (this._state.hasCustomPosition()) {
       targetLeft = this._state.getDefaultX();
@@ -194,8 +200,6 @@ export class BoxRenderer {
     }
 
     this._isAnimating = true;
-
-    // 开启 transition
     this._container.style.transition = `left ${duration}ms cubic-bezier(0.34, 1.56, 0.64, 1), top ${duration}ms cubic-bezier(0.34, 1.56, 0.64, 1)`;
     this._container.style.left = targetLeft + 'px';
     this._container.style.top = targetTop + 'px';
@@ -214,46 +218,50 @@ export class BoxRenderer {
   //  开箱动画序列
   // ======================
 
-  /**
-   * 播放完整开箱动画序列，共 5 阶段约 3.3 秒
-   * @param {{ emoji: string, label: string, message: string }} item — 物品数据
-   */
   async playOpenSequence(item) {
     if (!this._boxEl || this._isAnimating) return;
     this._isAnimating = true;
 
-    // 设置物品内容
-    this._itemEmojiEl.textContent = item.emoji;
+    const customItemImg = this._state.getItemImage(item.id);
+
+    if (customItemImg && this._itemImgEl) {
+      this._itemImgEl.src = customItemImg;
+      this._itemImgEl.style.display = '';
+      this._itemEmojiEl.style.display = 'none';
+    } else {
+      this._itemEmojiEl.textContent = item.emoji;
+      this._itemEmojiEl.style.display = '';
+      if (this._itemImgEl) this._itemImgEl.style.display = 'none';
+    }
     this._itemLabelEl.textContent = item.label;
     this._itemMessageEl.textContent = item.message;
 
-    // 阶段 1：开箱（0.4s）
     this._boxEl.classList.add('opening');
     await DELAY(TIMING.OPEN);
 
-    // 阶段 2：物品弹出（0.6s）
     this._itemEl.classList.add('popping');
     await DELAY(TIMING.ITEM_POP);
 
-    // 阶段 3：展示（1.5s）
     this._itemEl.classList.remove('popping');
     this._itemEl.classList.add('showing');
     await DELAY(TIMING.SHOW);
 
-    // 阶段 4：物品收回（0.4s）
     this._itemEl.classList.remove('showing');
     this._itemEl.classList.add('retracting');
     await DELAY(TIMING.ITEM_RETRACT);
 
-    // 阶段 5：关箱（0.4s）
     this._itemEl.classList.remove('retracting');
     this._boxEl.classList.remove('opening');
     this._boxEl.classList.add('closing');
     await DELAY(TIMING.CLOSE);
     this._boxEl.classList.remove('closing');
 
-    // 清理物品内容
     this._itemEmojiEl.textContent = '';
+    this._itemEmojiEl.style.display = '';
+    if (this._itemImgEl) {
+      this._itemImgEl.src = '';
+      this._itemImgEl.style.display = 'none';
+    }
     this._itemLabelEl.textContent = '';
     this._itemMessageEl.textContent = '';
 
@@ -266,43 +274,60 @@ export class BoxRenderer {
 
   _updateCountDisplay() {
     if (!this._countEl) return;
-    const cnt = this._state.getCount();
-    this._countEl.textContent = '已打开 ' + cnt + ' 次';
+    this._countEl.textContent = UI.magicBox.countFormat(this._state.getCount());
   }
 
-  /** 外部调用：刷新计数器文本 */
   refreshCount() {
     this._updateCountDisplay();
   }
 
   // ======================
-  //  自定义图片
+  //  自定义贴图（箱盖+箱体双部件）
   // ======================
 
-  _applyCustomImage() {
-    if (!this._customImgEl) return;
-    const img = this._state.getCustomImage();
-    if (img) {
-      this._customImgEl.style.backgroundImage = 'url(' + img + ')';
-      this._customImgEl.style.display = 'block';
-      // 隐藏默认 CSS 外观
-      if (this._bodyEl) this._bodyEl.style.opacity = '0';
-      if (this._lidEl) this._lidEl.style.opacity = '0';
-    } else {
-      this._customImgEl.style.backgroundImage = '';
-      this._customImgEl.style.display = 'none';
-      if (this._bodyEl) this._bodyEl.style.opacity = '';
-      if (this._lidEl) this._lidEl.style.opacity = '';
+  /** 应用箱盖和箱体的自定义贴图：有贴图则显示贴图层并隐藏对应 CSS 装饰，无则恢复 */
+  _applyCustomImages() {
+    // 箱盖贴图
+    const lidImg = this._state.getCustomLidImage();
+    if (lidImg && this._customLidImgEl) {
+      this._customLidImgEl.style.backgroundImage = 'url(' + lidImg + ')';
+      this._customLidImgEl.style.display = '';
+      if (this._lidTopEl) this._lidTopEl.style.opacity = '0';
+      if (this._hingeEl) this._hingeEl.style.opacity = '0';
+    } else if (this._customLidImgEl) {
+      this._customLidImgEl.style.backgroundImage = '';
+      this._customLidImgEl.style.display = 'none';
+      if (this._lidTopEl) this._lidTopEl.style.opacity = '';
+      if (this._hingeEl) this._hingeEl.style.opacity = '';
+    }
+
+    // 箱体贴图
+    const bodyImg = this._state.getCustomBodyImage();
+    if (bodyImg && this._customBodyImgEl) {
+      this._customBodyImgEl.style.backgroundImage = 'url(' + bodyImg + ')';
+      this._customBodyImgEl.style.display = '';
+      if (this._lockEl) this._lockEl.style.opacity = '0';
+    } else if (this._customBodyImgEl) {
+      this._customBodyImgEl.style.backgroundImage = '';
+      this._customBodyImgEl.style.display = 'none';
+      if (this._lockEl) this._lockEl.style.opacity = '';
     }
   }
 
-  /** 设置自定义图片并刷新渲染 */
-  setCustomImage(dataUrl) {
-    this._state.setCustomImage(dataUrl);
-    this._applyCustomImage();
+  setCustomLidImage(dataUrl) {
+    this._state.setCustomLidImage(dataUrl);
+    this._applyCustomImages();
   }
 
-  /** 设置拖拽状态下的抓取样式 */
+  setCustomBodyImage(dataUrl) {
+    this._state.setCustomBodyImage(dataUrl);
+    this._applyCustomImages();
+  }
+
+  // ======================
+  //  拖拽状态
+  // ======================
+
   setGrabbing(active) {
     if (!this._boxEl) return;
     if (active) {
@@ -312,7 +337,6 @@ export class BoxRenderer {
     }
   }
 
-  /** 管理员模式高亮提示 */
   setAdminHint(active) {
     if (!this._boxEl) return;
     if (active) {
@@ -333,12 +357,17 @@ export class BoxRenderer {
     this._container = null;
     this._boxEl = null;
     this._lidEl = null;
+    this._bodyEl = null;
     this._itemEl = null;
     this._itemEmojiEl = null;
+    this._itemImgEl = null;
     this._itemLabelEl = null;
     this._itemMessageEl = null;
     this._countEl = null;
-    this._bodyEl = null;
-    this._customImgEl = null;
+    this._customLidImgEl = null;
+    this._customBodyImgEl = null;
+    this._lidTopEl = null;
+    this._hingeEl = null;
+    this._lockEl = null;
   }
 }

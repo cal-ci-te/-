@@ -430,4 +430,35 @@ export const UI = {
         resetToDefault: '拼图已恢复为默认背景',
     },
 
+    magicBox: {
+        items: [
+            { id: 'feather', emoji: '🪶', label: '一根白色羽毛', message: '它轻得几乎不存在。' },
+            { id: 'coin',   emoji: '🪙', label: '一枚旧硬币',   message: '年份已经模糊不清。' },
+            { id: 'key',    emoji: '🗝️', label: '一把生锈的钥匙', message: '它不适合任何锁。' },
+            { id: 'note',   emoji: '📄', label: '一张字条',     message: '上面写着："你。"' },
+            { id: 'sand',   emoji: '⏳', label: '一粒沙',       message: '它来自一个你从未去过的海滩。' },
+            { id: 'thread', emoji: '🧵', label: '一颗纽扣',     message: '它被缝在什么东西上——但你不知道是什么。' },
+            { id: 'mirror', emoji: '🪞', label: '一面小镜子',   message: '镜子里没有人。' },
+            { id: 'void',   emoji: '🌫️', label: '（什么都没有）', message: '但箱子似乎更重了。' },
+        ],
+        countFormat: (n) => `已打开 ${n} 次`,
+        contextMenu: {
+            switchToAbsolute: '🔄 切换样式',
+            switchToFixed: '🔄 切换样式',
+        },
+        toast: {
+            uploadNotReady: '上传控件未就绪',
+            imageFormatOnly: '仅支持图片格式（PNG/JPEG/WebP）',
+            lidImageUpdated: '箱盖外观已更新',
+            bodyImageUpdated: '箱体外观已更新',
+            imageReadFailed: '图片读取失败',
+            lidImageRemoved: '已恢复默认箱盖',
+            bodyImageRemoved: '已恢复默认箱体',
+            selectItemFirst: '请先选择要自定义的物品',
+            selectItem: '请先选择物品',
+            itemImageUpdated: (label) => `物品 "${label}" 贴图已更新`,
+            itemImageRemoved: (label) => `物品 "${label}" 已恢复默认 Emoji`,
+        },
+    },
+
 };

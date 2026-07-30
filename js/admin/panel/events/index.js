@@ -42,6 +42,26 @@ const handlerMap = {
     const { handleOpenPuzzleCustomizer } = await import('../../puzzle/PuzzleCustomizer.js');
     handleOpenPuzzleCustomizer();
   },
+
+  // 超现实箱子自定义（箱盖+箱体双部件 + 物品贴图）
+  'upload-lid-image': function () {
+    import('../handlers/magic-box.js').then(function (m) { m.uploadLidImage(); });
+  },
+  'remove-lid-image': function () {
+    import('../handlers/magic-box.js').then(function (m) { m.removeLidImage(); });
+  },
+  'upload-body-image': function () {
+    import('../handlers/magic-box.js').then(function (m) { m.uploadBodyImage(); });
+  },
+  'remove-body-image': function () {
+    import('../handlers/magic-box.js').then(function (m) { m.removeBodyImage(); });
+  },
+  'upload-item-image': function () {
+    import('../handlers/magic-box.js').then(function (m) { m.uploadItemImage(); });
+  },
+  'remove-item-image': function () {
+    import('../handlers/magic-box.js').then(function (m) { m.removeItemImage(); });
+  },
 };
 
 // 注册到 AdminPanel

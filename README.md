@@ -2,7 +2,7 @@
 
 原创角色档案馆，一个带内容管理、贴纸装饰、水印保护、多主题切换的 Web 应用。
 
-当前版本：v1.16.0
+当前版本：v1.16.1
 
 ---
 
@@ -146,6 +146,23 @@ Docker 安全部署：进程降权（非 root）、端口默认仅绑定 localho
 多主题系统：CSS 变量驱动，三套主题动态加载。
 
 ## 更新日志
+
+### v1.16.1
+
+**超现实箱子 — 双部件贴图、拖拽修复、右键菜单、文案提取**：
+
+v1.16.0 的首次快速迭代，覆盖 6 项修复和 4 项增强。
+
+- **修复 — 首次拖拽跳原点**：`BoxDrag._startDrag()` 内联 `style.left` 为空时（CSS `right/bottom` 定位）`parseFloat("")` → `NaN` → 回退 0。改为 `getBoundingClientRect()` 获取真实视口坐标
+- **修复 — 管理员持久化失效**：`mount()` 在 `load()` 之前调用，`_applyInitialPosition()` 读到未加载的 `null` 坐标。交换顺序：先 `load()` 后 `mount()`
+- **修复 — 导入路径错误**：`BoxItemPool.js` 对 `utils/ui-strings.js` 的导入路径少一层（`../../` → `../../../`），导致整个模块链断裂、页面持续加载中
+- **修复 — absolute 模式拖拽范围**：`_clampPosition()` 对 fixed/absolute 两种模式均用 `window.innerWidth/Height`。absolute 模式改用 `documentElement.scrollWidth/Height`
+- **增强 — 双部件贴图**：箱子外观从单图覆盖重构为箱盖/箱体双部件独立贴图层，贴图层嵌入 `magic-box-lid`/`magic-box-body` 内，随 `rotateX` 旋转联动，开箱动画与自定义贴图共存
+- **增强 — 拖拽范围限制**：`onDragMove` 实时钳制 left/top，含底部计数器 28px 延伸，确保箱子不超出页面
+- **增强 — 右键菜单**：右键弹出单选项菜单（复用 `#deco-context-menu` 样式），支持 fixed ↔ absolute 切换，带视口↔文档坐标转换，状态持久化到 `positionStyle`
+- **增强 — BroadcastChannel 同步**：管理员拖拽设定新默认位置后广播 `magic_box_position_changed`，`broadcast-setup.js` 接收并同步到其他标签页
+- **增强 — 文案统一提取**：23 条硬编码中文文案（物品池 / 计数器 / 右键菜单 / Toast）全部移至 `UI.magicBox`，统一存储于 `js/utils/ui-strings.js`
+- **增强 — 旧数据兼容**：`BoxState.load()` 自动将旧版 `customImage` 字段迁移至 `customBodyImage`
 
 ### v1.16.0
 

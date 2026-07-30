@@ -1,39 +1,42 @@
-// 超现实箱子主控模块 — 组装 State / Renderer / Drag，管理完整交互生命周期。
-// 设计参照 Puzzle 类模式：构造注入 → init() 挂载 → 拖拽/点击双路分发 → destroy() 清理。
+// 超现实箱子主控模块 — 组装 State/Renderer/Drag，拖拽范围限制，右键菜单切换 fixed/absolute。
 import { BoxState } from './BoxState.js';
 import { BoxRenderer } from './BoxRenderer.js';
 import { BoxDrag } from './BoxDrag.js';
 import { pickItem } from './BoxItemPool.js';
+import { UI } from '../../../utils/ui-strings.js';
 import { AppState } from '../../../core/app-state.js';
 import { EventBus } from '../../../core/event-bus.js';
 import { EVENTS } from '../../../core/event-constants.js';
 
+// 拖拽边界：计数器底部伸出约 22px，左右各留 10px 边距
+const DRAG_MARGIN = 10;
+const BOTTOM_EXTRA = 28; // 计数器区域
+
 export class BoxManager {
   constructor() {
     this._state = new BoxState();
-    this._renderer = new BoxRenderer(this._state, {
-      defaultRight: 30,
-      defaultBottom: 30,
-    });
-    this._drag = null; // 在 mount 后创建
-
+    this._renderer = new BoxRenderer(this._state, { defaultRight: 30, defaultBottom: 30 });
+    this._drag = null;
+    this._ctxMenuEl = null;
     this._mounted = false;
-    this._interactive = true; // false 时禁止点击和拖拽（飞回动画期间）
+    this._interactive = true;
   }
 
-  /** 初始化：挂载 DOM → 绑定交互 → 加载持久化状态 */
+  // ======================
+  //  初始化
+  // ======================
+
   init() {
     if (this._mounted) return this;
 
-    // 挂载 DOM
+    this._state.load();
     this._renderer.mount();
     this._mounted = true;
 
-    // 加载持久化状态
-    this._state.load();
+    // 应用持久化的位置样式
+    this._applyPositionStyle(this._state.getPositionStyle());
     this._renderer.refreshCount();
 
-    // 创建拖拽处理器
     const el = this._renderer.getElement();
     const self = this;
 
@@ -41,42 +44,72 @@ export class BoxManager {
       onClick: function () { self._handleClick(); },
       onDragStart: function () { self._handleDragStart(); },
       onDragMove: function (dx, dy, newLeft, newTop) {
-        self._renderer.moveTo(newLeft, newTop);
+        const clamped = self._clampPosition(newLeft, newTop);
+        self._renderer.moveTo(clamped.left, clamped.top);
       },
       onDragEnd: function (finalLeft, finalTop, isAdmin) {
         self._handleDragEnd(finalLeft, finalTop, isAdmin);
       },
+      onContextMenu: function (x, y) { self._showContextMenu(x, y); },
       isAdmin: function () { return self._isAdmin(); },
     });
 
     this._drag.enable();
 
-    // 监听主题变更（用于刷新拼图背景等，当前箱子无依赖，预留）
     EventBus.on(EVENTS.AUTH_LOGGED_IN, () => {
-      console.log('[MagicBox] 管理员已登录，拖拽将设定新默认位置');
+      console.log('[MagicBox] 管理员已登录');
     });
     EventBus.on(EVENTS.AUTH_LOGGED_OUT, () => {
-      console.log('[MagicBox] 管理员已登出，拖拽将飞回默认位置');
+      console.log('[MagicBox] 管理员已登出');
     });
 
-    console.log('[MagicBox] 初始化完成 — 位置:', this._state.hasCustomPosition()
-      ? `自定义 (${this._state.getDefaultX()}, ${this._state.getDefaultY()})`
-      : 'CSS 右下角默认',
+    // 全局点击关闭右键菜单
+    document.addEventListener('click', function (e) {
+      if (self._ctxMenuEl && !e.target.closest('#magic-box-context-menu')) {
+        self._hideContextMenu();
+      }
+    });
+
+    console.log('[MagicBox] 初始化完成 — 样式:', this._state.getPositionStyle(),
+      '| 位置:', this._state.hasCustomPosition()
+        ? `自定义 (${this._state.getDefaultX()}, ${this._state.getDefaultY()})`
+        : 'CSS 右下角默认',
       '| 已打开:', this._state.getCount(), '次');
 
     return this;
   }
 
   // ======================
-  //  权限判断
+  //  权限
   // ======================
 
   _isAdmin() {
-    try {
-      return !!AppState.get('isLoggedIn');
-    } catch (e) {
-      return false;
-    }
+    try { return !!AppState.get('isLoggedIn'); } catch (e) { return false; }
+  }
+
+  // ======================
+  //  拖拽范围限制
+  // ======================
+
+  /** 钳制箱子位置：fixed 模式限视口，absolute 模式限文档 */
+  _clampPosition(left, top) {
+    const el = this._renderer.getElement();
+    if (!el) return { left, top };
+    const w = el.offsetWidth || 120;
+    const h = (el.offsetHeight || 100) + BOTTOM_EXTRA;
+
+    const isAbsolute = this._state.getPositionStyle() === 'absolute';
+    const maxLeft = isAbsolute
+      ? (document.documentElement.scrollWidth  || document.body.scrollWidth  || window.innerWidth)  - w - DRAG_MARGIN
+      : window.innerWidth  - w - DRAG_MARGIN;
+    const maxTop = isAbsolute
+      ? (document.documentElement.scrollHeight || document.body.scrollHeight || window.innerHeight) - h - DRAG_MARGIN
+      : window.innerHeight - h - DRAG_MARGIN;
+
+    return {
+      left: Math.max(DRAG_MARGIN, Math.min(left, maxLeft)),
+      top:  Math.max(DRAG_MARGIN, Math.min(top,  maxTop)),
+    };
   }
 
   // ======================
@@ -84,39 +117,122 @@ export class BoxManager {
   // ======================
 
   _handleClick() {
-    if (!this._interactive) return;
-    if (this._renderer.isAnimating) return;
-
+    if (!this._interactive || this._renderer.isAnimating) return;
     this._openBox();
   }
 
   _handleDragStart() {
     this._renderer.setGrabbing(true);
-
-    // 管理员拖拽时显示视觉提示
-    if (this._isAdmin()) {
-      this._renderer.setAdminHint(true);
-    }
+    if (this._isAdmin()) this._renderer.setAdminHint(true);
   }
 
   _handleDragEnd(finalLeft, finalTop, isAdmin) {
     this._renderer.setGrabbing(false);
     this._renderer.setAdminHint(false);
 
+    const clamped = this._clampPosition(finalLeft, finalTop);
+
     if (isAdmin) {
-      // 管理员：以拖拽终点为新默认位置，直接停留
-      this._state.setDefaultPosition(finalLeft, finalTop);
-      console.log('[MagicBox] 管理员设定新默认位置:', finalLeft, finalTop);
+      this._state.setDefaultPosition(clamped.left, clamped.top);
+      console.log('[MagicBox] 管理员设定新默认位置:', clamped.left, clamped.top);
+      try {
+        const c = new BroadcastChannel('revachol');
+        c.postMessage({ type: 'magic_box_position_changed', payload: { defaultX: clamped.left, defaultY: clamped.top } });
+        c.close();
+      } catch (e) { /* ignore */ }
     } else {
-      // 普通用户：飞回默认位置
       this._interactive = false;
       const self = this;
       this._renderer.flyToDefault(500);
-      // 飞回结束后恢复交互
-      setTimeout(function () {
-        self._interactive = true;
-      }, 520); // 略多于动画时长，确保 transition 结束
+      setTimeout(function () { self._interactive = true; }, 520);
     }
+  }
+
+  // ======================
+  //  右键菜单
+  // ======================
+
+  _showContextMenu(x, y) {
+    this._hideContextMenu();
+
+    const self = this;
+    const currentStyle = this._state.getPositionStyle();
+    const nextStyle = currentStyle === 'fixed' ? 'absolute' : 'fixed';
+    const label = currentStyle === 'fixed'
+      ? UI.magicBox.contextMenu.switchToAbsolute
+      : UI.magicBox.contextMenu.switchToFixed;
+
+    const menu = document.createElement('div');
+    menu.id = 'magic-box-context-menu';
+    menu.style.cssText =
+      'position:fixed;display:block;background:var(--color-bg-tertiary);border:1px solid var(--color-border);' +
+      'border-radius:4px;padding:4px 0;z-index:99999;min-width:150px;box-shadow:0 4px 20px rgba(0,0,0,0.5);';
+
+    const item = document.createElement('div');
+    item.className = 'ctx-item';
+    item.textContent = label;
+    item.style.cssText =
+      'padding:8px 16px;cursor:pointer;font-size:13px;color:var(--color-text-primary);' +
+      'font-family:var(--font-family-base);white-space:nowrap;transition:background 0.15s;';
+    item.addEventListener('mouseenter', function () { this.style.background = 'var(--color-hover)'; });
+    item.addEventListener('mouseleave', function () { this.style.background = ''; });
+    item.addEventListener('click', function () {
+      self._togglePositionStyle();
+      self._hideContextMenu();
+    });
+    menu.appendChild(item);
+    document.body.appendChild(menu);
+
+    // 定位：不超出视口
+    const winW = window.innerWidth, winH = window.innerHeight;
+    menu.style.left = Math.min(x, winW - 160) + 'px';
+    menu.style.top = Math.min(y, winH - 40) + 'px';
+
+    this._ctxMenuEl = menu;
+  }
+
+  _hideContextMenu() {
+    if (this._ctxMenuEl) {
+      this._ctxMenuEl.remove();
+      this._ctxMenuEl = null;
+    }
+  }
+
+  /** 切换 fixed ↔ absolute，带坐标转换 */
+  _togglePositionStyle() {
+    const oldStyle = this._state.getPositionStyle();
+    const newStyle = oldStyle === 'fixed' ? 'absolute' : 'fixed';
+    const el = this._renderer.getElement();
+    if (!el) return;
+
+    const rect = el.getBoundingClientRect();
+    const scrollX = window.scrollX || window.pageXOffset;
+    const scrollY = window.scrollY || window.pageYOffset;
+
+    let newLeft, newTop;
+    if (oldStyle === 'fixed' && newStyle === 'absolute') {
+      // fixed → absolute：视口坐标转文档坐标
+      newLeft = rect.left + scrollX;
+      newTop = rect.top + scrollY;
+    } else {
+      // absolute → fixed：文档坐标转视口坐标
+      newLeft = rect.left - scrollX;
+      newTop = rect.top - scrollY;
+    }
+
+    this._state.setPositionStyle(newStyle);
+    this._state.setDefaultPosition(newLeft, newTop);
+    this._applyPositionStyle(newStyle);
+    this._renderer.moveTo(newLeft, newTop);
+
+    console.log('[MagicBox] 切换定位:', oldStyle, '→', newStyle, '坐标:', newLeft, newTop);
+  }
+
+  /** 应用 positionStyle 到容器 DOM */
+  _applyPositionStyle(style) {
+    const el = this._renderer.getElement();
+    if (!el) return;
+    el.style.position = style;
   }
 
   // ======================
@@ -125,76 +241,50 @@ export class BoxManager {
 
   async _openBox() {
     const item = pickItem(this._state.getLastItemId());
-
-    // EventBus 通知（可选广播）
     EventBus.emit('box:opened', { item });
-
-    // 播放入场动画序列
     await this._renderer.playOpenSequence(item);
-
-    // 更新计数器
     this._state.incrementCount();
     this._state.setLastItemId(item.id);
     this._renderer.refreshCount();
-
-    // EventBus 通知物品已展示
     EventBus.emit('box:item-shown', { item, count: this._state.getCount() });
   }
 
   // ======================
-  //  公开 API（供管理面板调用）
+  //  公开 API
   // ======================
 
-  /** 设置自定义箱子图片 */
-  setCustomImage(dataUrl) {
-    this._renderer.setCustomImage(dataUrl);
-  }
+  setCustomLidImage(dataUrl)  { this._renderer.setCustomLidImage(dataUrl); }
+  setCustomBodyImage(dataUrl) { this._renderer.setCustomBodyImage(dataUrl); }
+  setItemImage(itemId, dataUrl) { this._state.setItemImage(itemId, dataUrl); }
+  getState() { return this._state.exportState(); }
 
-  /** 获取当前状态快照 */
-  getState() {
-    return this._state.exportState();
-  }
-
-  /** 重置计数器 */
   resetCount() {
     this._state.resetCount();
     this._renderer.refreshCount();
   }
 
-  /** 清除自定义位置，恢复 CSS 默认 */
   resetPosition() {
     this._state.clearPosition();
     this._renderer.flyToDefault(500);
   }
 
   destroy() {
-    if (this._drag) {
-      this._drag.destroy();
-      this._drag = null;
-    }
-    if (this._renderer) {
-      this._renderer.destroy();
-      this._renderer = null;
-    }
+    this._hideContextMenu();
+    if (this._drag) { this._drag.destroy(); this._drag = null; }
+    if (this._renderer) { this._renderer.destroy(); this._renderer = null; }
     this._state = null;
     this._mounted = false;
   }
 }
 
-// 单例工厂函数（与 initPuzzle 模式一致，便于 app.js 直接调用）
+// 单例工厂
 let _instance = null;
 
 export function initMagicBox() {
-  if (_instance) {
-    console.warn('[MagicBox] 已初始化，跳过');
-    return _instance;
-  }
+  if (_instance) { console.warn('[MagicBox] 已初始化，跳过'); return _instance; }
   _instance = new BoxManager();
   _instance.init();
   return _instance;
 }
 
-/** 获取当前实例（供外部模块引用） */
-export function getMagicBox() {
-  return _instance;
-}
+export function getMagicBox() { return _instance; }

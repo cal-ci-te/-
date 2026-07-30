@@ -28,6 +28,18 @@ export function setupBroadcastChannel() {
                     });
             } else if (type === 'draft_saved') {
                 console.log('[BroadcastChannel] 草稿保存（忽略）:', data.payload);
+            } else if (type === 'magic_box_position_changed') {
+                // 超现实箱子：其他标签页管理员拖拽更新了默认位置
+                const { defaultX, defaultY } = data.payload || {};
+                if (defaultX !== undefined && defaultY !== undefined) {
+                    import('../ui/components/magic-box/index.js').then(function (mod) {
+                        const box = mod.getMagicBox();
+                        if (box && box._state) {
+                            box._state.setDefaultPosition(defaultX, defaultY);
+                            console.log('[BroadcastChannel] 箱子默认位置已同步:', defaultX, defaultY);
+                        }
+                    });
+                }
             } else {
                 console.log('[BroadcastChannel] 未知消息类型:', type);
             }

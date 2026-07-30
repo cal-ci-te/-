@@ -149,6 +149,11 @@ h1 { color: var(--color-text-heading) !important; }
 #deco-context-menu .ctx-item { color: var(--color-text-primary) !important; }
 #deco-context-menu .ctx-item:hover { background: var(--color-hover) !important; }
 
+/* ===== 箱子右键菜单 ===== */
+#magic-box-context-menu { background: var(--color-bg-secondary) !important; border-color: var(--color-border) !important; }
+#magic-box-context-menu .ctx-item { color: var(--color-text-primary) !important; }
+#magic-box-context-menu .ctx-item:hover { background: var(--color-hover) !important; }
+
 /* ===== 位置控件按钮主题色 ===== */
 .pos-mode-enter { background: var(--color-accent-dark) !important; color: var(--color-text-accent) !important; }
 .pos-mode-save   { background: var(--color-success) !important; color: var(--color-text-accent) !important; }
