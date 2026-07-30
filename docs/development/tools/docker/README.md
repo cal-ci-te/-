@@ -43,7 +43,7 @@ docker compose logs -f
 ### 端口被占用
 
 ```bash
-# [REVIEW] Windows 查看端口占用
+# Windows 查看端口占用
 netstat -ano | findstr :3000
 
 # 修改 docker-compose.yml 中端口映射

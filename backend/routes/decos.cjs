@@ -1,7 +1,7 @@
 // 贴图路由：元数据存 SQLite，图片文件通过 StorageService 独立存储。
 // GET /api/decos/:id/image 直接从适配器读取二进制返回，不经过 JSON 序列化。
 // 写操作（PUT/DELETE）通过 requireAuth 包装器保护，GET 保持公开。
-const { send, json } = require('../enhance.cjs'); 
+const { send, sendError, json } = require('../enhance.cjs'); 
 const { storage } = require('../storage/index.cjs');
 const dbModule = require('../db.cjs');
 const { broadcast } = require('../websocket.cjs');
@@ -25,7 +25,7 @@ function registerDecoRoutes(GET, PUT, DELETE) {
             send(res, result);
         } catch (err) {
             console.error('[GET /api/decos] 错误:', err);
-            send(res, { error: err.message }, 500);
+            sendError(res, 500, err.message);
         }
     });
 
@@ -37,7 +37,7 @@ function registerDecoRoutes(GET, PUT, DELETE) {
             const row = dbModule.query('SELECT image_path FROM decos WHERE id = ?', [id]);
             if (!row || !row.image_path) {
                 console.log('[GET /api/decos/:id/image] ❌ 图片不存在, ID:', id);
-                send(res, { error: 'Image not found' }, 404);
+                sendError(res, 404, 'Image not found');
                 return;
             }
 
@@ -67,7 +67,7 @@ function registerDecoRoutes(GET, PUT, DELETE) {
             }
 
             console.log('[GET /api/decos/:id/image] ❌ 图片不存在, ID:', id);
-            send(res, { error: 'Image not found' }, 404);
+            sendError(res, 404, 'Image not found');
         } catch (err) {
             console.error('[GET /api/decos/:id/image] ❌ 获取图片错误:', err);
             res.writeHead(500);
@@ -83,7 +83,7 @@ function registerDecoRoutes(GET, PUT, DELETE) {
         // 验证 id
         if (!id) {
             console.log('[PUT /api/decos/:id] ❌ id 为空');
-            send(res, { error: 'Missing id' }, 400);
+            sendError(res, 400, 'Missing id');
             return;
         }
 
@@ -95,7 +95,7 @@ function registerDecoRoutes(GET, PUT, DELETE) {
             
             if (!existing) {
                 console.log('[PUT /api/decos/:id] ❌ 贴图不存在');
-                send(res, { error: 'Deco not found' }, 404);
+                sendError(res, 404, 'Deco not found');
                 return;
             }
 
@@ -154,7 +154,7 @@ function registerDecoRoutes(GET, PUT, DELETE) {
                     console.log('[PUT /api/decos/:id] image_path 更新为:', result.key);
                 } catch (err) {
                     console.error('[PUT /api/decos/:id] ❌ 图片处理失败:', err);
-                    send(res, { error: 'Image processing failed: ' + err.message }, 500);
+                    sendError(res, 500, 'Image processing failed: ' + err.message);
                     return;
                 }
             }
@@ -162,7 +162,7 @@ function registerDecoRoutes(GET, PUT, DELETE) {
             // 4. 检查是否有字段需要更新
             if (fields.length === 0) {
                 console.log('[PUT /api/decos/:id] ⚠️ 没有字段需要更新');
-                send(res, { error: 'No fields to update' }, 400);
+                sendError(res, 400, 'No fields to update');
                 return;
             }
 
@@ -177,7 +177,7 @@ function registerDecoRoutes(GET, PUT, DELETE) {
             
             if (result.changes === 0) {
                 console.log('[PUT /api/decos/:id] ⚠️ 没有行被更新');
-                send(res, { error: 'Deco not found or no changes' }, 404);
+                sendError(res, 404, 'Deco not found or no changes');
                 return;
             }
 
@@ -223,7 +223,7 @@ function registerDecoRoutes(GET, PUT, DELETE) {
             console.log('[DELETE /api/decos/:id] 删除结果:', result);
 
             if (result.changes === 0) {
-                send(res, { error: 'Deco not found' }, 404);
+                sendError(res, 404, 'Deco not found');
                 return;
             }
 
@@ -231,7 +231,7 @@ function registerDecoRoutes(GET, PUT, DELETE) {
             send(res, { success: true });
         } catch (err) {
             console.error('[DELETE /api/decos/:id] 错误:', err);
-            send(res, { error: err.message }, 500);
+            sendError(res, 500, err.message);
         }
     }));
 }

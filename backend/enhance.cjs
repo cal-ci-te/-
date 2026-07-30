@@ -8,6 +8,20 @@ function send(res, data, status = 200) {
     res.end(JSON.stringify(data));
 }
 
+/**
+ * 统一错误响应格式
+ * 前后端约定：所有错误响应均为 { error: string, code?: string }
+ * @param {object} res
+ * @param {number} statusCode
+ * @param {string} message
+ * @param {string|null} code - 可选错误码（便于前端分类处理）
+ */
+function sendError(res, statusCode, message, code = null) {
+    const payload = { error: message };
+    if (code) payload.code = code;
+    send(res, payload, statusCode);
+}
+
 function json(req) {
     return new Promise((resolve, reject) => {
         let body = '';
@@ -53,4 +67,4 @@ function match(method, pathname) {
     return null;
 }
 
-module.exports = { send, json, GET, POST, PUT, DELETE, match, routes };
+module.exports = { send, sendError, json, GET, POST, PUT, DELETE, match, routes };

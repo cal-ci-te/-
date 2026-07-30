@@ -4,12 +4,14 @@
 export const EventBus = {
   _events: {},
 
+  // 登记事件
   on(eventName, callback) {
     if (!this._events[eventName]) this._events[eventName] = [];
     this._events[eventName].push(callback);
     return this;
   },
 
+  // 取消登记事件
   off(eventName, callback) {
     if (!this._events[eventName]) return this;
     if (callback) {
