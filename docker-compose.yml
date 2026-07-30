@@ -31,6 +31,36 @@ services:
       - backend
     restart: unless-stopped
 
+  # ============================================================
+  # Playwright E2E 测试容器
+  # 依赖 backend + frontend 就绪，运行测试后自动退出
+  # 用法：
+  #   docker compose run --rm playwright-tests              # 运行测试
+  #   docker compose run --rm playwright-tests --archive     # 运行测试 + 归档
+  #   docker compose build playwright-tests                  # 仅构建镜像
+  # ============================================================
+  playwright-tests:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    depends_on:
+      backend:
+        condition: service_started
+      frontend:
+        condition: service_started
+    volumes:
+      # 测试结果持久化到宿主机
+      - ./playwright-report:/app/playwright-report
+      - ./test-results:/app/test-results
+      - ./run-history:/app/run-history
+    environment:
+      - CI=true
+      - BASE_URL=http://frontend:3000
+    # 测试容器是一次性的，完成后自动退出
+    restart: "no"
+    # 默认运行 Docker 专用配置
+    command: ["npx", "playwright", "test", "--config", "e2e-tests/playwright.docker.config.js"]
+
 volumes:
   revachol_data:
   revachol_uploads:

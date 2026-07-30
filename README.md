@@ -2,7 +2,7 @@
 
 原创角色档案馆，一个带内容管理、贴纸装饰、水印保护、多主题切换的 Web 应用。
 
-当前版本：v1.12.2
+当前版本：v1.13.0
 
 ---
 
@@ -70,7 +70,7 @@
 部署：Docker Compose（镜像加速、非 root 运行、端口安全绑定）
 存储：本地文件系统 / S3 兼容对象存储（适配器模式切换）
 监控：ErrPulse
-测试：Vitest + jsdom
+测试：Vitest + jsdom（单元）、Playwright（端到端）、playwright-archive（历史报告）
 
 ---
 
@@ -146,6 +146,33 @@ Docker 安全部署：进程降权（非 root）、端口默认仅绑定 localho
 多主题系统：CSS 变量驱动，三套主题动态加载。
 
 ## 更新日志
+
+### v1.13.0
+
+**E2E 测试体系 + 单元测试补全 + Docker 测试容器化**：
+
+- **Playwright 端到端测试**：
+  - 新增 `playwright.config.js`，仅使用 Chromium，支持 local/CI 双模式
+  - 测试套件覆盖 7 个功能域：冒烟（首页可访问性）、认证（登录/登出/Token 验证）、文章 CRUD（创建/编辑/删除/可见性）、贴纸管理（上传/更新/删除）、主题切换（暗色/亮色/低保真）、目录树（折叠/展开/搜索）、站点设置（读取/修改/权限验证）
+  - 登录态复用机制：`auth.setup.js` 通过 API 获取 Token → `storageState` 保存 → 其他测试项目通过 `dependencies: ['setup']` 继承，避免重复登录
+  - 集成 playwright-archive：测试报告自动归档到 `run-history/`，支持历史仪表盘（`http://localhost:3200`）
+  - webServer 优化：从 `isCI ? undefined` 改为始终配置 `reuseExistingServer`，本地/Docker/CI 三环境零配置切换
+  - 归档脚本重构：`test:e2e`（纯测试） | `test:e2e:archive`（仅归档） | `test:e2e:ci`（测试→通过才归档），消灭 `|| exit 0` 吞噬失败信号问题
+- **单元测试补全**（5 个模块，97 个用例）：
+  - `tests/unit/auth.test.js`：generateToken / verifyToken / revokeToken / requireAuth / requireRole / optionalAuth / compose，含完整 req/res mock 与集成测试
+  - `tests/unit/app-state.test.js`：commit() API 全覆盖（19 种 mutation + SET_KEY + 订阅者通知 + reset + snapshot）
+  - `tests/unit/api-client.test.js`：GET/POST/PUT/DELETE + FormData + 拦截器链 + 超时 408
+  - `tests/unit/function.test.js`：debounce / throttle（fake timers + this 绑定 + 参数验证）
+  - `tests/unit/event-bus.test.js`：补充 emit 无数据/once+on 混用/off 不存在回调/错误恢复 等边界
+- **Docker 测试容器**：
+  - 新增 `Dockerfile.test`：基于 `mcr.microsoft.com/playwright:v1.48.0-noble` 官方镜像（预装 Chromium + 系统依赖），三层 COPY 缓存优化，`pwuser` 非 root 运行
+  - `docker-compose.yml` 新增 `playwright-tests` 服务：依赖 backend + frontend，bind mount 持久化报告，一次性运行自动退出
+  - `e2e-tests/playwright.docker.config.js`：Docker 专用配置（60s 超时、始终无头、录像开启、webServer: undefined）
+  - `scripts/run-e2e-in-docker.sh`：一键脚本（检查 Docker → 启动依赖 → 等待就绪 → 运行测试 → 归档报告）
+  - npm 脚本：`test:e2e:docker` | `test:e2e:docker:build` | `test:e2e:docker:ci`
+- **文档**：
+  - `e2e-tests/README.md`：测试文件结构、命令速查、登录态机制说明、编写指南、CI 集成
+  - `e2e-tests/DOCKER-README.md`：Docker 测试架构、调试指南、常见问题
 
 ### v1.12.2
 
@@ -440,7 +467,9 @@ sql.js 参数绑定 Bug 排查（历时最长修复）：
 
 ## 后续计划
 
-补充 UI 自动化测试
+文章全文搜索
+
+多语言支持
 
 文章全文搜索
 

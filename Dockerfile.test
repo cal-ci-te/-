@@ -1,0 +1,44 @@
+# ============================================================
+# REVACHOL Playwright E2E 测试容器镜像
+# 基于微软官方 Playwright 镜像（已预装 Chromium + 系统依赖）
+# ============================================================
+
+FROM mcr.microsoft.com/playwright:v1.48.0-noble
+
+# Playwright 官方镜像默认用户为 pwuser (UID 1000)
+# 构建阶段以 root 运行以安装依赖，运行阶段切回 pwuser
+USER root
+
+WORKDIR /app
+
+# ---- 第 1 层：安装 Node.js 依赖（利用缓存） ----
+COPY package.json package-lock.json ./
+# 需要安装 devDependencies（@playwright/test, playwright-archive 等）
+RUN npm install
+
+# ---- 第 2 层：复制项目源码和配置 ----
+COPY js/           ./js/
+COPY css/          ./css/
+COPY backend/      ./backend/
+COPY e2e-tests/    ./e2e-tests/
+COPY tests/        ./tests/
+COPY index.html    ./
+COPY article-editor.html ./
+COPY vite.config.js    ./
+COPY vitest.config.js  ./
+COPY playwright.config.js ./
+
+# ---- 第 3 层：创建报告输出目录 ----
+RUN mkdir -p /app/playwright-report /app/test-results /app/run-history \
+    && chown -R pwuser:pwuser /app
+
+# ---- 运行时配置 ----
+ENV CI=true
+ENV BASE_URL=http://frontend:3000
+# 后端 API 通过 Vite 代理转发，测试容器直接访问前端容器
+
+# 切换到非 root 用户（Playwright 官方镜像内置 pwuser）
+USER pwuser
+
+# 默认命令：运行测试
+CMD ["npx", "playwright", "test", "--config", "playwright.docker.config.js"]
