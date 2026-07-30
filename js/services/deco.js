@@ -491,6 +491,35 @@ export const DecoShelf = {
     Utils.showToast(UI.deco.editCancelled, false);
   },
 
+  /** 应用贴纸自定义尺寸（width/height 或 scaleX/scaleY transform） */
+  _applyDecoSize: function (el, item) {
+    const pos = item.position;
+    if (!pos) {
+      el.style.width = 'auto';
+      el.style.height = 'auto';
+      el.style.transform = '';
+      return;
+    }
+    const hasCustomSize = (pos.width && pos.width !== 'auto') || (pos.height && pos.height !== 'auto');
+    const hasScale = pos.scaleX !== undefined || pos.scaleY !== undefined;
+    if (hasScale) {
+      el.style.width = (pos.width || 100) + 'px';
+      el.style.height = (pos.height || 100) + 'px';
+      el.style.transform = 'scale(' + (pos.scaleX || 1) + ', ' + (pos.scaleY || 1) + ')';
+      el.style.transformOrigin = 'top left';
+      el._scaleX = pos.scaleX || 1;
+      el._scaleY = pos.scaleY || 1;
+    } else if (hasCustomSize) {
+      el.style.width = (typeof pos.width === 'number' ? pos.width + 'px' : pos.width) || 'auto';
+      el.style.height = (typeof pos.height === 'number' ? pos.height + 'px' : pos.height) || 'auto';
+      el.style.transform = '';
+    } else {
+      el.style.width = 'auto';
+      el.style.height = 'auto';
+      el.style.transform = '';
+    }
+  },
+
   _renderAllDecos: function () {
     // 遍历贴纸，原地更新已有位置的元素，不需删除重建
     this._library.forEach((item) => {
@@ -540,13 +569,23 @@ export const DecoShelf = {
       existing.style.left = item.position.left || 'auto';
       existing.style.bottom = item.position.bottom || 'auto';
       existing.style.right = item.position.right || 'auto';
-      existing.style.width = item.position.width || 'auto';
-      existing.style.height = item.position.height || 'auto';
+      // 支持自定义尺寸（贴纸缩放功能）
+      this._applyDecoSize(existing, item);
       const imgSrc = item.dataUrl || item.url;
       if (imgSrc) {
         existing.style.backgroundImage = 'url(' + imgSrc + ')';
       }
       existing.title = item.name + ' (' + posStyle + ')';
+      // 确保 pointer-events 和右键菜单事件（修复首次放置/刷新后右键无响应）
+      existing.style.pointerEvents = 'auto';
+      if (!existing._contextMenuBound) {
+        existing.addEventListener('contextmenu', function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          EventBus.emit(EVENTS.DECO_CONTEXT_MENU, { decoId: id, x: e.clientX, y: e.clientY });
+        });
+        existing._contextMenuBound = true;
+      }
       return;
     }
 
@@ -558,8 +597,8 @@ export const DecoShelf = {
     el.style.left = item.position.left || 'auto';
     el.style.bottom = item.position.bottom || 'auto';
     el.style.right = item.position.right || 'auto';
-    el.style.width = item.position.width || 'auto';
-    el.style.height = item.position.height || 'auto';
+    // 支持自定义尺寸（贴纸缩放功能）
+    this._applyDecoSize(el, item);
     const imgSrc = item.dataUrl || item.url;
     if (imgSrc) {
       el.style.backgroundImage = 'url(' + imgSrc + ')';

@@ -1,0 +1,86 @@
+/* ============================================
+   贴纸缩放功能样式 — deco-resize.css
+   使用 CSS 变量与三套主题兼容
+   ============================================ */
+
+/* 缩放模式下的高亮边框 */
+.deco-resizing {
+    outline: 2px dashed var(--color-accent, #c47a44);
+    outline-offset: 4px;
+    z-index: 99 !important;
+    transition: outline 0.2s;
+}
+
+/* 缩放控制点 */
+.deco-resize-handle {
+    position: absolute;
+    bottom: -10px;
+    right: -10px;
+    width: 20px;
+    height: 20px;
+    cursor: nwse-resize;
+    background: var(--color-accent, #c47a44);
+    border: 2px solid var(--color-bg-primary, #1a1612);
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    z-index: 101;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.deco-resize-handle:hover {
+    transform: scale(1.2);
+}
+
+.deco-resize-handle::after {
+    content: '◢';
+    font-size: 10px;
+    color: var(--color-bg-primary, #1a1612);
+    line-height: 1;
+}
+
+/* 缩放工具栏 */
+.resize-toolbar {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--color-bg-secondary, #2a2520);
+    padding: 12px 24px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    z-index: 1000;
+    border: 1px solid var(--color-border, #444);
+}
+
+.resize-toolbar span {
+    color: var(--color-text-primary, #f0ece6);
+    font-size: 14px;
+}
+
+.resize-toolbar .admin-btn {
+    padding: 6px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    font-family: inherit;
+}
+
+.resize-toolbar .admin-btn.primary {
+    background: #4caf50;
+    color: #fff;
+}
+
+.resize-toolbar .admin-btn.danger {
+    background: #f44336;
+    color: #fff;
+}
+
+.resize-toolbar .admin-btn:hover {
+    opacity: 0.85;
+}

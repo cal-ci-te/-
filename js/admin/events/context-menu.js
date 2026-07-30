@@ -1,5 +1,6 @@
 //自定义右键菜单（修复切换样式，移除对 AdminAssetEvents 的直接依赖） ==========
 import { DecoShelf } from '../../services/deco.js';
+import { DecoResize } from '../../services/deco-resize.js';
 import { Utils } from '../../utils.js';
 import { EventBus } from '../../core/event-bus.js';
 import { EVENTS } from '../../core/event-constants.js';
@@ -22,6 +23,8 @@ export const ContextMenu = {
             <div class="ctx-item" data-action="paste">${UI.deco.menuPaste}</div>
             <div class="ctx-item" data-action="rename">${UI.deco.menuRename}</div>
             <div class="ctx-item" data-action="edit-pos">${UI.deco.menuEditPos}</div>
+            <div class="ctx-item" data-action="resize">${UI.deco.menuResize}</div>
+            <div class="ctx-item" data-action="reset-size">${UI.deco.menuResetSize}</div>
             <div class="ctx-item" data-action="toggle-style">${UI.deco.menuToggleStyle}</div>
             <div class="ctx-item" data-action="remove-page">${UI.deco.menuRemovePage}</div>
             <div class="ctx-item" data-action="delete-lib" style="color:var(--color-error);">${UI.deco.menuDeleteLib}</div>
@@ -61,7 +64,7 @@ export const ContextMenu = {
     const winW = window.innerWidth,
       winH = window.innerHeight;
     const menuW = 160,
-      menuH = 210;
+      menuH = 270;
     const left = Math.min(x, winW - menuW);
     const top = Math.min(y, winH - menuH);
     menu.style.left = Math.max(0, left) + 'px';
@@ -145,6 +148,16 @@ export const ContextMenu = {
         }
         DecoShelf.startEditingPosition(id);
         Utils.showToast(UI.deco.editPosToast, false);
+        break;
+
+      case 'resize':
+        if (DecoResize.isActive()) DecoResize.exitResizeMode(false);
+        DecoResize.enterResizeMode(id);
+        Utils.showToast(UI.deco.resizeToast, false);
+        break;
+
+      case 'reset-size':
+        DecoResize.resetToOriginalSize(id);
         break;
 
       case 'toggle-style': {

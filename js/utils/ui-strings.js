@@ -174,6 +174,8 @@ export const UI = {
         menuPaste: '📋 粘贴',
         menuRename: '✏️ 重命名',
         menuEditPos: '📍 编辑位置',
+        menuResize: '📐 调整大小',
+        menuResetSize: '↺ 恢复默认大小',
         menuToggleStyle: '🔄 切换样式',
         menuRemovePage: '❌ 从网页删除',
         menuDeleteLib: '🗑️ 从库中删除',
@@ -193,6 +195,7 @@ export const UI = {
         formatNotSupported: '格式不正确，只支持 PNG、WebP、JPG 格式',
         removedFromPage: '已从页面移除',
         pasteSuccess: '粘贴成功',
+        resizeToast: '拖拽右下角控制点调整大小，右键菜单确认或取消',
     },
 
     notification: {
