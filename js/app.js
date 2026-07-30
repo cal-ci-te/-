@@ -27,6 +27,7 @@ import { ContextMenu } from './admin/events/context-menu.js';
 import { ThemeService } from './services/theme-service.js';
 import { Texture } from './services/texture.js';
 import { initPuzzle } from './puzzle/Puzzle.js';
+import { initMagicBox } from './ui/components/magic-box/index.js';
 
 console.log('🚀 [app] ES Module 入口已加载');
 
@@ -329,6 +330,16 @@ setTimeout(() => {
         console.error('[app] 拼图初始化失败:', err);
     });
 }, 100);
+
+// 超现实箱子组件 — 右下角悬浮装饰
+setTimeout(() => {
+    try {
+        initMagicBox();
+        console.log('[app] 超现实箱子已初始化');
+    } catch (err) {
+        console.error('[app] 超现实箱子初始化失败:', err);
+    }
+}, 200);
 
 // 心跳加载动画隐藏——保证至少显示 400ms，配合 10s 超时兜底
 const elapsed = Date.now() - APP_START_TIME;

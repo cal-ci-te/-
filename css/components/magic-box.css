@@ -1,0 +1,313 @@
+/* ========== 超现实箱子组件 — 3D 木箱 + 开箱动画 + 三主题适配 ========== */
+
+/* ---- 容器定位 ---- */
+.magic-box-container {
+  position: fixed;
+  right: 30px;
+  bottom: 30px;
+  z-index: 998;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  /* 无默认 transition — 拖拽时即时移动，飞回时 JS 临时注入 */
+}
+
+.magic-box-container:active {
+  cursor: grabbing;
+}
+
+/* ---- 3D 场景 ---- */
+.magic-box {
+  width: 120px;
+  height: 100px;
+  position: relative;
+  perspective: 300px;
+}
+
+/* ====== 箱盖 ====== */
+.magic-box-lid {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 120px;
+  height: 22px;
+  z-index: 3;
+  transform-origin: bottom center;
+  transform-style: preserve-3d;
+  transition: transform 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+/* 开箱：箱盖绕底部旋转打开 */
+.magic-box.opening .magic-box-lid {
+  transform: rotateX(-110deg);
+}
+
+/* 关箱回弹（closing class 过渡到闭合态） */
+.magic-box.closing .magic-box-lid {
+  transition: transform 0.4s ease-in;
+}
+
+.magic-box-lid-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 120px;
+  height: 22px;
+  background: var(--color-bg-tertiary);
+  border: 2px solid var(--color-border);
+  border-radius: 4px 4px 0 0;
+  box-shadow: inset 0 2px 0 rgba(255,255,255,0.05), 0 2px 6px rgba(0,0,0,0.3);
+}
+
+/* 黄铜合页装饰 */
+.magic-box-hinge {
+  position: absolute;
+  bottom: -4px;
+  width: 100%;
+  height: 4px;
+  display: flex;
+  justify-content: space-around;
+  pointer-events: none;
+}
+
+.magic-box-hinge::before,
+.magic-box-hinge::after {
+  content: '';
+  display: block;
+  width: 14px;
+  height: 6px;
+  background: linear-gradient(to bottom, #b08050, #8a5a3a);
+  border-radius: 3px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+
+/* ====== 箱体 ====== */
+.magic-box-body {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 120px;
+  height: 78px;
+  background: linear-gradient(
+    180deg,
+    var(--color-bg-tertiary) 0%,
+    var(--color-bg-secondary) 100%
+  );
+  border: 2px solid var(--color-border);
+  border-top: none;
+  border-radius: 0 0 6px 6px;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.03),
+    0 4px 12px rgba(0,0,0,0.35);
+  overflow: visible;
+}
+
+/* 木纹纹理装饰（横线模拟木纹） */
+.magic-box-body::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 4px; right: 4px; bottom: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 13px,
+    rgba(0,0,0,0.06) 13px,
+    rgba(0,0,0,0.06) 14px
+  );
+  pointer-events: none;
+  border-radius: 0 0 4px 4px;
+}
+
+/* 箱体正面锁扣装饰 */
+.magic-box-lock {
+  position: absolute;
+  bottom: 35px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 18px;
+  height: 20px;
+}
+
+.magic-box-lock::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 14px;
+  background: linear-gradient(135deg, #c49a5a, #a07840);
+  border-radius: 3px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.15);
+}
+
+.magic-box-lock::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 8px;
+  height: 8px;
+  background: linear-gradient(135deg, #c49a5a, #a07840);
+  border-radius: 50%;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+
+/* ====== 物品展示区 ====== */
+.magic-box-item {
+  position: absolute;
+  top: -60px;
+  left: 50%;
+  transform: translateX(-50%) scale(0);
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  pointer-events: none;
+  opacity: 0;
+}
+
+/* 物品弹出动画 */
+.magic-box-item.popping {
+  transition:
+    transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1),
+    opacity 0.2s ease;
+  transform: translateX(-50%) scale(1) translateY(-30px);
+  opacity: 1;
+}
+
+/* 展示停留 */
+.magic-box-item.showing {
+  transform: translateX(-50%) scale(1) translateY(-30px);
+  opacity: 1;
+}
+
+/* 物品收回 */
+.magic-box-item.retracting {
+  transition:
+    transform 0.4s cubic-bezier(0.55, 0, 1, 0.45),
+    opacity 0.3s ease;
+  transform: translateX(-50%) scale(0) translateY(10px);
+  opacity: 0;
+}
+
+.magic-box-item-emoji {
+  font-size: 36px;
+  line-height: 1.2;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+
+.magic-box-item-label {
+  font-family: var(--font-family-serif);
+  font-size: 13px;
+  color: var(--color-text-heading);
+  white-space: nowrap;
+  margin-top: 2px;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+.magic-box-item-message {
+  font-family: var(--font-family-mono);
+  font-size: 10px;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  margin-top: 2px;
+  font-style: italic;
+}
+
+/* ====== 计数器 ====== */
+.magic-box-count {
+  position: absolute;
+  bottom: -22px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-family-mono);
+  font-size: 11px;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+
+/* ====== 自定义图片层 ====== */
+.magic-box-custom-img {
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  width: 128px;
+  height: 108px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 8px;
+  z-index: 1;
+  pointer-events: none;
+  display: none;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.35);
+}
+
+/* ====== 拖拽状态 ====== */
+.magic-box.grabbing {
+  cursor: grabbing;
+}
+
+/* 管理员拖拽提示 — 边框发光 */
+.magic-box.admin-drag .magic-box-lid-top,
+.magic-box.admin-drag .magic-box-body {
+  border-color: var(--color-border-highlight);
+  box-shadow: 0 0 12px rgba(196, 122, 68, 0.4);
+}
+
+/* ====== hover 效果（非拖拽、非动画时） ====== */
+.magic-box-container:hover .magic-box:not(.opening):not(.closing):not(.grabbing) .magic-box-lid {
+  transform: rotateX(-3deg);
+  transition: transform 0.2s ease;
+}
+
+/* ====== 移动端适配 ====== */
+@media (max-width: 768px) {
+  .magic-box-container {
+    right: 12px;
+    bottom: 12px;
+  }
+
+  .magic-box {
+    width: 90px;
+    height: 75px;
+    perspective: 200px;
+  }
+
+  .magic-box-lid,
+  .magic-box-lid-top {
+    width: 90px;
+    height: 18px;
+  }
+
+  .magic-box-body {
+    width: 90px;
+    height: 57px;
+  }
+
+  .magic-box-custom-img {
+    width: 98px;
+    height: 83px;
+  }
+
+  .magic-box-item-emoji {
+    font-size: 28px;
+  }
+
+  .magic-box-item-label {
+    font-size: 11px;
+  }
+
+  .magic-box-item-message {
+    font-size: 9px;
+  }
+
+  .magic-box-count {
+    font-size: 10px;
+    bottom: -18px;
+  }
+}
