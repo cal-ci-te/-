@@ -13,6 +13,7 @@ import { AdminPosition } from './position.js';
 import { AdminUI } from './ui.js';
 import { AdminEvents } from './events/index.js';
 import { DecoShelf } from '../services/deco.js';
+import { DecoEdit } from '../services/deco-edit.js';
 import { DOMRefs } from '../core/dom-refs.js';
 import { UI } from '../utils/ui-strings.js';
 
@@ -97,6 +98,9 @@ export const AdminAuth = {
       if (typeof DecoShelf.cancelEditing === 'function') {
         DecoShelf.cancelEditing();
       }
+    }
+    if (DecoEdit && DecoEdit.isActive()) {
+      DecoEdit.exitEditMode(false);
     }
 
     const token = localStorage.getItem('auth_token');

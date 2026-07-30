@@ -173,9 +173,7 @@ export const UI = {
         menuDuplicate: '📋 复制',
         menuPaste: '📋 粘贴',
         menuRename: '✏️ 重命名',
-        menuEditPos: '📍 编辑位置',
-        menuResize: '📐 调整大小',
-        menuResetSize: '↺ 恢复默认大小',
+        menuEdit: '📐 移动和缩放',
         menuToggleStyle: '🔄 切换样式',
         menuRemovePage: '❌ 从网页删除',
         menuDeleteLib: '🗑️ 从库中删除',
@@ -195,7 +193,17 @@ export const UI = {
         formatNotSupported: '格式不正确，只支持 PNG、WebP、JPG 格式',
         removedFromPage: '已从页面移除',
         pasteSuccess: '粘贴成功',
-        resizeToast: '拖拽右下角控制点调整大小，右键菜单确认或取消',
+    },
+
+    decoEdit: {
+        toolbarTitle: '📐 拖拽贴纸移动 · 拖拽右下角 ◢ 调整大小',
+        confirmBtn: '✅ 确认更改',
+        resetBtn: '🔄 重置',
+        cancelBtn: '❌ 取消',
+        confirmToast: '✅ 贴纸位置和大小已保存',
+        resetToast: '🔄 已重置到进入时的状态',
+        cancelToast: '已取消更改',
+        menuLabel: '📐 移动和缩放',
     },
 
     notification: {

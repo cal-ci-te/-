@@ -1,4 +1,5 @@
 import { DecoShelf } from '../../services/deco.js';
+import { DecoEdit } from '../../services/deco-edit.js';
 import { Utils } from '../../utils.js';
 import { EventBus } from '../../core/event-bus.js';
 import { EVENTS } from '../../core/event-constants.js';
@@ -84,7 +85,7 @@ export const DecoShelfUI = {
                     <div style="display:flex;gap:1px;">
                         <button class="asset-duplicate-btn" data-id="${escapedId}" style="background:none;border:1px solid var(--color-danger);color:var(--color-text-secondary);cursor:pointer;font-size:10px;padding:1px 5px;border-radius:2px;" title="${UI.admin.decoDuplicate}">📋</button>
                         <button class="asset-rename-btn" data-id="${escapedId}" style="background:none;border:1px solid var(--color-danger);color:var(--color-text-secondary);cursor:pointer;font-size:10px;padding:1px 5px;border-radius:2px;" title="${UI.admin.decoRename}">✏️</button>
-                        <button class="asset-edit-pos-btn" data-id="${escapedId}" style="background:none;border:1px solid var(--color-danger);color:var(--color-text-secondary);cursor:pointer;font-size:10px;padding:1px 5px;border-radius:2px;" title="${UI.admin.decoEditPos}">📍</button>
+                        <button class="asset-deco-edit-btn" data-id="${escapedId}" style="background:none;border:1px solid var(--color-danger);color:var(--color-text-secondary);cursor:pointer;font-size:10px;padding:1px 5px;border-radius:2px;" title="${UI.decoEdit.menuLabel}">📐</button>
                         <button class="asset-download-btn" data-id="${escapedId}" style="background:none;border:1px solid var(--color-danger);color:var(--color-text-secondary);cursor:pointer;font-size:10px;padding:1px 5px;border-radius:2px;" title="${UI.admin.decoDownload}">⬇️</button>
                         <button class="asset-delete-btn" data-id="${escapedId}" style="background:none;border:1px solid var(--color-danger);color:var(--color-error);cursor:pointer;font-size:10px;padding:1px 5px;border-radius:2px;" title="${UI.admin.decoDelete}">🗑️</button>
                     </div>
@@ -137,16 +138,15 @@ export const DecoShelfUI = {
       });
     });
 
-    container.querySelectorAll('.asset-edit-pos-btn').forEach((btn) => {
+    container.querySelectorAll('.asset-deco-edit-btn').forEach((btn) => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
         const id = btn.dataset.id;
-        const editingId = DecoShelf.getEditingId();
-        if (editingId && editingId !== id) {
-          DecoShelf.stopEditingPosition(false);
+        if (DecoEdit.isActive()) {
+            if (DecoEdit.getActiveDecoId() === id) return;
+            DecoEdit.exitEditMode(false);
         }
-        DecoShelf.startEditingPosition(id);
-        Utils.showToast(UI.deco.editPosToast, false);
+        DecoEdit.enterEditMode(id);
       });
     });
 

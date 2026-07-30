@@ -1,9 +1,11 @@
 /* ============================================
-   贴纸缩放功能样式 — deco-resize.css
+   贴纸统一编辑功能样式 — deco-edit.css
    使用 CSS 变量与三套主题兼容
+   包含：编辑模式高亮、缩放控制点、统一底部工具栏
    ============================================ */
 
-/* 缩放模式下的高亮边框 */
+/* 编辑模式下的高亮边框（统一移动+缩放） */
+.deco-editing,
 .deco-resizing {
     outline: 2px dashed var(--color-accent, #c47a44);
     outline-offset: 4px;
@@ -11,7 +13,8 @@
     transition: outline 0.2s;
 }
 
-/* 缩放控制点 */
+/* 缩放控制点（右下角） */
+.deco-edit-handle,
 .deco-resize-handle {
     position: absolute;
     bottom: -10px;
@@ -29,58 +32,87 @@
     justify-content: center;
 }
 
+.deco-edit-handle:hover,
 .deco-resize-handle:hover {
     transform: scale(1.2);
 }
 
-.deco-resize-handle::after {
-    content: '◢';
-    font-size: 10px;
-    color: var(--color-bg-primary, #1a1612);
-    line-height: 1;
-}
-
-/* 缩放工具栏 */
-.resize-toolbar {
+/* 统一编辑模式底部工具栏 */
+.deco-edit-toolbar {
     position: fixed;
-    bottom: 80px;
+    bottom: 40px;
     left: 50%;
     transform: translateX(-50%);
     background: var(--color-bg-secondary, #2a2520);
-    padding: 12px 24px;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    padding: 14px 28px;
+    border-radius: 14px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
     display: flex;
     align-items: center;
-    gap: 16px;
-    z-index: 1000;
+    gap: 20px;
+    z-index: 10000;
     border: 1px solid var(--color-border, #444);
+    backdrop-filter: blur(8px);
+    flex-wrap: wrap;
+    justify-content: center;
 }
 
-.resize-toolbar span {
+.deco-edit-toolbar span {
     color: var(--color-text-primary, #f0ece6);
     font-size: 14px;
+    white-space: nowrap;
 }
 
-.resize-toolbar .admin-btn {
-    padding: 6px 16px;
+.deco-edit-toolbar .toolbar-btn {
+    padding: 8px 20px;
     border: none;
-    border-radius: 6px;
+    border-radius: 8px;
     cursor: pointer;
-    font-size: 13px;
+    font-size: 14px;
+    font-weight: 500;
     font-family: inherit;
+    transition: opacity 0.2s, transform 0.15s;
 }
 
-.resize-toolbar .admin-btn.primary {
+.deco-edit-toolbar .toolbar-btn:hover {
+    opacity: 0.85;
+    transform: scale(1.02);
+}
+
+.deco-edit-toolbar .toolbar-btn.primary {
     background: #4caf50;
     color: #fff;
 }
 
-.resize-toolbar .admin-btn.danger {
-    background: #f44336;
+.deco-edit-toolbar .toolbar-btn.secondary {
+    background: var(--color-bg-tertiary, #3d3630);
+    color: var(--color-text-primary, #f0ece6);
+    border: 1px solid var(--color-border, #555);
+}
+
+.deco-edit-toolbar .toolbar-btn.danger {
+    background: #e74c3c;
     color: #fff;
 }
 
-.resize-toolbar .admin-btn:hover {
-    opacity: 0.85;
+/* 移动端适配 */
+@media (max-width: 768px) {
+    .deco-edit-toolbar {
+        bottom: 20px;
+        padding: 12px 16px;
+        gap: 12px;
+        width: calc(100% - 32px);
+        border-radius: 12px;
+    }
+    .deco-edit-toolbar span {
+        font-size: 12px;
+        width: 100%;
+        text-align: center;
+    }
+    .deco-edit-toolbar .toolbar-btn {
+        padding: 6px 14px;
+        font-size: 12px;
+        flex: 1;
+        text-align: center;
+    }
 }
