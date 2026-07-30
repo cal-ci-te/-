@@ -2,7 +2,7 @@
 
 原创角色档案馆，一个带内容管理、贴纸装饰、水印保护、多主题切换的 Web 应用。
 
-当前版本：v1.13.0
+当前版本：v1.13.1
 
 ---
 
@@ -146,6 +146,14 @@ Docker 安全部署：进程降权（非 root）、端口默认仅绑定 localho
 多主题系统：CSS 变量驱动，三套主题动态加载。
 
 ## 更新日志
+
+### v1.13.1
+
+**文章编辑器认证令牌修复**：
+
+- **根因**：编辑器页面（`article-editor.html`）是独立 HTML 文档，拥有独立的 JS 上下文。`ApiClient` 的请求拦截器仅在主页面 `app.js` 中注册，导致编辑器内所有需认证的 API 调用（草稿保存/恢复/删除、文章保存）均不携带 `Authorization` 头，返回 401
+- **修复 `ApiClient` 拦截器缺失**：在 `article-editor.js` 中注册与主页面相同的请求拦截器（注入 `Bearer Token`）+ 响应拦截器（401 自动清理过期 Token + 更新登录状态）
+- **修复 `autoSaveOnUnload` 令牌缺失**：页面关闭/隐藏时的草稿自动保存从 `sendBeacon`（不支持自定义请求头）改为 `fetch + keepalive: true`，并注入 `Authorization` 头
 
 ### v1.13.0
 

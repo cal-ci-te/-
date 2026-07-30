@@ -11,6 +11,30 @@ import { UI } from '../utils/ui-strings.js';
 import { EditorCore } from '../editor/editor-core.js';
 import { HistoryUI } from '../editor/history-ui.js';
 import { AutoSave } from '../editor/auto-save.js';
+import { ApiClient } from '../services/api-client.js';
+
+// 注册请求拦截器，自动注入 Bearer Token（与主页面 app.js 保持一致）
+// 编辑器页面是独立 HTML 文档，拥有独立的 JS 上下文，必须自行注册拦截器
+ApiClient.useRequestInterceptor((config) => {
+    const token = localStorage.getItem('auth_token');
+    if (token) {
+        config.options.headers = { ...config.options.headers, 'Authorization': `Bearer ${token}` };
+    }
+    return config;
+});
+ApiClient.useResponseInterceptor(
+    (data) => data,
+    async (error) => {
+        if (error.status === 401) EventBus.emit(EVENTS.AUTH_UNAUTHORIZED);
+        return Promise.reject(error);
+    }
+);
+// 401 响应 → 自动清理过期 Token
+EventBus.on(EVENTS.AUTH_UNAUTHORIZED, () => {
+    console.log('[article-editor] 收到 401，Token 已过期或无效');
+    localStorage.removeItem('auth_token');
+    AppState.commit(MUTATIONS.SET_LOGGED_IN, false);
+});
 
 const THEME_CSS = { dark: '/css/themes/dark.css', light: '/css/themes/light.css', lofi: '/css/themes/lofi.css' };
 const EDITOR_THEME_CSS = { dark: '/css/pages/editor/themes/_dark-editor.css', light: '/css/pages/editor/themes/_light-editor.css', lofi: '/css/pages/editor/themes/_lofi-editor.css' };
@@ -344,28 +368,20 @@ function autoSaveOnUnload() {
     const data = JSON.stringify(payload);
     console.log('[AutoSaveOnUnload] 准备保存草稿，文章ID:', articleId, '内容长度:', content.length);
     const url = `/api/articles/${articleId}/drafts`;
-    if (navigator.sendBeacon) {
-        const blob = new Blob([data], { type: 'application/json' });
-        const sent = navigator.sendBeacon(url, blob);
-        if (sent) {
-            console.log('[AutoSaveOnUnload] sendBeacon 发送成功');
-        } else {
-            console.warn('[AutoSaveOnUnload] sendBeacon 失败，使用 fetch fallback');
-            fetch(url, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: data,
-                keepalive: true
-            }).catch(err => console.warn('[AutoSaveOnUnload] fetch fallback 失败:', err));
-        }
-    } else {
-        fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: data,
-            keepalive: true
-        }).catch(err => console.warn('[AutoSaveOnUnload] fetch 失败:', err));
+    // 从 localStorage 读取认证令牌注入 Authorization 头
+    // sendBeacon 不支持自定义请求头（Blob 方式下无法携带 Authorization），
+    // 统一改用 fetch + keepalive 以确保认证令牌正确传递
+    const token = localStorage.getItem('auth_token');
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) {
+        headers['Authorization'] = 'Bearer ' + token;
     }
+    fetch(url, {
+        method: 'POST',
+        headers: headers,
+        body: data,
+        keepalive: true
+    }).catch(err => console.warn('[AutoSaveOnUnload] fetch 保存失败:', err));
 }
 window.addEventListener('beforeunload', autoSaveOnUnload);
 let hiddenTimeout = null;
