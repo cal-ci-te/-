@@ -415,6 +415,21 @@ export const UI = {
         imageFormatInvalid: '格式不正确，只支持 PNG、WebP、JPG 格式',
         decoUploadSuccess: (name) => `贴图 "${name}" 上传成功`,
         decoUploadFailed: (msg) => `上传失败：${msg}`,
+
+        monitorDegraded: '⚠️ 部分服务不可用，请稍后重试',
+        monitorDegradedDetail: (svc) => `⚠️ ${svc}服务不可用，部分功能受限`,
+        monitorUnreachable: '🔴 无法连接到后端服务',
+        monitorRestored: '✅ 服务已恢复',
+    },
+
+    monitor: {
+        statusOk: '服务正常',
+        statusDegraded: '服务降级',
+        statusUnreachable: '无法连接',
+        bannerDegraded: '⚠️ 部分服务不可用，部分功能受限',
+        bannerDegradedDetail: (svc) => `⚠️ ${svc}服务不可用 — 已禁用编辑和上传功能`,
+        bannerUnreachable: '🔴 无法连接到后端服务，请检查网络',
+        uploadDisabled: '服务降级中，上传功能暂不可用',
     },
 
     puzzle: {

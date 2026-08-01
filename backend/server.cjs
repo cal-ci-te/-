@@ -1,6 +1,6 @@
 const http = require('http');
 const dbModule = require('./db.cjs');
-const { initWebSocket } = require('./websocket.cjs');
+const { initWebSocket, clients } = require('./websocket.cjs'); // [MODIFIED] 健康检查需要 clients 统计连接数
 const { ensureUploadDir } = require('./utils.cjs');
 const { handleDecoUpload } = require('./upload.cjs');
 
@@ -17,7 +17,7 @@ console.log('[Server] 存储服务已初始化:', storage.isLocal() ? '本地' :
 
 // 自研路由层（enhance.cjs）：因项目仅 ~15 个 API 端点，引入 Express 会导致工具代码超过业务代码。
 // 若后续 API 增长至 50+，可无缝迁移至 Express/k 的控制器结构。
-const { GET, POST, PUT, DELETE, match, routes } = require('./enhance.cjs');
+const { GET, POST, PUT, DELETE, match, routes, send } = require('./enhance.cjs'); // [MODIFIED] 健康检查需要 send 函数返回 JSON
 
 const { init } = require('@errpulse/node');
 init({ serverUrl: 'http://localhost:3800', projectId: 'revachol-backend', enabled: true });
@@ -31,6 +31,73 @@ registerArticleRoutes(GET, POST, PUT, DELETE);
 registerDecoRoutes(GET, PUT, DELETE);
 registerSettingsRoutes(GET, PUT);
 registerDraftsRoutes(GET, POST, PUT, DELETE);
+
+// [MONITOR] [MODIFIED] 健康检查端点 — 供 Docker/K8s 容器编排探活使用
+// 数据库：执行 SELECT 1 验证 SQLite 可用，记录延迟
+// 存储：写入临时文件验证读写能力，记录延迟
+// WebSocket：统计当前连接数
+// 内存：计算 heapUsed / heapTotal 百分比
+GET('/api/health', async (req, res) => {
+  const checks = {
+    database: { status: 'ok', latency: 0 },
+    storage: { status: 'ok', latency: 0 },
+    websocket: { status: 'ok', connections: 0 },
+    memory: { status: 'ok', usage: 0 },
+  };
+
+  // 数据库检查（含响应延迟）
+  const dbStart = Date.now();
+  try {
+    dbModule.query('SELECT 1');
+    checks.database.latency = Date.now() - dbStart;
+  } catch (_) {
+    checks.database.status = 'error';
+    checks.database.latency = Date.now() - dbStart;
+  }
+
+  // 存储检查（含响应延迟）
+  const storageStart = Date.now();
+  try {
+    const testFile = 'health-check.tmp';
+    await storage.upload(Buffer.from('health'), testFile, 'text/plain');
+    await storage.delete(testFile);
+    checks.storage.latency = Date.now() - storageStart;
+  } catch (_) {
+    checks.storage.status = 'error';
+    checks.storage.latency = Date.now() - storageStart;
+  }
+
+  // WebSocket 连接数
+  checks.websocket.connections = clients ? clients.size : 0;
+
+  // 内存使用率（heapUsed / heapTotal 百分比）
+  const mem = process.memoryUsage();
+  checks.memory.usage = Math.round((mem.heapUsed / mem.heapTotal) * 100);
+
+  const healthy = checks.database.status === 'ok' && checks.storage.status === 'ok';
+
+  // [MODIFIED] 添加 X-Health-Status 自定义响应头，方便 Docker 解析
+  res.setHeader('X-Health-Status', healthy ? 'healthy' : 'unhealthy');
+
+  // [MODIFIED] 健康检查失败时上报 ErrPulse
+  if (!healthy) {
+    try {
+      const { capture } = require('@errpulse/node');
+      capture(new Error('Health check failed'), {
+        level: 'critical',
+        tags: { service: 'revachol-backend' },
+        extra: { checks },
+      });
+    } catch (_) { /* ErrPulse 未安装或不可用，静默忽略 */ }
+  }
+
+  send(res, {
+    status: healthy ? 'ok' : 'degraded',
+    timestamp: new Date().toISOString(),
+    uptime: Math.round(process.uptime() * 100) / 100,
+    checks,
+  }, healthy ? 200 : 503);
+});
 
 console.log('[Server] 已注册路由 — GET:', Object.keys(routes.GET || {}),
   'POST:', Object.keys(routes.POST || {}),
@@ -135,6 +202,7 @@ dbModule.initDb().then(() => {
         console.log(`✅ API & WebSocket 服务运行在 http://${host}:${PORT}`);
         console.log(`🔍 ErrPulse 仪表盘: http://localhost:3800`);
         console.log(`📁 贴纸存储于: ${storage.isLocal() ? '本地文件系统' : 'MinIO/RustFS'}`);
+        console.log(`[MONITOR] /api/health 健康检查端点已启用`);
     });
 }).catch(err => {
     console.error('❌ 数据库初始化失败:', err);

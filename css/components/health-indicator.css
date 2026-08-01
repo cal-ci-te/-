@@ -1,0 +1,110 @@
+/* ========== 健康状态指示器 v2.0 ========== */
+
+/* 容器：紧挨登录控件下方 */
+.health-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  margin-top: 6px;
+  border-radius: var(--radius-sm, 4px);
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border-light);
+  font-family: var(--font-family-mono);
+  font-size: 11px;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  user-select: none;
+  transition: border-color 0.25s, background 0.25s;
+}
+
+.health-indicator:hover {
+  border-color: var(--color-accent);
+  background: var(--color-bg-card);
+}
+
+/* 状态圆点 */
+.health-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--color-text-muted);
+  transition: background 0.3s;
+}
+
+.health-indicator.ok .health-dot {
+  background: #5cb85c;
+  box-shadow: 0 0 6px rgba(92, 184, 92, 0.5);
+}
+
+.health-indicator.degraded .health-dot {
+  background: #f0ad4e;
+  box-shadow: 0 0 6px rgba(240, 173, 78, 0.5);
+  animation: health-pulse 2s ease-in-out infinite;
+}
+
+.health-indicator.unreachable .health-dot {
+  background: #d9534f;
+  box-shadow: 0 0 6px rgba(217, 83, 79, 0.5);
+  animation: health-pulse 1s ease-in-out infinite;
+}
+
+@keyframes health-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.4; }
+}
+
+/* 文字标签 */
+.health-label {
+  white-space: nowrap;
+  line-height: 1;
+}
+
+/* [NEW] 细化详情 — 降级时显示具体故障服务 */
+.health-detail {
+  white-space: nowrap;
+  font-size: 10px;
+  opacity: 0.8;
+  font-style: italic;
+}
+
+/* ========== 全局横幅 v2.0 ========== */
+#health-banner {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 10001;
+  padding: 8px 16px;
+  text-align: center;
+  font-family: var(--font-family-mono);
+  font-size: 13px;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}
+
+#health-banner.warning {
+  background: #f0ad4e;
+  color: #1a1a1a;
+}
+
+#health-banner.error {
+  background: #d9534f;
+  color: #fff;
+}
+
+/* [NEW] 横幅关闭按钮 */
+#health-banner .banner-close {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  opacity: 0.7;
+  font-size: 16px;
+  line-height: 1;
+}
+#health-banner .banner-close:hover { opacity: 1; }
+
+/* 与下方内容的过渡 */
+body { transition: padding-top 0.3s; }
+body:has(#health-banner) { padding-top: 36px; }

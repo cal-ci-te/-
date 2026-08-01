@@ -33,4 +33,5 @@ function broadcast(data) {
 module.exports = {
     initWebSocket,
     broadcast,
+    clients,
 };

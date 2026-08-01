@@ -53,6 +53,11 @@ export const EVENTS = {
   NOTIFICATION_SHOW: 'notification:show',
   NOTIFICATION_HIDE: 'notification:hide',
 
+  // 健康检查
+  HEALTH_CHECK_PASSED: 'health:check-passed',
+  HEALTH_CHECK_DEGRADED: 'health:check-degraded',
+  HEALTH_CHECK_FAILED: 'health:check-failed',
+
   // 其他
   ARTICLES_LIST_UPDATED: 'articles:list-updated',
   APP_STARTED: 'app:started',

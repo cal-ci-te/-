@@ -2,7 +2,7 @@
 
 原创角色档案馆，一个带内容管理、贴纸装饰、水印保护、多主题切换的 Web 应用。
 
-当前版本：v1.16.1
+当前版本：v1.17.0
 
 ---
 
@@ -146,6 +146,25 @@ Docker 安全部署：进程降权（非 root）、端口默认仅绑定 localho
 多主题系统：CSS 变量驱动，三套主题动态加载。
 
 ## 更新日志
+
+### v1.17.0
+
+**全栈健康监控系统**：
+
+为后端新增 `/api/health` 端点，为前端新增实时状态指示器与自动轮询，覆盖 10 项边缘情况，支持 Docker 原生 healthcheck。
+
+- **后端健康检查端点**：`GET /api/health` 返回 `{ status, timestamp, uptime, checks: { database, storage, websocket, memory } }`；数据库 `SELECT 1` 验证、存储临时文件读写验证、WebSocket 连接数统计、heapUsed/heapTotal 内存百分比
+- **响应延迟记录**：各检查项记录 ms 级延迟（`database.latency` / `storage.latency`），HTTP 状态码 200/503 区分健康/降级
+- **X-Health-Status 响应头**：`healthy` / `unhealthy`，方便 Docker 和负载均衡器解析
+- **ErrPulse 集成**：健康检查失败时自动上报 `critical` 级别错误
+- **Docker 原生 healthcheck**：`docker-compose.yml` backend 服务新增 `healthcheck` 指令（`node -e` 解析 JSON，interval 30s / timeout 5s / retries 3 / start_period 10s）
+- **健康检查脚本**：`scripts/test-health.sh` 支持单次检查 / 等待就绪（`--wait` 最多 60s）/ JSON 输出（`--json`）
+- **前端健康监控服务**：`js/services/health-monitor.js`（~380 行），对象字面量模式，定时轮询 `/api/health` 端点
+- **边缘情况 v2.0 覆盖**：指数退避（初始 5s→最大 60s） / 失败重试（最多 3 次，递增延迟） / 非 JSON 响应 `_safeJsonParse` / 多标签页 BroadcastChannel 主导选举同步 / 可见性自适应频率（隐藏 5min） / 并发锁 `_pendingCheck` / 细化降级提示显示具体故障服务名 / 首次加载 2s 延迟 + 二段式 `init()`→`start()`
+- **BroadcastChannel 辅助工具**：`js/utils/broadcast-helper.js`（64 行），封装跨标签页通信，leader 选举，`health-sync` + `health-join` + `health-leave` 消息协议
+- **UI 状态指示器**：右上角圆点 + 文字 + 详细说明（`.health-detail`），悬停 Tooltip 显示各服务延迟详情；降级时顶部黄色/红色全局横幅 + Toast 通知；自动禁用编辑/上传控件
+- **CSS 样式**：`css/components/health-indicator.css`（106 行），三色圆点 + 脉冲动画 + 横幅样式，`var(--color-*)` 变量自动适配三套主题
+- 新增 3 个 `EVENTS.HEALTH_*` 事件常量，`UI.monitor` 9 条 + `UI.toast` 4 条文案
 
 ### v1.16.1
 

@@ -28,6 +28,7 @@ import { ThemeService } from './services/theme-service.js';
 import { Texture } from './services/texture.js';
 import { initPuzzle } from './puzzle/Puzzle.js';
 import { initMagicBox } from './ui/components/magic-box/index.js';
+import { HealthMonitor } from './services/health-monitor.js';
 
 console.log('🚀 [app] ES Module 入口已加载');
 
@@ -292,6 +293,7 @@ window.__REVACHOL__ = {
   UIDirectory,
   ThemeService,
   Texture,
+  HealthMonitor,
 };
 
 // 左上角工具栏：展开/收起切换
@@ -340,6 +342,21 @@ setTimeout(() => {
         console.error('[app] 超现实箱子初始化失败:', err);
     }
 }, 200);
+
+// —— 健康监控：延迟 2 秒初始化，DOM + AppState 就绪后再启动 ——
+// [MODIFIED] 边缘情况 #9：确保 AppState 初始化完成后才启动
+setTimeout(() => {
+  HealthMonitor.init();
+  // 额外延迟 1 秒确保模块间依赖就绪，然后启动自动轮询
+  setTimeout(() => {
+    HealthMonitor.start();
+  }, 1000);
+}, 2000);
+
+// 页面关闭前停止轮询
+window.addEventListener('beforeunload', () => {
+  HealthMonitor.destroy();
+});
 
 // 心跳加载动画隐藏——保证至少显示 400ms，配合 10s 超时兜底
 const elapsed = Date.now() - APP_START_TIME;
