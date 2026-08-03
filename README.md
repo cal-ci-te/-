@@ -2,7 +2,7 @@
 
 原创角色档案馆，一个带内容管理、贴纸装饰、水印保护、多主题切换的 Web 应用。
 
-当前版本：v1.17.0
+当前版本：v1.17.1
 
 ---
 
@@ -146,6 +146,16 @@ Docker 安全部署：进程降权（非 root）、端口默认仅绑定 localho
 多主题系统：CSS 变量驱动，三套主题动态加载。
 
 ## 更新日志
+
+### v1.17.1
+
+**修复 E2E 测试容器构建失败**：
+
+Playwright 官方镜像缺少 C++ 编译工具链，导致 `bcrypt` 原生模块在 `npm install` 时编译失败（`node-pre-gyp ERR! not ok`）。
+
+- **Dockerfile.test**：在 `npm install` 前新增编译工具链安装层（`build-essential` / `python3` / `g++` / `make`），安装后清理 APT 缓存控制镜像增量
+- **多阶段构建评估**：评估了 alpine → ubuntu 多阶段方案，因 musl/glibc ABI 不兼容而否决，直接安装编译工具为最优解
+- **文档整合**：将 `docs/deployment/docker-setup.md` 整合到 `docs/development/tools/docker/README.md`，新增 E2E 测试容器构建说明章节（含原生模块依赖、解决方案、musl/glibc 兼容性分析、验证步骤）
 
 ### v1.17.0
 

@@ -11,6 +11,17 @@ USER root
 
 WORKDIR /app
 
+# ---- 第 0 层：安装 C++ 编译工具链 ----
+# Playwright 官方镜像为精简体积，未包含 g++/make/python3
+# 但项目依赖含有原生模块（bcrypt），npm install 时需要 node-gyp 编译
+# 多阶段构建（alpine → ubuntu）不可行：musl 编译的 .node 二进制与 glibc 不兼容
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    python3 \
+    g++ \
+    make \
+    && rm -rf /var/lib/apt/lists/*
+
 # ---- 第 1 层：安装 Node.js 依赖（利用缓存） ----
 COPY package.json package-lock.json ./
 # 需要安装 devDependencies（@playwright/test, playwright-archive 等）
