@@ -1,4 +1,5 @@
 import { ArticleService } from '../../../services/article-service.js';
+import { ApiClient } from '../../../services/api-client.js';
 import { Utils } from '../../../utils.js';
 
 export function createPendingMovesManager() {
@@ -28,23 +29,17 @@ export function createPendingMovesManager() {
 
         for (const move of moves) {
             try {
-                const article = ArticleService.getArticle(move.articleId);
+                const articles = ArticleService.getAllArticles();
+                const article = articles.find(a => a.id === move.articleId);
                 if (!article) {
                     console.warn('[PendingMoves] 文章不存在，跳过:', move.articleId);
                     continue;
                 }
-                const response = await fetch('/api/articles/' + move.articleId, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        title: article.title,
-                        content: article.content,
-                        category: move.newCategory
-                    })
+                await ApiClient.put('/api/articles/' + move.articleId, {
+                    title: article.title,
+                    content: article.content,
+                    category: move.newCategory
                 });
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
-                }
                 console.log('[PendingMoves] 提交成功:', move.articleId);
             } catch (err) {
                 console.error('[PendingMoves] 提交移动失败:', move.articleId, err);

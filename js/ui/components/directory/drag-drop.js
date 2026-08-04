@@ -1,6 +1,7 @@
 import { Utils } from '../../../utils.js';
 import { Article } from '../../../models/article-model.js';
 import { ArticleService } from '../../../services/article-service.js';
+import { ApiClient } from '../../../services/api-client.js';
 // [新增] 导入 UI 文案
 import { UI } from '../../../utils/ui-strings.js';
 
@@ -209,21 +210,17 @@ export function enableDragDrop(container, updateTreeFn) {
                 dragData = null;
                 return;
             }
-            fetch('/api/articles/' + article.id, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    title: article.title,
-                    content: article.content,
-                    category: newCategory
-                })
+            ApiClient.put('/api/articles/' + article.id, {
+                title: article.title,
+                content: article.content,
+                category: newCategory
             }).then(() => {
                 Utils.showToast(UI.toast.articleMoveSuccess(newCategory), false);
                 ArticleService.fetchArticles(true).then(() => {
                     if (updateTreeFn) updateTreeFn();
                 });
             }).catch(err => {
-                Utils.showToast(UI.toast.articleMoveFailed(err.message), true);
+                Utils.showToast(UI.toast.articleMoveFailed(err.message || err), true);
             });
             dragData = null;
             return;

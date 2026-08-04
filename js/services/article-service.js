@@ -93,7 +93,11 @@ export const ArticleService = {
             const parentExists = this._categories.some(c => c.id === parentId);
             if (!parentExists) return false;
         }
-        const newCat = { id: trimmed, name: trimmed, parent: parentId };
+        var maxOrder = 0;
+        this._categories.forEach(function (c) {
+            if (c.sort_order != null && c.sort_order >= maxOrder) maxOrder = c.sort_order + 1;
+        });
+        const newCat = { id: trimmed, name: trimmed, parent: parentId, sort_order: maxOrder };
         this._categories.push(newCat);
         this._saveCategories();
         EventBus.emit(EVENTS.ARTICLE_VISIBILITY_CHANGED, { categoryAdded: trimmed });
@@ -144,6 +148,20 @@ export const ArticleService = {
     /** 批量移除指定 ID 的分类条目 */
     removeCategoriesByIds(ids) {
         this._categories = this._categories.filter(function (c) { return !ids.includes(c.id); });
+        this._saveCategories();
+    },
+
+    /**
+     * 设置根级分类排序（Plan 3 接口 — 拖拽排序时调用）。
+     * 传入按期望顺序排列的分类 id 数组，未出现的分类保持原有 sort_order。
+     * @param {string[]} orderedIds - 按期望顺序排列的根级分类 id 列表
+     */
+    setCategoriesOrder(orderedIds) {
+        if (!Array.isArray(orderedIds)) return;
+        orderedIds.forEach(function (id, index) {
+            var cat = this._categories.find(function (c) { return c.id === id; });
+            if (cat) cat.sort_order = index;
+        }, this);
         this._saveCategories();
     },
 
@@ -402,6 +420,7 @@ export const ArticleService = {
         const buildNode = (catNode) => {
             const node = {
                 name: catNode.name,
+                sort_order: catNode.sort_order,
                 type: 'folder',
                 children: [],
                 isFolder: true,
@@ -437,7 +456,15 @@ export const ArticleService = {
         };
 
         const result = tree.map(buildNode);
-        result.sort((a, b) => a.minId - b.minId);
+        // sort_order 优先（Plan 3 接口），回退拼音排序（方案一）
+        result.sort((a, b) => {
+            const hasA = a.sort_order != null;
+            const hasB = b.sort_order != null;
+            if (hasA && hasB) return a.sort_order - b.sort_order;
+            if (hasA) return -1;
+            if (hasB) return 1;
+            return a.name.localeCompare(b.name, 'zh-CN');
+        });
         return result;
     },
 };

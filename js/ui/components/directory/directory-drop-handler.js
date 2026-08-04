@@ -1,4 +1,5 @@
 import { ArticleService } from '../../../services/article-service.js';
+import { ApiClient } from '../../../services/api-client.js';
 import { Utils } from '../../../utils.js';
 
 /**
@@ -57,22 +58,14 @@ export async function handleDirectoryDrop(sourceData, targetData, context) {
 
         // 非位置模式：立即发送 API
         try {
-            const response = await fetch('/api/articles/' + article.id, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    title: article.title,
-                    content: article.content,
-                    category: newCategory
-                })
+            await ApiClient.put('/api/articles/' + article.id, {
+                title: article.title,
+                content: article.content,
+                category: newCategory
             });
-            if (response.ok) {
-                Utils.showToast(UI.toast.articleMoveSuccess(newCategory), false);
-                await ArticleService.fetchArticles(true);
-                if (updateTreeFn) updateTreeFn();
-            } else {
-                Utils.showToast(UI.toast.articleMoveFailed(response.statusText), true);
-            }
+            Utils.showToast(UI.toast.articleMoveSuccess(newCategory), false);
+            await ArticleService.fetchArticles(true);
+            if (updateTreeFn) updateTreeFn();
         } catch (err) {
             console.error('[DropHandler] 移动文章失败:', err);
             Utils.showToast(UI.toast.articleMoveFailed(err.message), true);

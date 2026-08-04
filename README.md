@@ -2,7 +2,7 @@
 
 原创角色档案馆，一个带内容管理、贴纸装饰、水印保护、多主题切换的 Web 应用。
 
-当前版本：v1.17.2
+当前版本：v1.17.3
 
 ---
 
@@ -146,6 +146,16 @@ Docker 安全部署：进程降权（非 root）、端口默认仅绑定 localho
 多主题系统：CSS 变量驱动，三套主题动态加载。
 
 ## 更新日志
+
+### v1.17.3
+
+**目录树拖拽修复 + 排序优化 + 文案统一管理**：
+
+- **修复 — 文章拖拽移动认证缺失**：`drag-drop.js`、`directory-drop-handler.js`、`directory-pending-moves.js` 三处文章移动使用裸 `fetch()` 直接调用 `PUT /api/articles/:id`，未携带 `Authorization` 头导致 401 拖拽失败。统一替换为 `ApiClient.put()`，走请求拦截器自动注入 Token
+- **修复 — 待处理移动队列方法不存在**：`directory-pending-moves.js` 调用 `ArticleService.getArticle()`（不存在的方法），导致 `commitMoves()` 所有文章因"不存在"被静默跳过。修正为 `ArticleService.getAllArticles().find()`
+- **重构 — 目录树排序策略（方案一 + 方案三接口）**：文件夹排序从 `minId`（文章 ID）改为拼音排序（`localeCompare('zh-CN')`），解决拖拽文章后源文件夹因 `minId` 突变导致位置跳跃的问题。同步预留 `sort_order` 字段和 `setCategoriesOrder()` 方法，为手动拖拽排序做好准备
+- **重构 — 健康监控文案提取**：`health-monitor.js` 中 6 处硬编码中文字符串（超时提示、服务名、Tooltip 模板等）迁移至 `UI.monitor.*`，与项目其他模块统一管理
+- **路线图更新**：标记「目录树排序策略优化」为已完成
 
 ### v1.17.2
 

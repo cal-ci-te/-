@@ -430,6 +430,12 @@ export const UI = {
         bannerDegradedDetail: (svc) => `⚠️ ${svc}服务不可用 — 已禁用编辑和上传功能`,
         bannerUnreachable: '🔴 无法连接到后端服务，请检查网络',
         uploadDisabled: '服务降级中，上传功能暂不可用',
+        checkTimeout: '健康检查超时',
+        serviceDb: '数据库',
+        serviceStorage: '存储',
+        noData: '无可用数据',
+        tooltipTemplate: (db, st, ws, mem) => `数据库: ${db}\n存储: ${st}\nWebSocket: ${ws}\n内存: ${mem}`,
+        detailDegraded: (services) => `（${services}不可用）`,
     },
 
     puzzle: {

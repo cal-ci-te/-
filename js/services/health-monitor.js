@@ -52,7 +52,7 @@ export const HealthMonitor = {
     } catch (err) {
       clearTimeout(timer);
       if (err.name === 'AbortError') {
-        throw new Error('Health check timed out');
+        throw new Error(UI.monitor.checkTimeout);
       }
       throw err;  // 网络错误，保留原始错误供重试判断
     }
@@ -256,8 +256,8 @@ export const HealthMonitor = {
   _getFailedServices(checks) {
     if (!checks) return [];
     const failed = [];
-    if (checks.database && checks.database.status !== 'ok') failed.push('数据库');
-    if (checks.storage && checks.storage.status !== 'ok') failed.push('存储');
+    if (checks.database && checks.database.status !== 'ok') failed.push(UI.monitor.serviceDb);
+    if (checks.storage && checks.storage.status !== 'ok') failed.push(UI.monitor.serviceStorage);
     return failed;
   },
 
@@ -361,20 +361,20 @@ export const HealthMonitor = {
     if (detail) {
       if (status === 'degraded' && checks) {
         const failed = this._getFailedServices(checks);
-        detail.textContent = failed.length > 0 ? `（${failed.join('、')}不可用）` : '';
+        detail.textContent = failed.length > 0 ? UI.monitor.detailDegraded(failed.join('、')) : '';
       } else {
         detail.textContent = '';
       }
     }
 
     // Tooltip
-    let tip = '无可用数据';
+    let tip = UI.monitor.noData;
     if (checks) {
       const db = checks.database ? `${checks.database.status} (${checks.database.latency}ms)` : '—';
       const st = checks.storage ? `${checks.storage.status} (${checks.storage.latency}ms)` : '—';
       const ws = checks.websocket ? `${checks.websocket.connections} 连接` : '—';
       const mem = checks.memory ? `${checks.memory.usage}%` : '—';
-      tip = `数据库: ${db}\n存储: ${st}\nWebSocket: ${ws}\n内存: ${mem}`;
+      tip = UI.monitor.tooltipTemplate(db, st, ws, mem);
     }
     this._indicator.title = tip;
   },
