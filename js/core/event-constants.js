@@ -58,6 +58,17 @@ export const EVENTS = {
   HEALTH_CHECK_DEGRADED: 'health:check-degraded',
   HEALTH_CHECK_FAILED: 'health:check-failed',
 
+  // 组件管理器
+  COMPONENT_REGISTERED: 'component:registered',
+  COMPONENT_INITIALIZED: 'component:initialized',
+  COMPONENT_MOUNTED: 'component:mounted',
+  COMPONENT_UNMOUNTED: 'component:unmounted',
+  COMPONENT_ERROR: 'component:error',
+  COMPONENT_BEFORE_DESTROY: 'component:before-destroy',
+  COMPONENT_ALL_INITIALIZED: 'component:all-initialized',
+  COMPONENT_ALL_READY: 'component:all-ready',
+  COMPONENT_CONFIG_CHANGED: 'component:config-changed',
+
   // 其他
   ARTICLES_LIST_UPDATED: 'articles:list-updated',
   APP_STARTED: 'app:started',

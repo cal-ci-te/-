@@ -30,6 +30,13 @@ import { initPuzzle } from './puzzle/Puzzle.js';
 import { initMagicBox } from './ui/components/magic-box/index.js';
 import { HealthMonitor } from './services/health-monitor.js';
 
+// 组件统一管理系统
+import { ComponentManager } from './core/component-manager.js';
+import { decoComponent } from './components/deco-component.js';
+import { puzzleComponent } from './components/puzzle-component.js';
+import { magicBoxComponent } from './components/magic-box-component.js';
+import { healthComponent } from './components/health-component.js';
+
 console.log('🚀 [app] ES Module 入口已加载');
 
 const APP_START_TIME = Date.now();
@@ -294,6 +301,7 @@ window.__REVACHOL__ = {
   ThemeService,
   Texture,
   HealthMonitor,
+  ComponentManager,
 };
 
 // 左上角工具栏：展开/收起切换
@@ -326,36 +334,34 @@ setTimeout(() => {
 SiteIcon.init();
 SiteIcon.playEntranceAnimation();
 
-// 拼图组件 — 坐标模式 {x, y} 决定视口内位置，流式模式兼容 initPuzzle('.hero-section', 'afterend')
-setTimeout(() => {
-    initPuzzle({ x: 525, y: 450 }).catch(err => {
-        console.error('[app] 拼图初始化失败:', err);
-    });
-}, 100);
+// =========================================================================
+// 组件统一管理系统 — 注册 + 批量初始化 + 挂载
+// 替代原有的 ad-hoc setTimeout 初始化，提供统一生命周期管理。
+// =========================================================================
+ComponentManager
+  .register(decoComponent)
+  .register(puzzleComponent)
+  .register(magicBoxComponent)
+  .register(healthComponent);
 
-// 超现实箱子组件 — 右下角悬浮装饰
-setTimeout(() => {
-    try {
-        initMagicBox();
-        console.log('[app] 超现实箱子已初始化');
-    } catch (err) {
-        console.error('[app] 超现实箱子初始化失败:', err);
-    }
-}, 200);
+// 延迟初始化所有组件（等待 DOM + AppInitializer 完成）
+setTimeout(async () => {
+  console.log('[app] ComponentManager 开始批量初始化...');
+  const initResult = await ComponentManager.initAll();
+  console.log('[app] initAll 完成:', initResult);
 
-// —— 健康监控：延迟 2 秒初始化，DOM + AppState 就绪后再启动 ——
-// [MODIFIED] 边缘情况 #9：确保 AppState 初始化完成后才启动
-setTimeout(() => {
-  HealthMonitor.init();
-  // 额外延迟 1 秒确保模块间依赖就绪，然后启动自动轮询
-  setTimeout(() => {
-    HealthMonitor.start();
-  }, 1000);
-}, 2000);
+  // 挂载所有已初始化的组件
+  const mountResult = await ComponentManager.mountAll();
+  console.log('[app] mountAll 完成:', mountResult);
+  console.log('[app] 组件状态摘要:', ComponentManager.getSummary());
+}, 300);
 
-// 页面关闭前停止轮询
+// 页面关闭前统一卸载所有组件
+// 使用 sync 模式：浏览器在 beforeunload 中不保证等待 async 完成，
+// 因此 unmountAll({ sync: true }) 用 fire-and-forget 方式调用清理钩子。
 window.addEventListener('beforeunload', () => {
-  HealthMonitor.destroy();
+  console.log('[app] beforeunload: 正在同步卸载所有组件...');
+  ComponentManager.unmountAll({ sync: true });
 });
 
 // 心跳加载动画隐藏——保证至少显示 400ms，配合 10s 超时兜底

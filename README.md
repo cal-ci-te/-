@@ -2,7 +2,7 @@
 
 原创角色档案馆，一个带内容管理、贴纸装饰、水印保护、多主题切换的 Web 应用。
 
-当前版本：v1.17.3
+当前版本：v1.18.0
 
 ---
 
@@ -146,6 +146,22 @@ Docker 安全部署：进程降权（非 root）、端口默认仅绑定 localho
 多主题系统：CSS 变量驱动，三套主题动态加载。
 
 ## 更新日志
+
+### v1.18.0
+
+**组件统一管理系统（ComponentManager）**：
+
+为项目 4 个交互/装饰组件（贴纸系统、拼图、魔法箱子、健康监控）建立统一管理架构，并为后续"一条龙互动组件引擎"预留接口。
+
+- **核心管理器**（`js/core/component-manager.js`，738 行）：统一生命周期（register → init → mount → unmount）、状态追踪（registered/initialized/mounted/unmounted/error）、拓扑排序依赖解析、单组件失败错误隔离、完整的单组件操作 API（initComponent/mountComponent/unmountComponent/remountComponent/updateComponent）、运行时配置更新（updateConfig）、EventBus 订阅自动清理（trackEvents）、超时保护（init/mount/unmount 可配置超时）
+- **4 个组件适配器**（`js/components/{deco,puzzle,magic-box,health}-component.js`）：将现有组件包装为符合 ComponentManager 描述符规范的标准化组件
+- **事件体系扩展**：新增 9 个 `COMPONENT_*` 事件常量（REGISTERED/INITIALIZED/MOUNTED/UNMOUNTED/ERROR/BEFORE_DESTROY/ALL_INITIALIZED/ALL_READY/CONFIG_CHANGED）
+- **文案统一管理**：新增 `UI.componentManager` 文案对象（27 个字符串），遵循项目规范
+- **app.js 集成**：替代原有的 3 个 ad-hoc setTimeout 初始化块，统一用 `ComponentManager.initAll()` → `mountAll()`。beforeunload 使用 `unmountAll({ sync: true })` 同步卸载路径
+- **互动引擎预留**：`createInteractive()` / `renderInteractive()` / `getInteractiveConfigs()` / `setInteractiveEnabled()` 4 个接口先空实现不报错，配置存储到队列等待后续引擎消费
+- **P0/P1 审计修复**：超时保护防止 Promise 挂起阻塞 initAll、beforeunload 同步卸载路径避免异步丢失、remountComponent 支持卸载后重新挂载、拓扑排序结果缓存 + 脏标记
+- **完整开发者文档**（`docs/development/component-manager.md`，378 行）：架构设计、注册新组件、适配现有组件、调试方法、互动引擎预留说明、测试验证清单
+- **路线图更新**：标记「组件抽象化统一管理」为已完成
 
 ### v1.17.3
 

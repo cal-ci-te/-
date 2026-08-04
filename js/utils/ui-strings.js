@@ -451,6 +451,33 @@ export const UI = {
         resetToDefault: '拼图已恢复为默认背景',
     },
 
+    componentManager: {
+        panelTitle: '🧩 组件状态',
+        stateRegistered: '已注册',
+        stateInitialized: '已初始化',
+        stateMounted: '已挂载',
+        stateUnmounted: '已卸载',
+        stateError: '错误',
+        stateUnknown: '未知',
+        versionLabel: '版本',
+        depsLabel: '依赖',
+        noDeps: '无',
+        desktopOnly: '仅桌面端',
+        allPlatforms: '全平台',
+        actionInit: '初始化',
+        actionMount: '挂载',
+        actionUnmount: '卸载',
+        actionRemount: '重新挂载',
+        initAll: '全部初始化',
+        mountAll: '全部挂载',
+        unmountAll: '全部卸载',
+        registeredCount: (n) => `已注册 ${n} 个组件`,
+        mountedCount: (n) => `已挂载 ${n} 个`,
+        errorCount: (n) => `${n} 个异常`,
+        debugHint: '通过 window.__REVACHOL__.ComponentManager 查看详细状态',
+        enginePlaceholder: '互动引擎预留接口已就绪',
+    },
+
     magicBox: {
         items: [
             { id: 'feather', emoji: '🪶', label: '一根白色羽毛', message: '它轻得几乎不存在。' },
