@@ -20,6 +20,7 @@ import { EventBus } from '../core/event-bus.js';
 import { EVENTS } from '../core/event-constants.js';
 import { UI } from '../utils/ui-strings.js';
 import { Utils } from '../utils.js';
+import { MarkdownUtils } from '../utils/markdown-utils.js';
 import { StickerRenderer } from './sticker-renderer.js';
 import { StickerShape } from './sticker-shape.js';
 import { ArticleEditorToolbar } from './article-editor-toolbar.js';
@@ -33,7 +34,8 @@ export const ArticleEditorMode = {
   _article: null,
   _articleId: null,
   _dirty: false,
-  _snapshot: null,        // 打开时的原始数据快照 { title, content }
+  _saving: false,           // 防重复保存/发布锁
+  _snapshot: null,        // 打开时的原始数据快照 { title, content, stickers }
 
   _overlay: null,
   _articleContainer: null,
@@ -103,10 +105,11 @@ export const ArticleEditorMode = {
       article.stickers = this._parseStickersFromContent(article.content || '');
     }
 
-    // 快照：用于检测是否真的有修改
+    // 快照：用于检测是否真的有修改（含贴纸数据）
     this._snapshot = {
       title: article.title || '',
       content: article.content || '',
+      stickers: article.stickers ? JSON.parse(JSON.stringify(article.stickers)) : [],
     };
 
     // 加载贴纸库
@@ -246,33 +249,8 @@ export const ArticleEditorMode = {
       return text;
     }
 
-    // Markdown → HTML 转换
-    var html = Utils.escapeHtml(text);
-
-    html = html.replace(/```([\s\S]*?)```/g, function (match, code) {
-      return '<pre><code>' + code + '</code></pre>';
-    });
-    html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
-    html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
-    html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
-    html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
-    html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-    html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
-    html = html.replace(/^&gt; (.+)$/gm, '<blockquote>$1</blockquote>');
-    html = html.replace(/^- (.+)$/gm, '<li>$1</li>');
-    html = html.replace(/(<li>.*<\/li>\s*)+/g, function (match) {
-      return '<ul>' + match + '</ul>';
-    });
-    html = html.replace(/\n{2,}/g, "</p><p>");
-    html = html.replace(/\n/g, '<br>');
-    html = '<p>' + html + '</p>';
-    html = html.replace(/<p><\/p>/g, '');
-    html = html.replace(/<p><br><\/p>/g, '');
-    html = html.replace(/<(h[1-6]|ul|ol|li|blockquote|pre)>/g, function (match) {
-      return match.replace('<br>', '');
-    });
-
-    return html;
+    // Markdown → HTML（委托给公共工具，避免两个编辑器重复实现）
+    return MarkdownUtils.toHTML(text);
   },
 
   /**
@@ -317,7 +295,7 @@ export const ArticleEditorMode = {
 
       // 将纯文本转为带换行的 HTML
       var html = Utils.escapeHtml(text)
-    html = html.replace(/\n{2,}/g, "</p><p>");
+        .replace(/\n{2,}/g, "</p><p>")
         .replace(/\n/g, '<br>');
       html = '<p>' + html + '</p>';
 
@@ -389,9 +367,9 @@ export const ArticleEditorMode = {
     // 追加当前贴纸标记
     var stickers = this._article ? (this._article.stickers || []) : [];
     stickers.forEach(function (s) {
-      html += '
-<!-- sticker:' + s.decoId + ' align=' + (s.align || 'left') + ' w=' + (s.width || StickerShape.DEFAULT_SIZE) + ' h=' + (s.height || StickerShape.DEFAULT_SIZE) + ' -->';
+      html += '\n' + StickerRenderer.createMarker(s.decoId, s);
     });
+
 
     return html.trim();
   },
@@ -404,16 +382,17 @@ export const ArticleEditorMode = {
   _parseStickersFromContent(content) {
     var stickers = [];
     if (!content) return stickers;
-    var regex = /<!--\s*sticker:([a-zA-Z0-9_-]+)\s*(?:align=(left|right))?\s*(?:w=(\d+))?\s*(?:h=(\d+))?\s*-->/g;
+    var regex = StickerRenderer._MARKER_REGEX;
     var match;
     while ((match = regex.exec(content)) !== null) {
+      var fields = StickerRenderer._parseMarkerContent(match[1]);
       stickers.push({
-        decoId: match[1],
-        align: match[2] || 'left',
-        x: 50,
-        y: 50 + stickers.length * 80,
-        width: parseInt(match[3]) || StickerShape.DEFAULT_SIZE,
-        height: parseInt(match[4]) || StickerShape.DEFAULT_SIZE,
+        decoId: fields.decoId,
+        x: fields.x ? parseInt(fields.x) : StickerShape.DEFAULT_X,
+        y: fields.y ? parseInt(fields.y) : StickerShape.DEFAULT_Y + stickers.length * StickerShape.DEFAULT_GAP,
+        width: parseInt(fields.w) || StickerShape.DEFAULT_SIZE,
+        height: parseInt(fields.h) || StickerShape.DEFAULT_SIZE,
+        align: fields.align || 'left',
       });
     }
     return stickers;
@@ -428,9 +407,11 @@ export const ArticleEditorMode = {
 
     var currentTitle = this.getTitle();
     var currentContent = this.getContentHTML();
+    var currentStickers = this._article ? (this._article.stickers || []) : [];
 
     return currentTitle !== this._snapshot.title ||
-           currentContent !== this._snapshot.content;
+           currentContent !== this._snapshot.content ||
+           JSON.stringify(currentStickers) !== JSON.stringify(this._snapshot.stickers || []);
   },
 
   // =========================================================================
@@ -456,7 +437,7 @@ export const ArticleEditorMode = {
       var imgSrc = deco.dataUrl || deco.url || '';
       var w = data.width || StickerShape.DEFAULT_SIZE;
       var h = data.height || StickerShape.DEFAULT_SIZE;
-      var x = data.x || 50, y = data.y || 50;
+      var x = data.x || StickerShape.DEFAULT_X, y = data.y || StickerShape.DEFAULT_Y;
       if (self._articleContainer) {
         var cw = self._articleContainer.offsetWidth || 800;
         x = Math.max(0, Math.min(x, cw - w - 10));
@@ -564,6 +545,9 @@ export const ArticleEditorMode = {
         return;
       }
 
+      // Ctrl+S/Ctrl+Enter 在 contentEditable 中不触发（防止输入时误操作）
+      if (isEditing && (e.ctrlKey || e.metaKey)) return;
+
       // Ctrl+S → 保存草稿
       if ((e.ctrlKey || e.metaKey) && e.key === 's') {
         e.preventDefault();
@@ -587,6 +571,7 @@ export const ArticleEditorMode = {
    * 保存草稿到后端。
    */
   async saveDraft() {
+    if (this._saving) { console.log('[ArticleEditorMode] 保存中，跳过重复请求'); return; }
     if (!this._articleId) {
       Utils.showToast(UI.editor.noArticleSelected, true);
       return;
@@ -601,6 +586,7 @@ export const ArticleEditorMode = {
     var content = this._buildSaveContent();
     var category = this._article ? (this._article.category || '未分类') : '未分类';
 
+    this._saving = true;
     try {
       await ApiClient.post('/api/articles/' + this._articleId + '/drafts', {
         title: title,
@@ -610,13 +596,15 @@ export const ArticleEditorMode = {
       Utils.showToast(UI.editor.saveSuccess, false);
 
       // 更新快照 + 刷新草稿列表
-      this._snapshot = { title: title, content: content };
+      this._snapshot = { title: title, content: content, stickers: this._article ? JSON.parse(JSON.stringify(this._article.stickers || [])) : [] };
       this._dirty = false;
       if (this._draftManager) { this._draftManager.refresh(); }
       console.log('[ArticleEditorMode] 草稿已保存');
     } catch (err) {
       console.error('[ArticleEditorMode] 草稿保存失败:', err);
       Utils.showToast(UI.editor.saveFailed + err.message, true);
+    } finally {
+      this._saving = false;
     }
   },
 
@@ -624,6 +612,7 @@ export const ArticleEditorMode = {
    * 发布/更新文章到后端。
    */
   async saveAndPublish() {
+    if (this._saving) { console.log('[ArticleEditorMode] 发布中，跳过重复请求'); return; }
     if (!this._articleId) {
       Utils.showToast(UI.editor.noArticleSelected, true);
       return;
@@ -639,6 +628,7 @@ export const ArticleEditorMode = {
     var content = this._buildSaveContent();
     var category = this._article ? (this._article.category || '未分类') : '未分类';
 
+    this._saving = true;
     try {
       // 先保存草稿
       await ApiClient.put('/api/articles/' + this._articleId, {
@@ -653,7 +643,7 @@ export const ArticleEditorMode = {
       Utils.showToast(UI.editor.publishSuccess, false);
 
       // 更新快照
-      this._snapshot = { title: title, content: content };
+      this._snapshot = { title: title, content: content, stickers: this._article ? JSON.parse(JSON.stringify(this._article.stickers || [])) : [] };
       this._dirty = false;
 
       // 通知主页面
@@ -667,6 +657,8 @@ export const ArticleEditorMode = {
     } catch (err) {
       console.error('[ArticleEditorMode] 发布失败:', err);
       Utils.showToast(UI.editor.publishFailed + err.message, true);
+    } finally {
+      this._saving = false;
     }
   },
 
@@ -738,8 +730,21 @@ export const ArticleEditorMode = {
       this._contentEl.innerHTML = this._renderContent(draft.content);
     }
 
+    // 恢复贴纸数据（从 content 标记解析，draft 不含独立 stickers 字段）
+    if (this._article && draft.content) {
+      this._article.stickers = this._parseStickersFromContent(draft.content);
+      this._refreshStickerLayer();
+    }
+
     // 标记脏状态
     this._dirty = true;
+
+    // 更新快照（防止草稿恢复后 ESC 不弹确认框）
+    this._snapshot = {
+      title: draft.title || '',
+      content: draft.content || '',
+      stickers: this._article ? JSON.parse(JSON.stringify(this._article.stickers || [])) : [],
+    };
 
     // 更新工具栏
     if (this._toolbar) {
@@ -818,8 +823,7 @@ export const ArticleEditorMode = {
           var content = self._article.content || '';
           content = content.replace(StickerRenderer._MARKER_REGEX, '');
           data.stickers.forEach(function (s) {
-            content += '
-' + StickerRenderer.createMarker(s.decoId, s);
+            content += '\n' + StickerRenderer.createMarker(s.decoId, s);
           });
           self._article.content = content.trim();
         }

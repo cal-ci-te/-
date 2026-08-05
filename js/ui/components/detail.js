@@ -6,6 +6,7 @@ import { EventBus } from '../../core/event-bus.js';
 import { EVENTS } from '../../core/event-constants.js';
 import { Utils } from '../../utils.js';
 import { UI } from '../../utils/ui-strings.js';
+import { StickerRenderer } from '../../editor/sticker-renderer.js';
 
 export const UIDetail = {
   overlay: null,
@@ -498,8 +499,8 @@ export const UIDetail = {
       el.className = 'detail-sticker';
       el.style.cssText = [
         'position:absolute',
-        'left:' + (s.x || 50) + 'px',
-        'top:' + (s.y || 50) + 'px',
+        'left:' + (s.x || StickerShape.DEFAULT_X) + 'px',
+        'top:' + (s.y || StickerShape.DEFAULT_Y) + 'px',
         'width:' + (s.width || 100) + 'px',
         'height:' + (s.height || 100) + 'px',
         'background-image:url(' + imgSrc + ')',
@@ -513,18 +514,20 @@ export const UIDetail = {
     });
   },
 
-  /** 从内容中解析贴纸标记 */
+  /** 从内容中解析贴纸标记（复用 StickerRenderer._MARKER_REGEX 统一正则） */
   _parseStickerMarkers: function (content) {
     var stickers = [];
-    var regex = /<!--\s*sticker:([a-zA-Z0-9_-]+)\s*(?:align=(left|right))?\s*(?:w=(\d+))?\s*(?:h=(\d+))?\s*-->/g;
+    var regex = StickerRenderer._MARKER_REGEX;
     var match;
     while ((match = regex.exec(content)) !== null) {
+      var fields = StickerRenderer._parseMarkerContent(match[1]);
       stickers.push({
-        decoId: match[1],
-        align: match[2] || 'left',
-        x: 50, y: 50 + stickers.length * 80,
-        width: parseInt(match[3]) || 100,
-        height: parseInt(match[4]) || 100,
+        decoId: fields.decoId,
+        x: fields.x ? parseInt(fields.x) : StickerShape.DEFAULT_X,
+        y: fields.y ? parseInt(fields.y) : StickerShape.DEFAULT_Y + stickers.length * StickerShape.DEFAULT_GAP,
+        width: parseInt(fields.w) || 100,
+        height: parseInt(fields.h) || 100,
+        align: fields.align || 'left',
       });
     }
     return { stickers: stickers };

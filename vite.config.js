@@ -125,8 +125,8 @@ export default defineConfig(({ mode }) => {
                     assetFileNames: 'assets/[name].[hash].[ext]',
                     // 手动分包优化
                     manualChunks: {
-                        // 将第三方库分离到单独的 chunk
-                        vendor: ['lodash', 'dayjs'],
+                        // 预留：将第三方库分离到单独的 chunk
+                        // vendor: ['lodash', 'dayjs'],
                     },
                 },
                 // 外部依赖（如果使用 CDN）
@@ -180,8 +180,8 @@ export default defineConfig(({ mode }) => {
         // 优化依赖预构建
         optimizeDeps: {
             include: [
-                'lodash',
-                'dayjs',
+                // 'lodash',
+                // 'dayjs',
                 // 预构建可能会用到的依赖
             ],
             exclude: [],

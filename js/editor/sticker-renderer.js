@@ -6,7 +6,7 @@
  *   2. 在编辑模式的覆盖层中渲染贴纸
  *   3. 清理和管理贴纸 DOM
  *
- * 贴纸在文章中的占位标记格式：<!-- sticker:decoId -->
+ * 贴纸在文章中的占位标记格式：<!-- sticker:{id} x={x} y={y} w={width} h={height} align={align} -->
  * 渲染后替换为 <div class="article-sticker" data-deco-id="decoId"> ... </div>
  *
  * 依赖：StickerShape（形状生成）、DecoShelf（贴纸数据）、DecoEdit（交互）
@@ -17,8 +17,28 @@ import { DecoShelf } from '../services/deco.js';
 
 export const StickerRenderer = {
 
-  /** 贴纸占位标记正则：<!-- sticker:xxx --> */
-  _MARKER_REGEX: /<!--\s*sticker:([a-zA-Z0-9_-]+)\s*(?:align=(left|right))?\s*(?:w=(\d+))?\s*(?:h=(\d+))?\s*-->/g,
+  /**
+   * 贴纸占位标记正则（统一数据源，所有解析/清除复用此正则）。
+   * 匹配任意 <!-- sticker:{content} --> 注释块，不依赖字段顺序。
+   * 捕获组 1 = 注释内容（不含 <!-- sticker: 和 -->）。
+   */
+  _MARKER_REGEX: /<!--\s*sticker:(.*?)-->/g,
+
+  /**
+   * 从标记注释内容中解析字段（字段顺序无关，兼容新旧格式）。
+   * @param {string} raw - 注释内部文本，如 "deco_abc align=left w=120 h=120"
+   * @returns {object} { decoId, x, y, w, h, align }
+   */
+  _parseMarkerContent: function (raw) {
+    var parts = raw.trim().split(/\s+/);
+    var result = {};
+    if (parts.length > 0) result.decoId = parts[0];
+    for (var i = 1; i < parts.length; i++) {
+      var kv = parts[i].split('=');
+      if (kv.length === 2) result[kv[0]] = kv[1];
+    }
+    return result;
+  },
 
   /** 已创建的贴纸元素集合（用于清理） */
   _elements: [],
@@ -35,14 +55,16 @@ export const StickerRenderer = {
     var regex = this._MARKER_REGEX;
     regex.lastIndex = 0;
 
-    // 收集所有标记
     var match;
     while ((match = regex.exec(content)) !== null) {
+      var fields = this._parseMarkerContent(match[1]);
       stickers.push({
-        decoId: match[1],
-        align: match[2] || 'left',
-        w: parseInt(match[3]) || StickerShape.DEFAULT_SIZE,
-        h: parseInt(match[4]) || StickerShape.DEFAULT_SIZE,
+        decoId: fields.decoId,
+        x: fields.x ? parseInt(fields.x) : StickerShape.DEFAULT_X,
+        y: fields.y ? parseInt(fields.y) : StickerShape.DEFAULT_Y + stickers.length * StickerShape.DEFAULT_GAP,
+        w: parseInt(fields.w) || StickerShape.DEFAULT_SIZE,
+        h: parseInt(fields.h) || StickerShape.DEFAULT_SIZE,
+        align: fields.align || 'left',
         index: match.index,
       });
     }
@@ -59,14 +81,16 @@ export const StickerRenderer = {
    *
    * @param {string} decoId - 贴纸 ID
    * @param {object} opts - { align, w, h }
-   * @returns {string} 如 "<!-- sticker:deco_abc align=left w=120 h=120 -->"
+   * @returns {string} 如 "<!-- sticker:deco_abc x=50 y=50 w=120 h=120 align=left -->"
    */
   createMarker(decoId, opts) {
     opts = opts || {};
+    var x = opts.x !== undefined ? opts.x : StickerShape.DEFAULT_X;
+    var y = opts.y !== undefined ? opts.y : StickerShape.DEFAULT_Y;
     var align = opts.align || 'left';
     var w = opts.w || opts.width || StickerShape.DEFAULT_SIZE;
     var h = opts.h || opts.height || StickerShape.DEFAULT_SIZE;
-    return '<!-- sticker:' + decoId + ' align=' + align + ' w=' + w + ' h=' + h + ' -->';
+    return '<!-- sticker:' + decoId + ' x=' + x + ' y=' + y + ' w=' + w + ' h=' + h + ' align=' + align + ' -->';
   },
 
   /**

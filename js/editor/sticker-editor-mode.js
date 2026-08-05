@@ -16,6 +16,7 @@ import { EventBus } from '../core/event-bus.js';
 import { EVENTS } from '../core/event-constants.js';
 import { UI } from '../utils/ui-strings.js';
 import { Utils } from '../utils.js';
+import { MarkdownUtils } from '../utils/markdown-utils.js';
 import { StickerRenderer } from './sticker-renderer.js';
 import { StickerShape } from './sticker-shape.js';
 
@@ -54,7 +55,7 @@ export const StickerEditorMode = {
     // 加载贴纸库
     var decos = DecoShelf.getAll();
     if (!decos || !decos.length) {
-      try { await DecoShelf.loadLibrary(); } catch (e) { /* 继续 */ }
+      try { await DecoShelf.loadLibrary(); } catch (e) { console.warn("[StickerEditorMode] 贴纸库加载失败:", e); Utils.showToast(UI.stickerEditor.emptyLibrary || "贴纸库加载失败，请检查网络连接", true); }
     }
 
     // 快照
@@ -170,40 +171,10 @@ export const StickerEditorMode = {
   },
 
   /**
-   * 完全复用 UIDetail.renderContent 的 Markdown→HTML 逻辑
+   * 委托给公共 Markdown 工具（避免两个编辑器重复实现）。
    */
   _renderContent(text) {
-    if (!text) return '<p style="color:var(--color-text-muted);">（空内容）</p>';
-
-    var html = Utils.escapeHtml(text);
-
-    // 代码块
-    html = html.replace(/```([\s\S]*?)```/g, function (match, code) {
-      return '<pre><code>' + code + '</code></pre>';
-    });
-    html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
-    // 标题
-    html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
-    html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
-    html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
-    // 粗体/斜体
-    html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-    html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
-    // 引用
-    html = html.replace(/^&gt; (.+)$/gm, '<blockquote>$1</blockquote>');
-    // 列表
-    html = html.replace(/^- (.+)$/gm, '<li>$1</li>');
-    html = html.replace(/(<li>.*<\/li>\s*)+/g, function (match) {
-      return '<ul>' + match + '</ul>';
-    });
-    // 段落
-    html = html.replace(/\n{2,}/g, '</p><p>');
-    html = html.replace(/\n/g, '<br>');
-    html = '<p>' + html + '</p>';
-    html = html.replace(/<p><\/p>/g, '');
-    html = html.replace(/<p><br><\/p>/g, '');
-
-    return html;
+    return MarkdownUtils.toHTML(text);
   },
 
   // =========================================================================
@@ -257,8 +228,8 @@ export const StickerEditorMode = {
 
       el.style.cssText = [
         'position:absolute',
-        'left:' + (data.x || 50) + 'px',
-        'top:' + (data.y || 50) + 'px',
+        'left:' + (data.x || StickerShape.DEFAULT_X) + 'px',
+        'top:' + (data.y || StickerShape.DEFAULT_Y) + 'px',
         'width:' + w + 'px',
         'height:' + h + 'px',
         'background-image:url(' + imgSrc + ')',
@@ -272,6 +243,9 @@ export const StickerEditorMode = {
       // hover 边框高亮
       el.addEventListener('mouseenter', function () {
         if (el.style.cursor !== 'grabbing') {
+        // 禁止拖拽时选中文本
+        document.body.style.userSelect = 'none';
+
           el.style.borderColor = 'var(--color-accent, #c47a44)';
         }
       });
@@ -309,6 +283,9 @@ export const StickerEditorMode = {
       var startTop = parseFloat(el.style.top) || 0;
       el.style.cursor = 'grabbing';
       el.style.zIndex = '20';
+        // 禁止拖拽时选中文本
+        document.body.style.userSelect = 'none';
+
       el.style.borderColor = 'var(--color-accent, #c47a44)';
 
       var onMove = function (ev) {
@@ -336,6 +313,8 @@ export const StickerEditorMode = {
         el.style.borderColor = 'transparent';
         document.removeEventListener('mousemove', onMove);
         document.removeEventListener('mouseup', onUp);
+        document.body.style.userSelect = '';
+
       };
 
       document.addEventListener('mousemove', onMove);
@@ -552,6 +531,8 @@ export const StickerEditorMode = {
         panel.style.transition = '';
         document.removeEventListener('mousemove', onMove);
         document.removeEventListener('mouseup', onUp);
+        document.body.style.userSelect = '';
+
         self._saveConsolePos(
           parseFloat(panel.style.right) || 20,
           parseFloat(panel.style.bottom) || 80
@@ -574,6 +555,23 @@ export const StickerEditorMode = {
       var s = localStorage.getItem('sticker_console_pos');
       return s ? JSON.parse(s) : { right: 20, bottom: 80 };
     } catch (e) { return { right: 20, bottom: 80 }; }
+  },
+
+  /**
+   * 清除贴纸层中所有贴纸元素的显式事件监听器（innerHTML 清空前调用）。
+   */
+  _unbindStickerElements: function () {
+    if (!this._stickerLayer) return;
+    var els = this._stickerLayer.querySelectorAll('.article-sticker-editing');
+    els.forEach(function (el) {
+      if (el._stickerDragDown) {
+        el.removeEventListener('mousedown', el._stickerDragDown);
+        delete el._stickerDragDown;
+      }
+      el.onmouseenter = null;
+      el.onmouseleave = null;
+      el.oncontextmenu = null;
+    });
   },
 
   /**
@@ -699,6 +697,9 @@ export const StickerEditorMode = {
 
     el.addEventListener('mouseenter', function () {
       if (el.style.cursor !== 'grabbing') {
+        // 禁止拖拽时选中文本
+        document.body.style.userSelect = 'none';
+
         el.style.borderColor = 'var(--color-accent, #c47a44)';
       }
     });
@@ -730,6 +731,8 @@ export const StickerEditorMode = {
 
     this._escHandler = function (e) {
       if (e.key === 'Escape') {
+        self._removeContextMenu();
+        self._removeContextMenu();
         self._escPressCount++;
         if (self._escPressCount >= 2) {
           clearTimeout(self._escPressTimer);
@@ -783,18 +786,25 @@ export const StickerEditorMode = {
   _collectStickerData() {
     if (!this._stickerLayer) return [];
     var result = [];
+    // 建立 decoId → _stickerData 索引（用于恢复 align 等非 DOM 属性）
+    var dataMap = {};
+    if (this._stickerData) {
+      this._stickerData.forEach(function (d) { if (d && d.decoId) dataMap[d.decoId] = d; });
+    }
     var els = this._stickerLayer.querySelectorAll('.article-sticker-editing');
     els.forEach(function (el) {
+      var decoId = el.dataset.decoId;
+      var orig = dataMap[decoId] || {};
       result.push({
-        decoId: el.dataset.decoId,
+        decoId: decoId,
         x: parseFloat(el.style.left) || 0,
         y: parseFloat(el.style.top) || 0,
         width: parseFloat(el.style.width) || StickerShape.DEFAULT_SIZE,
         height: parseFloat(el.style.height) || StickerShape.DEFAULT_SIZE,
-        align: 'left',
-        margin: StickerShape.DEFAULT_MARGIN,
-        shape: 'circle',
-        vertices: 16,
+        align: orig.align || 'left',
+        margin: orig.margin || StickerShape.DEFAULT_MARGIN,
+        shape: orig.shape || 'circle',
+        vertices: orig.vertices || 16,
       });
     });
     return result;
@@ -819,6 +829,9 @@ export const StickerEditorMode = {
 
     // 右键菜单
     this._removeContextMenu();
+
+    // 贴纸元素监听器（在 DOM 移除前显式解绑）
+    this._unbindStickerElements();
 
     // 覆盖层（含文章容器 + 贴纸层）
     if (this._overlay) { this._overlay.remove(); this._overlay = null; }

@@ -2,7 +2,7 @@
 
 原创角色档案馆，一个带内容管理、贴纸装饰、水印保护、多主题切换的 Web 应用。
 
-当前版本：v1.18.1
+当前版本：v1.18.2
 
 ---
 
@@ -146,6 +146,41 @@ Docker 安全部署：进程降权（非 root）、端口默认仅绑定 localho
 多主题系统：CSS 变量驱动，三套主题动态加载。
 
 ## 更新日志
+
+### v1.18.2
+
+**贴纸系统 P0–P2 全量修复（WIP）**：
+
+> ⚠️ 融合仍未完成，编辑器与贴纸编辑的代码杂糅问题待后续版本解决。
+
+**P0 修复（2 项）：**
+- **标记字段顺序兼容**：旧格式 `<!-- sticker:id align=? w=? h=? -->` 与新格式 `<!-- sticker:id x=? y=? w=? h=? align=? -->` 字段顺序不同，导致旧文章贴纸标记完全无法解析。修复为正则两步法：通用提取 `(.*?)` + 字段独立解析 `(\w+)=(\S+)`，与字段顺序完全无关。
+- **align 方向持久化**：`_collectStickerData()` 硬编码 `align: 'left'`，右键切换的 `right` 方向在保存时丢失。修复为从 `_stickerData` 索引读取原始属性。
+
+**P1 修复（5 项）：**
+- **snapshot 含贴纸**：`_snapshot` 从 `{title, content}` 扩展为 `{title, content, stickers}`，`hasChanges()` 增加贴纸 JSON 对比。修复纯贴纸修改后 ESC 不弹确认框的问题。
+- **草稿恢复贴纸**：`_restoreFromDraft()` 增加 `_parseStickersFromContent()` + `_refreshStickerLayer()`。
+- **保存防重复**：`saveDraft()`/`saveAndPublish()` 增加 `_saving` 锁 + `try/finally` 释放。
+- **公共 Markdown 模块**：提取 `js/utils/markdown-utils.js`（`MarkdownUtils.toHTML()`），消除 `article-editor-mode.js` 和 `sticker-editor-mode.js` 中 55 行重复的 Markdown→HTML 转换代码。
+- **监听器显式解绑**：新增 `_unbindStickerElements()`，`_cleanup()` 中 DOM 移除前解绑 `mousedown`/`mouseenter`/`mouseleave`/`contextmenu`。
+
+**P2 修复（6 项）：**
+- 提取 `DEFAULT_X`/`DEFAULT_Y`/`DEFAULT_GAP` 到 `StickerShape`，替换 9 处硬编码 50/80
+- 拖拽时设置 `userSelect: 'none'` 防止文本选中
+- ESC 键关闭贴纸右键菜单
+- 草稿恢复后更新 `_snapshot`
+- `contentEditable` 中阻止 `Ctrl+S`/`Ctrl+Enter` 快捷键
+- 贴纸库加载失败 toast 提示
+
+**正则统一：**
+- `detail.js` 内联正则改为 `import { StickerRenderer }` 直接引用 `_MARKER_REGEX`
+- 所有 5 处正则读取路径统一为 `StickerRenderer._MARKER_REGEX`
+- 新增 `_parseMarkerContent()` 字段解析器
+
+**审计文档：**
+- `docs/ai-collaboration/editor-sticker-audit.md`：P0 全量检查报告（~545 行）
+- `docs/ai-collaboration/editor-sticker-p0-remains.md`：修复后 P0 遗留排查（~268 行）
+- `docs/ai-collaboration/editor-sticker-p1-remains.md`：修复后 P1 遗留排查（~334 行）
 
 ### v1.18.1
 

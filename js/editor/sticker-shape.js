@@ -25,6 +25,15 @@ export const StickerShape = {
   /** 默认顶点数 */
   DEFAULT_VERTICES: 16,
 
+  /** 默认坐标 X（标记解析无 x 时的回退值） */
+  DEFAULT_X: 50,
+
+  /** 默认坐标 Y 基准（标记解析无 y 时的回退值） */
+  DEFAULT_Y: 50,
+
+  /** 默认垂直间距（多贴纸解析时的 y 步进值） */
+  DEFAULT_GAP: 80,
+
   /**
    * 为贴纸生成浮动样式对象
    *
