@@ -9,7 +9,6 @@ export var magicBoxComponent = {
   name: 'magic-box',
 
   config: {
-    version: '1.0.0',
     dependencies: [],
     desktopOnly: true,
     requiresAuth: false,

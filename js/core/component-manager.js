@@ -13,7 +13,6 @@
 //   {
 //     name: string,                   // 唯一标识
 //     config: {
-//       version: string,              // 组件版本号
 //       dependencies: string[],       // 依赖的其他组件名
 //       desktopOnly: boolean,         // 是否仅桌面端可用
 //       requiresAuth: boolean,        // 是否需要管理员权限
@@ -27,6 +26,8 @@
 //     unmount: async (instance) => instance, // 清理资源返回实例
 //     update: async (instance, payload) => instance, // 动态更新（可选）
 //   }
+//
+// 注意：组件不需要独立版本号。版本号统一由 package.json 管理，变更追踪在 CHANGELOG 记录。
 
 import { EventBus } from './event-bus.js';
 import { EVENTS } from './event-constants.js';
@@ -97,7 +98,6 @@ export var ComponentManager = {
     var entry = {
       name: name,
       config: {
-        version: config.version || '1.0.0',
         dependencies: Array.isArray(config.dependencies) ? config.dependencies : [],
         desktopOnly: !!config.desktopOnly,
         requiresAuth: !!config.requiresAuth,
@@ -124,7 +124,7 @@ export var ComponentManager = {
     this._registry.set(name, entry);
     this._dirty = true;
 
-    console.log('[ComponentManager] 组件已注册:', name, 'v' + entry.config.version,
+    console.log('[ComponentManager] 组件已注册:', name,
       entry.config.desktopOnly ? '(仅桌面端)' : '',
       entry.config.dependencies.length > 0 ? '依赖: ' + entry.config.dependencies.join(', ') : '');
 
@@ -351,7 +351,6 @@ export var ComponentManager = {
     }
     if (!partialConfig) return false;
 
-    if (partialConfig.version !== undefined) entry.config.version = partialConfig.version;
     if (partialConfig.desktopOnly !== undefined) entry.config.desktopOnly = !!partialConfig.desktopOnly;
     if (partialConfig.requiresAuth !== undefined) entry.config.requiresAuth = !!partialConfig.requiresAuth;
     if (partialConfig.dependencies !== undefined) {
@@ -403,7 +402,6 @@ export var ComponentManager = {
       name: entry.name,
       state: entry.state,
       stateLabel: STATE_LABELS[entry.state] || '未知',
-      version: entry.config.version,
       dependencies: entry.config.dependencies,
       desktopOnly: entry.config.desktopOnly,
       requiresAuth: entry.config.requiresAuth,

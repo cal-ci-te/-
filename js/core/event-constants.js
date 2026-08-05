@@ -73,5 +73,12 @@ export const EVENTS = {
   ARTICLES_LIST_UPDATED: 'articles:list-updated',
   APP_STARTED: 'app:started',
   THEME_CHANGED: 'theme:changed',
+  EDITOR_OPENED: 'editor:opened',
+  EDITOR_CLOSED: 'editor:closed',
+
+  // 文章贴纸编辑
+  STICKER_EDITOR_OPENED: 'sticker-editor:opened',
+  STICKER_EDITOR_CLOSED: 'sticker-editor:closed',
+  STICKER_EDITOR_SAVED: 'sticker-editor:saved',
 };
 

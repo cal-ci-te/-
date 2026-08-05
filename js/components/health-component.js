@@ -7,7 +7,6 @@ export var healthComponent = {
   name: 'health',
 
   config: {
-    version: '2.0.0',
     dependencies: [],
     desktopOnly: false,
     requiresAuth: false,

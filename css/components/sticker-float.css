@@ -1,0 +1,107 @@
+/* ================================================================
+ * 贴纸文字绕排样式 — 用于文章详情页的浮动贴纸
+ * ================================================================ */
+
+/* ---- 基础贴纸浮动元素 ---- */
+.article-sticker {
+  float: left;                        /* 默认左浮动，可通过内联样式覆盖 */
+  shape-outside: circle(50%);
+  clip-path: circle(50%);
+  width: 120px;
+  height: 120px;
+  margin: 10px 20px 10px 10px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  position: relative;
+  pointer-events: auto;
+  border-radius: 4px;
+  transition: filter 0.2s ease;
+}
+
+/* 右浮动 */
+.article-sticker.float-right {
+  float: right;
+  margin: 10px 10px 10px 20px;
+}
+
+/* hover 微高亮 */
+.article-sticker:hover {
+  filter: brightness(1.1) drop-shadow(0 0 6px rgba(196, 122, 68, 0.3));
+}
+
+/* ---- 贴纸容器清除浮动 ---- */
+.article-sticker-container::after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+/* ---- 编辑模式中的贴纸 ---- */
+.article-sticker-editing {
+  float: none;
+  shape-outside: none;
+  clip-path: none;
+  border: 2px solid transparent;
+  border-radius: 4px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  cursor: grab;
+}
+
+.article-sticker-editing:hover {
+  border-color: var(--color-accent, #c47a44);
+  box-shadow: 0 0 12px rgba(196, 122, 68, 0.3);
+}
+
+.article-sticker-editing:active {
+  cursor: grabbing;
+}
+
+/* ---- 贴纸入场动画 ---- */
+.article-sticker.animate-in {
+  animation: sticker-float-in 0.5s ease-out;
+}
+
+@keyframes sticker-float-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.6) rotate(-5deg);
+  }
+  60% {
+    transform: scale(1.05) rotate(1deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+/* ---- 主题适配 ---- */
+
+/* 暗色主题 */
+[data-theme="dark"] .article-sticker {
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.4));
+}
+
+/* 亮色主题 */
+[data-theme="light"] .article-sticker {
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.15));
+}
+
+/* 低保真主题 */
+[data-theme="lofi"] .article-sticker {
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.2)) sepia(0.2);
+}
+
+/* ---- 移动端：贴纸缩小 ---- */
+@media (max-width: 768px) {
+  .article-sticker {
+    width: 80px;
+    height: 80px;
+    margin: 8px 12px 8px 8px;
+  }
+
+  .article-sticker.float-right {
+    margin: 8px 8px 8px 12px;
+  }
+}

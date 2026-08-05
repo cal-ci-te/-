@@ -9,7 +9,6 @@ export var decoComponent = {
   name: 'deco',
 
   config: {
-    version: '2.0.0',
     dependencies: ['storage'],
     desktopOnly: false,
     requiresAuth: false,

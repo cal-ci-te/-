@@ -1,5 +1,6 @@
 ﻿import { defineConfig, loadEnv } from "vite";
-import errpulse from '@errpulse/vite';
+// ErrPulse 前端采集已禁用（SDK 无开关配置，注释即关闭）。需启用时取消注释。
+// import errpulse from '@errpulse/vite';
 import { nodePolyfills } from 'vite-plugin-node-polyfills';
 
 export default defineConfig(({ mode }) => {
@@ -20,10 +21,10 @@ export default defineConfig(({ mode }) => {
                     process: true,
                 },
             }),
-            errpulse({
-                // ErrPulse 配置（如果使用）
-                // enabled: mode === 'production',
-            }),
+            // ErrPulse 前端采集已禁用。需启用时取消下方注释。
+            // errpulse({
+            //     // enabled: mode === 'production',
+            // }),
         ],
         
         // 根目录

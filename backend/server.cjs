@@ -20,7 +20,8 @@ console.log('[Server] 存储服务已初始化:', storage.isLocal() ? '本地' :
 const { GET, POST, PUT, DELETE, match, routes, send } = require('./enhance.cjs'); // [MODIFIED] 健康检查需要 send 函数返回 JSON
 
 const { init } = require('@errpulse/node');
-init({ serverUrl: 'http://localhost:3800', projectId: 'revachol-backend', enabled: true });
+// ErrPulse 后端采集已禁用。需启用时改为 enabled: true 并启动 errpulse-server。
+init({ serverUrl: 'http://localhost:3800', projectId: 'revachol-backend', enabled: false });
 
 const { registerArticleRoutes } = require('./routes/articles.cjs');
 const { registerDecoRoutes } = require('./routes/decos.cjs');
@@ -200,7 +201,7 @@ dbModule.initDb().then(() => {
     const host = process.env.HOST || '127.0.0.1';
     server.listen(PORT, host, () => {
         console.log(`✅ API & WebSocket 服务运行在 http://${host}:${PORT}`);
-        console.log(`🔍 ErrPulse 仪表盘: http://localhost:3800`);
+        console.log(`🔍 ErrPulse 仪表盘: http://localhost:3800（已禁用，需启用时改 serverUrl + enabled:true）`);
         console.log(`📁 贴纸存储于: ${storage.isLocal() ? '本地文件系统' : 'MinIO/RustFS'}`);
         console.log(`[MONITOR] /api/health 健康检查端点已启用`);
     });

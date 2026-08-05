@@ -283,11 +283,12 @@ AdminPanel.renderContent = function () {
         AdminPanel.bindEvents();
     }
 
-    // 文章编辑器按钮
+    // 文章编辑器按钮 → 内联编辑模式
     const editorBtn = document.getElementById('openArticleEditorBtn');
     if (editorBtn) {
-        editorBtn.addEventListener('click', function() {
-            window.open('/article-editor.html', '_blank');
+        editorBtn.addEventListener('click', function () {
+            // 提示用户在目录树中右键选择文章进行编辑
+            Utils.showToast('请在左侧目录树中右键点击文章 → "✏️ 编辑内容" 进入编辑器', false);
         });
     }
 

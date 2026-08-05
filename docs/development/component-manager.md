@@ -45,7 +45,6 @@ register() ──→ [registered]
 {
   name: 'string',              // 唯一标识，注册后不可更改
   config: {
-    version: 'string',         // 语义化版本号
     dependencies: ['string'],  // 依赖的其他组件名（拓扑排序依据）
     desktopOnly: boolean,      // 是否仅桌面端可用（移动端自动跳过 mount）
     requiresAuth: boolean,     // 是否需要管理员权限
@@ -75,7 +74,6 @@ export const myComponent = {
   name: 'my-component',                // 必须：唯一名称
 
   config: {
-    version: '1.0.0',
     dependencies: [],                   // 留空表示无依赖
     desktopOnly: false,
     requiresAuth: false,
@@ -141,7 +139,7 @@ await ComponentManager.mountComponent('my-component');
 ```javascript
 ComponentManager.register({
   name: 'simple-greeter',
-  config: { version: '1.0.0', dependencies: [] },
+  config: { dependencies: [] },
   async init() { return { msg: 'Hello' }; },
   async mount(inst) { console.log(inst.msg); return inst; },
   async unmount(inst) { return inst; },
@@ -160,7 +158,7 @@ ComponentManager.register({
 // 适配器模式示例
 export const existingComponentAdapter = {
   name: 'existing-component',
-  config: { version: '2.0', dependencies: [], ... },
+  config: { dependencies: [], ... },
 
   async init() {
     // 桥接：调用现有组件的初始化方法
@@ -208,7 +206,7 @@ window.__REVACHOL__.ComponentManager.getSummary()
 
 // 获取单个组件详情
 window.__REVACHOL__.ComponentManager.getState('puzzle')
-// 输出: { name, state, version, dependencies, metrics: {initMs, mountMs}, error, ... }
+// 输出: { name, state, dependencies, metrics: {initMs, mountMs}, error, ... }
 
 // 手动触发生命周期
 await window.__REVACHOL__.ComponentManager.unmountComponent('puzzle')

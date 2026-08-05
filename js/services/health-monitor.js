@@ -1,5 +1,5 @@
 // 健康监控服务：定时轮询 /api/health 端点，检测后端服务状态。
-// v2.0 — 新增边缘情况处理：指数退避、重试、非 JSON 响应、多标签页同步、
+// 包含：指数退避、重试、非 JSON 响应、多标签页同步、
 // 内存泄漏防护、可见性自适应、细化降级 UI、并发锁、首次加载时序、超时控制。
 // 模式参考项目现有 Service（如 ArticleService），使用对象字面量 + EventBus。
 import { EventBus } from '../core/event-bus.js';
@@ -147,6 +147,8 @@ export const HealthMonitor = {
 
   /** [NEW] 边缘情况 #1 — 指数退避：成功恢复默认间隔，失败逐步放大 */
   _applyBackoff(success) {
+    var prevFailures = this._consecutiveFailures;
+
     if (success) {
       this._consecutiveFailures = 0;
       this._pollInterval = DEFAULTS.initialInterval;
@@ -157,7 +159,11 @@ export const HealthMonitor = {
         Math.floor(DEFAULTS.initialInterval * Math.pow(DEFAULTS.backoffFactor, this._consecutiveFailures))
       );
     }
-    console.log(`[HealthMonitor] 退避: failures=${this._consecutiveFailures}, interval=${this._pollInterval / 1000}s`);
+
+    // 仅在 failures 计数变化或达到 5 的倍数时输出
+    if (this._consecutiveFailures !== prevFailures || this._consecutiveFailures % 5 === 0) {
+      console.log(`[HealthMonitor] 退避: failures=${this._consecutiveFailures}, interval=${this._pollInterval / 1000}s`);
+    }
   },
 
   stopPolling() {
@@ -177,7 +183,7 @@ export const HealthMonitor = {
    */
   async _runCheck() {
     if (this._pendingCheck) {
-      console.log('[HealthMonitor] 跳过：已有检查进行中');
+      // 静默跳过：已有检查进行中（并发锁保护，非异常）
       return;
     }
     this._pendingCheck = true;

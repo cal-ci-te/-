@@ -2,7 +2,7 @@
 
 原创角色档案馆，一个带内容管理、贴纸装饰、水印保护、多主题切换的 Web 应用。
 
-当前版本：v1.18.0
+当前版本：v1.18.1
 
 ---
 
@@ -146,6 +146,38 @@ Docker 安全部署：进程降权（非 root）、端口默认仅绑定 localho
 多主题系统：CSS 变量驱动，三套主题动态加载。
 
 ## 更新日志
+
+### v1.18.1
+
+**文章编辑器合并 + 文章内贴纸编辑系统（Phase 1，WIP）**：
+
+将原独立 `article-editor.html` 页面合并到主 SPA 中，并以全屏模态覆盖层形式新增文章内贴纸编辑功能。
+
+> ⚠️ **注意**：此为第一步合并，功能尚不完善，代码杂糅未做拆分。编辑器与贴纸编辑的 UI 逻辑耦合在主页面运行时中，后续需抽取为独立模块。
+
+- **编辑器内嵌化**：
+  - 删除独立 `article-editor.html`（124 行）及旧编辑器 CSS（`css/pages/editor/`，12 个文件）
+  - 删除旧编辑器 JS 文件：`js/pages/article-editor.js`（423 行）、`js/editor/editor-core.js`、`js/editor/auto-save.js`、`js/editor/draft-history.js`、`js/editor/history-ui.js`
+  - 新建 `js/editor/article-editor-mode.js`：主页面内全屏模态 WYSIWYG 文章编辑器，复用 `UIDetail.renderContent` 的 Markdown→HTML 逻辑，支持 Markdown/HTML 自动检测、快照脏检测、ESC 退出
+  - 新建 `js/editor/article-editor-toolbar.js`：工具栏（标题编辑 / 保存 / 贴纸模式切换 / 草稿切换）
+  - 新建 `js/editor/draft-manager.js`（311 行）：可拖拽、可折叠的草稿历史侧边面板，支持恢复/删除/双击恢复，`sendBeacon` 关闭前自动保存
+  - 新建 `css/editor/article-editor.css`（131 行）：全屏覆盖层排版，`contenteditable` 编辑态指示，复用 `.detail-body` 正文规则
+- **文章内贴纸编辑系统（全新）**：
+  - 新建 `js/editor/sticker-editor-mode.js`（~420 行）：沉浸式全屏贴纸编辑环境，贴纸库控制台（复用 `.admin-panel`）、拖拽放置 + 坐标微调、脉冲光标动画、`<!-- sticker:xxx -->` 标记解析
+  - 新建 `js/editor/sticker-renderer.js`（~150 行）：贴纸 DOM 创建、内容标记解析、文章内渲染
+  - 新建 `js/editor/sticker-shape.js`（~80 行）：16 边形 `shape-outside` 浮动形状配置、位置推荐
+  - 新建 `js/utils/shape-generator.js`（~120 行）：16 边形多边形顶点生成（圆形/椭圆/圆角矩形）
+  - 新建 `css/editor/sticker-editor.css`（131 行）：编辑模式覆盖层 + 控制台面板样式
+  - 新建 `css/components/sticker-float.css`（108 行）：`float` + `shape-outside: circle(50%)` 文字绕排，含三主题适配 + 移动端缩小
+- **文章阅读页面贴纸渲染**：
+  - `js/ui/components/detail.js` 新增 `_renderStickersForArticle()` 和 `_parseStickerMarkers()`：在阅读视图中渲染文章内贴纸（从 `article.stickers` 或内容标记解析），30+ 行
+- **快捷键**：`Ctrl+E` 打开当前活跃文章的编辑器（`js/app.js` 新增 20 行）
+- **事件扩展**：新增 5 个事件常量 `EDITOR_OPENED/CLOSED`、`STICKER_EDITOR_OPENED/CLOSED/SAVED`
+- **文案统一**：`ui-strings.js` 新增 `UI.editor` 扩展（2 条）+ `UI.stickerEditor` 全组（12 条）
+- **ErrPulse 禁用**：`backend/server.cjs` 改为 `enabled: false`，`vite.config.js` 注释 `@errpulse/vite` 插件（SDK 无开关配置，注释即关闭）
+- **组件清理**：4 个组件文件（deco/puzzle/magic-box/health-component.js）移除未使用的 import
+- **开发者文档**：`docs/development/sticker-editor.md`（贴纸系统架构 + 文件清单 + 数据流）
+- **ai协作文档**：`docs\ai-collaboration\all-summary.md`(ai总览项目建立上下文索引的提示词),`docs\development\css-index.md`（ai建立的css样式索引）,`docs\ai-collaboration\css-summary.md`(ai根据css建立上下文索引的提示词)
 
 ### v1.18.0
 

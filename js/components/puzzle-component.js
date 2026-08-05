@@ -7,7 +7,6 @@ export var puzzleComponent = {
   name: 'puzzle',
 
   config: {
-    version: '2.0.0',
     dependencies: [],
     desktopOnly: true,
     requiresAuth: false,

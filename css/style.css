@@ -17,6 +17,7 @@
 @import url('components/modal.css');
 @import url('components/watermark.css');
 @import url('components/mobile-controls.css');
+@import url('components/deco-resize.css');
 
 /* 3. 工具样式 */
 @import url('utilities/animations.css');

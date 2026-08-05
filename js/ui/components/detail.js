@@ -204,6 +204,8 @@ export const UIDetail = {
     );
 
     this.activateTab(id);
+    // 渲染文章贴纸
+    this._renderStickersForArticle(article, pane);
     this.overlay.classList.add('active');
     document.documentElement.style.overflow = "hidden"; document.body.style.overflow = "hidden";
   },
@@ -467,6 +469,65 @@ export const UIDetail = {
     document.documentElement.style.overflow = ''; document.body.style.overflow = '';
     this.activeId = null;
     if (document.fullscreenElement) this._exitFullscreen();
+  },
+
+  /** 在阅读面板中渲染文章贴纸（从 article.stickers 或内容标记解析） */
+  _renderStickersForArticle: function (article, pane) {
+    if (!pane) return;
+    // 清除旧贴纸
+    var existing = pane.querySelectorAll('.detail-sticker');
+    existing.forEach(function (el) { el.remove(); });
+
+    // 优先使用 article.stickers 数组
+    var stickers = article.stickers;
+    if (!stickers || !stickers.length) {
+      // 从内容标记中解析
+      var parsed = this._parseStickerMarkers(article.content || '');
+      stickers = parsed.stickers;
+    }
+    if (!stickers || !stickers.length) return;
+
+    var self = this;
+    stickers.forEach(function (s) {
+      var deco = window.__REVACHOL__ && window.__REVACHOL__.DecoShelf
+        ? window.__REVACHOL__.DecoShelf.get(s.decoId) : null;
+      var imgSrc = deco ? (deco.dataUrl || deco.url || '') : '/api/decos/' + s.decoId + '/image';
+      if (!imgSrc) return;
+
+      var el = document.createElement('div');
+      el.className = 'detail-sticker';
+      el.style.cssText = [
+        'position:absolute',
+        'left:' + (s.x || 50) + 'px',
+        'top:' + (s.y || 50) + 'px',
+        'width:' + (s.width || 100) + 'px',
+        'height:' + (s.height || 100) + 'px',
+        'background-image:url(' + imgSrc + ')',
+        'background-size:contain',
+        'background-repeat:no-repeat',
+        'background-position:center',
+        'pointer-events:none', 'z-index:5',
+        'border-radius:4px',
+      ].join(';');
+      pane.appendChild(el);
+    });
+  },
+
+  /** 从内容中解析贴纸标记 */
+  _parseStickerMarkers: function (content) {
+    var stickers = [];
+    var regex = /<!--\s*sticker:([a-zA-Z0-9_-]+)\s*(?:align=(left|right))?\s*(?:w=(\d+))?\s*(?:h=(\d+))?\s*-->/g;
+    var match;
+    while ((match = regex.exec(content)) !== null) {
+      stickers.push({
+        decoId: match[1],
+        align: match[2] || 'left',
+        x: 50, y: 50 + stickers.length * 80,
+        width: parseInt(match[3]) || 100,
+        height: parseInt(match[4]) || 100,
+      });
+    }
+    return { stickers: stickers };
   },
 };
 

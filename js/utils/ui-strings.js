@@ -279,6 +279,8 @@ export const UI = {
         articleNotFound: '文章不存在',
         shortcutSave: 'Ctrl+S 保存草稿',
         shortcutCancel: 'Esc 取消编辑',
+        unsavedConfirm: '有未保存的更改，确定要退出吗？',
+        categoryLabel: '📁 分类',
     },
 
     draft: {
@@ -459,7 +461,6 @@ export const UI = {
         stateUnmounted: '已卸载',
         stateError: '错误',
         stateUnknown: '未知',
-        versionLabel: '版本',
         depsLabel: '依赖',
         noDeps: '无',
         desktopOnly: '仅桌面端',
@@ -507,6 +508,25 @@ export const UI = {
             itemImageUpdated: (label) => `物品 "${label}" 贴图已更新`,
             itemImageRemoved: (label) => `物品 "${label}" 已恢复默认 Emoji`,
         },
+    },
+
+    stickerEditor: {
+        addStickerBtn: '📌 添加贴纸',
+        editingLabel: '✏️ 编辑中',
+        toolbarTitle: '贴纸库',
+        confirmBtn: '✅ 确认',
+        cancelBtn: '❌ 取消',
+        consoleTitle: '📚 贴纸库',
+        placedLabel: '已放置',
+        emptyLibrary: '贴纸库为空，请先在管理面板上传贴纸',
+        mobileWarning: '贴纸编辑功能仅支持桌面端',
+        ctxMoveAndResize: '📐 移动和缩放',
+        ctxToggleAlign: '🔄 切换浮动方向',
+        ctxRemove: '🗑️ 删除贴纸',
+        savedToast: '贴纸位置已保存',
+        cancelledToast: '已放弃贴纸更改',
+        escHint: '再按一次 ESC 放弃更改',
+        syncFailed: '贴纸保存失败，请重试',
     },
 
 };

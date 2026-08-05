@@ -94,10 +94,15 @@ export function showContextMenu(x, y, type, name, articleId, nodeLi, updateTreeF
 }
 
 async function handleContextAction(action, data, nodeLi, updateTreeFn) {
-    // ---- 编辑文章 ----
+    // ---- 编辑文章 → 内联编辑模式 ----
     if (action === 'edit-article') {
-        const editorUrl = '/article-editor.html?articleId=' + data;
-        window.open(editorUrl, '_blank');
+        // 通过全局命名空间访问 ArticleEditorMode
+        var AEM = window.__REVACHOL__ && window.__REVACHOL__.ArticleEditorMode;
+        if (AEM && typeof AEM.open === 'function') {
+            AEM.open(data);
+        } else {
+            Utils.showToast('编辑器模块未加载，请刷新页面后重试', true);
+        }
         return;
     }
 

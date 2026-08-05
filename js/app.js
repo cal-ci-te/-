@@ -29,6 +29,7 @@ import { Texture } from './services/texture.js';
 import { initPuzzle } from './puzzle/Puzzle.js';
 import { initMagicBox } from './ui/components/magic-box/index.js';
 import { HealthMonitor } from './services/health-monitor.js';
+import { ArticleEditorMode } from './editor/article-editor-mode.js';
 
 // 组件统一管理系统
 import { ComponentManager } from './core/component-manager.js';
@@ -302,6 +303,7 @@ window.__REVACHOL__ = {
   Texture,
   HealthMonitor,
   ComponentManager,
+  ArticleEditorMode,
 };
 
 // 左上角工具栏：展开/收起切换
@@ -333,6 +335,29 @@ setTimeout(() => {
 // 自定义站点图标（通过 SiteIcon 服务初始化）
 SiteIcon.init();
 SiteIcon.playEntranceAnimation();
+
+// =========================================================================
+// 键盘快捷键：Ctrl+E → 编辑当前活跃文章
+// =========================================================================
+document.addEventListener('keydown', function (e) {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'e') {
+    // 跳过在输入框/编辑器中的触发
+    var tag = document.activeElement && document.activeElement.tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || (document.activeElement && document.activeElement.contentEditable === 'true')) return;
+
+    e.preventDefault();
+    // 获取当前活跃的文章（来自详情标签页或目录选中）
+    var activeId = null;
+    if (UIController && UIController.detail && UIController.detail.activeId) {
+      activeId = UIController.detail.activeId;
+    }
+    if (!activeId) {
+      Utils.showToast('请先在目录树中选中一篇文章', false);
+      return;
+    }
+    ArticleEditorMode.open(activeId);
+  }
+});
 
 // =========================================================================
 // 组件统一管理系统 — 注册 + 批量初始化 + 挂载
