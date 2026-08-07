@@ -281,6 +281,12 @@ export const UI = {
         shortcutCancel: 'Esc 取消编辑',
         unsavedConfirm: '有未保存的更改，确定要退出吗？',
         categoryLabel: '📁 分类',
+        // 反馈弹窗
+        modalDraftSavedTitle: '✅ 草稿已保存',
+        modalDraftSavedTime: '保存时间',
+        modalPublishSuccessTitle: '🚀 文章已发布',
+        modalPublishSuccessDetail: '标题',
+        modalConfirmBtn: '确定',
     },
 
     draft: {

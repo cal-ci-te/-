@@ -1,101 +1,56 @@
 /* ================================================================
- * 文章编辑模式样式 — 全屏覆盖层内的文章编辑体验
- * 复用主页面文章阅读样式，所有颜色使用 CSS 变量适配三套主题
+ * 文章编辑模式样式 — 仅定义编辑器独有的样式
+ *
+ * 复用策略（完全复用，绝不重新定义）：
+ *   正文排版 → 完全复用 detail.css 的 .detail-body 及子选择器
+ *   标题/引用/代码块 → 完全复用 .detail-body h1/h2/h3/blockquote/code/pre
+ *   容器内边距 → 与阅读页 .detail-pane 保持一致（24px 32px）
+ *   所有颜色/字体/间距 → 通过 CSS 变量继承，不硬编码
+ *
+ * 本文件仅定义编辑模式特有的：
+ *   1. 覆盖层滚动条
+ *   2. 贴纸叠加层
+ *   3. 响应式隐藏
  * ================================================================ */
 
 /* ---- 编辑模式覆盖层 ---- */
 #article-editor-overlay {
   scrollbar-width: thin;
-  scrollbar-color: var(--color-border, #5a3e2b) transparent;
+  scrollbar-color: var(--color-border) transparent;
 }
 
 #article-editor-overlay::-webkit-scrollbar { width: 8px; }
 #article-editor-overlay::-webkit-scrollbar-track { background: transparent; }
 #article-editor-overlay::-webkit-scrollbar-thumb {
-  background: var(--color-border, #5a3e2b);
+  background: var(--color-border);
   border-radius: 4px;
 }
 
-/* ---- 标签栏占位 ---- */
-#article-editor-tabbar-placeholder {
+/* ---- 标签栏占位条 — 外观与阅读页 .detail-topbar 完全一致 ---- */
+#article-editor-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 1;
   height: 36px;
-  min-height: 36px;
-  background: var(--color-bg-secondary, #1e1a15);
-  border-bottom: 1px solid var(--color-border, #5a3e2b);
+  background: var(--color-bg-secondary);
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  color: var(--color-text-muted);
 }
 
-/* ---- 文章容器（与 StickerEditorMode 尺寸完全一致）---- */
+/* ---- 文章容器 — 完全匹配阅读页 .detail-pane ---- */
+/* 顶部 36px 由 #article-editor-topbar 作为真实元素占据， */
+/* 容器 padding 仅保留 .detail-pane 的 24px 32px。 */
 #article-editor-article {
-  max-width: 800px;
-  margin: 4px auto 0;
-  padding: 40px 50px 120px;
-  color: var(--color-text-primary, #d4c9b8);
-  font-family: "Courier New", monospace;
-  font-size: 15px;
-  line-height: 1.9;
+  padding: 24px 32px;
   position: relative;
   overflow: visible;
-  min-height: 80vh;
-}
-
-#article-editor-article h1 {
-  color: var(--color-text-heading, #e8c88a);
-  font-size: 28px;
-  margin: 0 0 8px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid var(--color-border, #5a3e2b);
-}
-
-#article-editor-article h2,
-#article-editor-article h3 {
-  color: var(--color-text-heading, #e8c88a);
-  margin: 24px 0 10px;
-}
-
-#article-editor-article blockquote {
-  border-left: 3px solid var(--color-accent, #c47a44);
-  padding: 4px 16px;
-  margin: 12px 0;
-  color: var(--color-text-secondary, #c4b5a0);
-  font-style: italic;
-}
-
-#article-editor-article code {
-  background: var(--color-bg-tertiary, #2a231c);
-  padding: 2px 6px;
-  border-radius: 3px;
-  font-size: 13px;
-}
-
-#article-editor-article pre {
-  background: var(--color-bg-tertiary, #2a231c);
-  padding: 14px 18px;
-  border-radius: 6px;
-  overflow-x: auto;
-  border: 1px solid var(--color-border, #5a3e2b);
-}
-
-#article-editor-article ul,
-#article-editor-article ol {
-  padding-left: 24px;
-  margin: 8px 0;
-}
-
-/* ---- 可编辑模式（Phase 2 启用）---- */
-#article-editor-title[contenteditable="true"] {
-  outline: none;
-  border-bottom: 2px solid var(--color-accent, #c47a44);
-  padding-bottom: 14px;
-  cursor: text;
-}
-
-#article-editor-article .detail-body[contenteditable="true"] {
-  outline: 2px dashed var(--color-accent, #c47a44);
-  outline-offset: 4px;
-  border-radius: 4px;
-  padding: 8px;
-  cursor: text;
-  min-height: 200px;
+  box-sizing: border-box;
+  min-height: 100%;
 }
 
 /* ---- 贴纸叠加层（只读模式）---- */
@@ -121,7 +76,7 @@
 }
 
 .article-editor-sticker:hover {
-  border-color: var(--color-accent, #c47a44);
+  border-color: var(--color-accent);
 }
 
 /* ---- 响应式：移动端隐藏编辑模式 ---- */

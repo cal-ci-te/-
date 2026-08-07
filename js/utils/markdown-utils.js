@@ -10,14 +10,31 @@ import { Utils } from '../utils.js';
 export var MarkdownUtils = {
 
   /**
-   * 将 Markdown 文本转换为 HTML。
+   * 检测文本是否已包含 HTML 标签（WYSIWYG 编辑器输出）。
+   * 使用启发式检测：匹配常见的块级/行内 HTML 标签。
+   * @param {string} text
+   * @returns {boolean}
+   */
+  _isLikelyHtml: function (text) {
+    if (!text) return false;
+    return /<\/?(p|div|span|h[1-6]|strong|b|em|i|u|a|ul|ol|li|br|blockquote|pre|code|table|img|hr)[>\s\/]/.test(text);
+  },
+
+  /**
+   * 将 Markdown 文本转换为 HTML。若内容本身已是 HTML 则直接返回。
    * 支持：标题 h1-h3、粗体/斜体、行内代码/代码块、引用、无序列表、段落。
    *
-   * @param {string} text - Markdown 原始文本
+   * @param {string} text - Markdown 原始文本 或 已渲染的 HTML
    * @returns {string} HTML 字符串
    */
   toHTML: function (text) {
     if (!text) return '<p style="color:var(--color-text-muted);">（空内容）</p>';
+
+    // 如果内容已包含 HTML 标签（WYSIWYG 编辑器输出），跳过 escapeHtml
+    // 避免将 <p> 转为 &lt;p&gt; 导致渲染为文本
+    if (this._isLikelyHtml(text)) {
+      return text;
+    }
 
     var html = Utils.escapeHtml(text);
 

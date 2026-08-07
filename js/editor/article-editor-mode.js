@@ -175,27 +175,18 @@ export const ArticleEditorMode = {
     ].join(';');
     document.body.appendChild(this._overlay);
 
-    // 标签栏占位（36px sticky，匹配 detail-topbar）
-    var tabbar = document.createElement('div');
-    tabbar.id = 'article-editor-tabbar-placeholder';
-    tabbar.style.cssText = [
-      'position:sticky', 'top:0', 'z-index:5',
-      'height:36px', 'background:var(--color-bg-secondary, #1e1a15)',
-      'border-bottom:1px solid var(--color-border, #5a3e2b)',
-    ].join(';');
-    this._overlay.appendChild(tabbar);
+    // 标签栏占位条 — 外观与阅读页 .detail-topbar 一致（36px，深色背景 + 底边框）
+    this._topbar = document.createElement('div');
+    this._topbar.id = 'article-editor-topbar';
+    this._topbar.textContent = '文章编辑';
+    this._overlay.appendChild(this._topbar);
 
-    // 文章容器 — 与 StickerEditorMode 的 _articleContainer 尺寸完全一致
-    // StickerEditorMode: max-width:800px, margin:40px auto, padding:40px 50px, overflow:visible
-    // margin-top 改为 4px（36px tabbar + 4px = 40px，匹配原 40px margin-top）
+    // 文章容器 — 完全匹配阅读页 .detail-pane（padding 24px 32px）
     this._articleContainer = document.createElement('div');
     this._articleContainer.id = 'article-editor-article';
     this._articleContainer.style.cssText = [
-      'max-width:800px', 'margin:4px auto 0', 'padding:40px 50px 120px',
-      'color:var(--color-text-primary, #d4c9b8)',
-      'font-family:"Courier New", monospace', 'font-size:15px',
-      'line-height:1.9', 'position:relative', 'overflow:visible',
-      'min-height:80vh',
+      'padding:24px 32px', 'position:relative', 'overflow:visible',
+      'box-sizing:border-box', 'min-height:100%',
     ].join(';');
     this._overlay.appendChild(this._articleContainer);
 
@@ -221,6 +212,7 @@ export const ArticleEditorMode = {
       'color:var(--color-text-heading, #e8c88a)',
       'font-size:28px', 'margin:0 0 8px', 'padding-bottom:16px',
       'border-bottom:1px solid var(--color-border, #5a3e2b)',
+      'font-family:var(--font-family-serif, Georgia, serif)',
       'outline:none',
     ].join(';');
     this._titleEl.textContent = article.title || '未命名文章';
@@ -362,7 +354,7 @@ export const ArticleEditorMode = {
     var html = this.getContentHTML();
 
     // 先移除已有的贴纸标记（避免重复）
-    html = html.replace(/<!--\s*sticker:.*?-->/g, '');
+    html = StickerRenderer.stripMarkers(html);
 
     // 追加当前贴纸标记
     var stickers = this._article ? (this._article.stickers || []) : [];
@@ -400,6 +392,7 @@ export const ArticleEditorMode = {
 
   /**
    * 检测是否有实际修改（对比快照）。
+   * 注意：_snapshot.content 可能含贴纸标记，getContentHTML 不含，比较前需剥离。
    * @returns {boolean}
    */
   hasChanges() {
@@ -409,8 +402,12 @@ export const ArticleEditorMode = {
     var currentContent = this.getContentHTML();
     var currentStickers = this._article ? (this._article.stickers || []) : [];
 
+    // 剥离贴纸标记后比较内容（快照 content 可能含标记）
+    var snapshotContent = StickerRenderer.stripMarkers(this._snapshot.content || '');
+    var cleanContent = StickerRenderer.stripMarkers(currentContent || '');
+
     return currentTitle !== this._snapshot.title ||
-           currentContent !== this._snapshot.content ||
+           cleanContent !== snapshotContent ||
            JSON.stringify(currentStickers) !== JSON.stringify(this._snapshot.stickers || []);
   },
 
@@ -499,7 +496,12 @@ export const ArticleEditorMode = {
     [{ label: '🔄 切换浮动方向', action: function () { stickerData.align = stickerData.align === 'right' ? 'left' : 'right'; self._removeEditorStickerMenu(); self._dirty = true; } },
      { sep: true },
      { label: '🗑️ 删除贴纸', action: function () {
+       // 1. 从数据中移除
        if (self._article && self._article.stickers) self._article.stickers = self._article.stickers.filter(function (s) { return s.decoId !== stickerData.decoId; });
+       // 2. 移除事件监听器
+       if (stickerEl._stickerDragDown) { stickerEl.removeEventListener('mousedown', stickerEl._stickerDragDown); delete stickerEl._stickerDragDown; }
+       stickerEl.onmouseenter = null; stickerEl.onmouseleave = null; stickerEl.oncontextmenu = null;
+       // 3. 从 DOM 中完全移除
        if (stickerEl.parentNode) stickerEl.parentNode.removeChild(stickerEl);
        self._removeEditorStickerMenu(); self._dirty = true;
      }}].forEach(function (item) {
@@ -568,6 +570,71 @@ export const ArticleEditorMode = {
   // =========================================================================
 
   /**
+   * 显示反馈弹窗（保存/发布成功）。
+   * @param {string} title - 弹窗标题
+   * @param {Array<{label:string, value:string}>} details - 详情行 [{label, value}]
+   */
+  _showFeedbackModal(title, details) {
+    var self = this;
+    // 移除已有弹窗
+    var existing = document.getElementById('editor-feedback-modal');
+    if (existing) existing.remove();
+
+    var overlay = document.createElement('div');
+    overlay.id = 'editor-feedback-modal';
+    overlay.style.cssText = [
+      'position:fixed', 'top:0', 'left:0', 'width:100%', 'height:100%',
+      'z-index:10050', 'display:flex', 'align-items:center', 'justify-content:center',
+      'background:rgba(0,0,0,0.5)', 'backdrop-filter:blur(4px)',
+    ].join(';');
+
+    var box = document.createElement('div');
+    box.style.cssText = [
+      'background:var(--color-bg-tertiary, #2a231c)',
+      'border:1px solid var(--color-border-highlight, #c47a44)',
+      'border-radius:8px', 'padding:24px 28px', 'min-width:300px', 'max-width:420px',
+      'box-shadow:var(--shadow-md, 4px 4px 0 rgba(0,0,0,0.35))',
+      'font-family:Courier New,monospace', 'font-size:13px',
+      'text-align:center',
+    ].join(';');
+
+    var titleEl = document.createElement('h3');
+    titleEl.style.cssText = 'color:var(--color-text-heading, #e8c88a);margin:0 0 16px;font-size:16px;';
+    titleEl.textContent = title;
+    box.appendChild(titleEl);
+
+    if (details && details.length) {
+      details.forEach(function (row) {
+        var line = document.createElement('div');
+        line.style.cssText = 'margin-bottom:8px;';
+        line.innerHTML =
+          '<span style="color:var(--color-text-muted);">' + row.label + '：</span>' +
+          '<span style="color:var(--color-text-accent);">' + Utils.escapeHtml(row.value || '') + '</span>';
+        box.appendChild(line);
+      });
+    }
+
+    var btn = document.createElement('button');
+    btn.textContent = UI.editor.modalConfirmBtn || '确定';
+    btn.style.cssText = [
+      'margin-top:16px', 'padding:8px 32px',
+      'background:var(--color-accent, #c47a44)',
+      'color:#fff', 'border:none', 'border-radius:4px',
+      'cursor:pointer', 'font-family:Courier New,monospace', 'font-size:13px',
+    ].join(';');
+    var closeModal = function () { if (overlay.parentNode) overlay.remove(); };
+    btn.addEventListener('click', closeModal);
+    box.appendChild(btn);
+
+    overlay.appendChild(box);
+    overlay.addEventListener('click', function (e) { if (e.target === overlay) closeModal(); });
+    document.body.appendChild(overlay);
+
+    // 2.5 秒后自动关闭
+    setTimeout(function () { if (overlay.parentNode) overlay.remove(); }, 2500);
+  },
+
+  /**
    * 保存草稿到后端。
    */
   async saveDraft() {
@@ -594,6 +661,10 @@ export const ArticleEditorMode = {
         category: category,
       });
       Utils.showToast(UI.editor.saveSuccess, false);
+      this._showFeedbackModal(UI.editor.modalDraftSavedTitle, [
+        { label: UI.editor.modalDraftSavedTime, value: new Date().toLocaleString() },
+        { label: UI.editor.titleLabel, value: title }
+      ]);
 
       // 更新快照 + 刷新草稿列表
       this._snapshot = { title: title, content: content, stickers: this._article ? JSON.parse(JSON.stringify(this._article.stickers || [])) : [] };
@@ -641,6 +712,10 @@ export const ArticleEditorMode = {
       await ArticleService.fetchArticles(true);
 
       Utils.showToast(UI.editor.publishSuccess, false);
+      this._showFeedbackModal(UI.editor.modalPublishSuccessTitle, [
+        { label: UI.editor.modalPublishSuccessDetail, value: title },
+        { label: UI.editor.categoryLabel, value: category }
+      ]);
 
       // 更新快照
       this._snapshot = { title: title, content: content, stickers: this._article ? JSON.parse(JSON.stringify(this._article.stickers || [])) : [] };
@@ -821,7 +896,7 @@ export const ArticleEditorMode = {
           self._article.stickers = JSON.parse(JSON.stringify(data.stickers));
           // 同时更新 article.content 中的贴纸标记（保持兼容）
           var content = self._article.content || '';
-          content = content.replace(StickerRenderer._MARKER_REGEX, '');
+          content = StickerRenderer.stripMarkers(content);
           data.stickers.forEach(function (s) {
             content += '\n' + StickerRenderer.createMarker(s.decoId, s);
           });

@@ -2,7 +2,7 @@
 
 原创角色档案馆，一个带内容管理、贴纸装饰、水印保护、多主题切换的 Web 应用。
 
-当前版本：v1.18.2
+当前版本：v1.18.3
 
 ---
 
@@ -146,6 +146,31 @@ Docker 安全部署：进程降权（非 root）、端口默认仅绑定 localho
 多主题系统：CSS 变量驱动，三套主题动态加载。
 
 ## 更新日志
+
+### v1.18.3
+
+**P0 渲染修复 + 编辑器阅读页样式对齐 + 贴纸边界调整：**
+
+**P0 修复（2 项）：**
+- **文章卡片 HTML 渲染**：`MarkdownUtils.toHTML()` 无条件 `escapeHtml()` 导致编辑器输出的 HTML 内容被双重转义，卡片显示原始标签文字（如 `<p>`、`<strong>`）而非富文本样式。修复为添加 `_isLikelyHtml()` 启发式检测，HTML 内容绕过转义直接渲染。卡片路径统一使用 `innerHTML` + `truncateHtml()` 替代旧的 `textContent` 截断。
+- **贴纸标记泄露**：标记剥离仅移除 `<!-- sticker:xxx -->` 但保留前面的 `\n` 换行符，导致文章末尾出现空行占位。修复为新增 `StickerRenderer.stripMarkers()` 统一函数，同时清理标记周围的换行空白，6 处散落裸正则全部替换。
+
+**编辑器 ↔ 阅读页样式对齐：**
+- 删除编辑器 `#article-editor-article` 的 `max-width:800px` 居中、底部 `120px` 工具栏留空、`min-height:80vh`、编辑态虚线框指示 — 完全靠拢 `.detail-pane` 布局
+- 新增 `#article-editor-topbar` 标签栏占位条（36px，`position:sticky`，深色背景 + 底边框），外观与阅读页 `.detail-topbar` 一致
+- 统一 `box-sizing:border-box`、`min-height:100%`、标题 `font-family:var(--font-family-serif)`
+- 阅读页新增 `h1.detail-title` 标题渲染，样式与编辑器 `#article-editor-title` 完全一致
+
+**贴纸位置边界调整：**
+- 贴纸上边界从视口顶（0px）改为标签栏占位下（36px）
+- 贴纸下边界从视口底改为 `50000px`（自由下移，性能安全）
+- 4 个钳制点统一常量：`MARGIN_H=10`、`TOP_MIN=36`、`BOTTOM_MAX=50000`
+
+**工具函数新增：**
+- `js/utils/dom.js` 新增 `stripHtml()`、`truncateHtml()`
+
+**修改文件（13 个）：**
+`markdown-utils.js`、`dom.js`、`sticker-renderer.js`、`articles.js`、`detail.js`、`article-editor-mode.js`、`detail.css`、`article-editor.css`、`deco.js`、`deco-edit.js`
 
 ### v1.18.2
 

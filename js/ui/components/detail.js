@@ -6,7 +6,9 @@ import { EventBus } from '../../core/event-bus.js';
 import { EVENTS } from '../../core/event-constants.js';
 import { Utils } from '../../utils.js';
 import { UI } from '../../utils/ui-strings.js';
+import { MarkdownUtils } from '../../utils/markdown-utils.js';
 import { StickerRenderer } from '../../editor/sticker-renderer.js';
+import { StickerShape } from '../../editor/sticker-shape.js';
 
 export const UIDetail = {
   overlay: null,
@@ -167,6 +169,7 @@ export const UIDetail = {
     pane.className = 'detail-pane';
     pane.dataset.id = id;
     pane.innerHTML = `
+            <h1 class="detail-title">${Utils.escapeHtml(title)}</h1>
             <div class="detail-body">${html}</div>
         `;
     this.panesContainer.appendChild(pane);
@@ -211,33 +214,18 @@ export const UIDetail = {
     document.documentElement.style.overflow = "hidden"; document.body.style.overflow = "hidden";
   },
 
+  /**
+   * 渲染文章内容为 HTML。
+   * 统一使用 MarkdownUtils.toHTML()，与编辑器保持一致的渲染结果。
+   * 渲染前剥离贴纸占位标记，避免渲染为文本。
+   * @param {string} text - 文章内容（Markdown 或 HTML）
+   * @returns {string} HTML
+   */
   renderContent: function (text) {
     if (!text) return '';
-    let html = Utils.escapeHtml(text);
-
-    html = html.replace(/```([\s\S]*?)```/g, function (match, code) {
-      return '<pre><code>' + Utils.escapeHtml(code) + '</code></pre>';
-    });
-    html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
-    html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
-    html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
-    html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
-    html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-    html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
-    html = html.replace(/^&gt; (.+)$/gm, '<blockquote>$1</blockquote>');
-    html = html.replace(/^- (.+)$/gm, '<li>$1</li>');
-    html = html.replace(/(<li>.*<\/li>\s*)+/g, function (match) {
-      return '<ul>' + match + '</ul>';
-    });
-    html = html.replace(/\n{2,}/g, '</p><p>');
-    html = html.replace(/\n/g, '<br>');
-    html = '<p>' + html + '</p>';
-    html = html.replace(/<p><\/p>/g, '');
-    html = html.replace(/<p><br><\/p>/g, '');
-    html = html.replace(/<(h[1-6]|ul|ol|li|blockquote|pre)>/g, function (match) {
-      return match.replace('<br>', '');
-    });
-    return html;
+    // 剥离贴纸占位标记及其周围空白（避免标记残留和空行占位）
+    var clean = StickerRenderer.stripMarkers(text);
+    return MarkdownUtils.toHTML(clean);
   },
 
   activateTab: function (id) {

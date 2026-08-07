@@ -33,7 +33,7 @@ export const ArticleEditorToolbar = {
       'right:20px', 'top:20px',
       'background:var(--color-bg-tertiary, #2a231c)',
       'border:1px solid var(--color-border-highlight, #c47a44)',
-      'border-radius:6px', 'box-shadow:4px 4px 0 rgba(0,0,0,0.35)',
+      'border-radius:8px', 'box-shadow:var(--shadow-md, 4px 4px 0 rgba(0,0,0,0.35))',
       'font-family:"Courier New", monospace', 'font-size:13px',
       'transition:width 0.2s',
     ].join(';');

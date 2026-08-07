@@ -106,19 +106,16 @@ export const DecoShelf = {
     return 'deco_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
   },
 
-  // 贴纸位置钳制到视口内，确保任何部分都不超出屏幕。
-  // 使用 element.offsetWidth/offsetHeight 获取实际尺寸（未渲染时返回 null 则跳过）。
-  // 如贴纸尺寸大于视口，则至少保留 10px 边缘间距。
+  // 贴纸位置钳制：左右在页面范围内，上方不超标签栏，下方允许较大值。
   clampPositionToViewport(position, element) {
     if (!position || !element) return position;
     const w = element.offsetWidth || 0;
     const h = element.offsetHeight || 0;
-    if (w === 0 && h === 0) return position; // 元素未渲染，跳过
-    const MARGIN = 10;
+    if (w === 0 && h === 0) return position;
+    const MARGIN_H = 10;
+    const TOP_MIN = 36;       // 标签栏占位高度
+    const BOTTOM_MAX = 50000; // 下方允许的较大值
     const vw = window.innerWidth;
-    const vh = window.innerHeight;
-    const maxW = Math.min(w, vw - MARGIN * 2);
-    const maxH = Math.min(h, vh - MARGIN * 2);
 
     let top = null, left = null;
     if (position.top !== undefined && position.top !== null) {
@@ -130,17 +127,17 @@ export const DecoShelf = {
 
     // right/bottom → left/top 统一
     if ((top === null || isNaN(top)) && position.bottom !== undefined && position.bottom !== null) {
-      top = vh - parseFloat(position.bottom) - h;
+      top = window.innerHeight - parseFloat(position.bottom) - h;
     }
     if ((left === null || isNaN(left)) && position.right !== undefined && position.right !== null) {
       left = vw - parseFloat(position.right) - w;
     }
 
-    if (top === null || isNaN(top)) top = MARGIN;
-    if (left === null || isNaN(left)) left = MARGIN;
+    if (top === null || isNaN(top)) top = TOP_MIN;
+    if (left === null || isNaN(left)) left = MARGIN_H;
 
-    top = Math.max(MARGIN, Math.min(top, vh - h - MARGIN));
-    left = Math.max(MARGIN, Math.min(left, vw - w - MARGIN));
+    top = Math.max(TOP_MIN, Math.min(top, BOTTOM_MAX));
+    left = Math.max(MARGIN_H, Math.min(left, vw - w - MARGIN_H));
 
     const clamped = { top: top + 'px', left: left + 'px' };
     if (position.width) clamped.width = position.width;
@@ -656,13 +653,14 @@ export const DecoShelf = {
       el.style.cursor = 'grabbing';
       const onMouseMove = (ev) => {
         ev.preventDefault();
-        const MARGIN = 10;
+        const MARGIN_H = 10;
+        const TOP_MIN = 36;
+        const BOTTOM_MAX = 50000;
         let newLeft = ev.clientX - offsetX;
         let newTop = ev.clientY - offsetY;
-        const maxLeft = window.innerWidth - el.offsetWidth - MARGIN;
-        const maxTop = window.innerHeight - el.offsetHeight - MARGIN;
-        newLeft = Math.max(MARGIN, Math.min(newLeft, maxLeft));
-        newTop = Math.max(MARGIN, Math.min(newTop, maxTop));
+        const maxLeft = window.innerWidth - el.offsetWidth - MARGIN_H;
+        newLeft = Math.max(MARGIN_H, Math.min(newLeft, maxLeft));
+        newTop = Math.max(TOP_MIN, Math.min(newTop, BOTTOM_MAX));
         el.style.left = newLeft + 'px';
         el.style.top = newTop + 'px';
         el.style.right = 'auto';

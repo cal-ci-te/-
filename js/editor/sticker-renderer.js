@@ -25,6 +25,24 @@ export const StickerRenderer = {
   _MARKER_REGEX: /<!--\s*sticker:(.*?)-->/g,
 
   /**
+   * 从内容中剥离所有贴纸标记及其周围的空白行。
+   * 标记以 HTML 注释形式嵌入：\n<!-- sticker:xxx -->\n
+   * 单纯剥离标记会留下 \n 残留导致卡片/详情页末尾出现空行占位，
+   * 此函数同时清理标记前后的空白。
+   *
+   * @param {string} content - 文章内容
+   * @returns {string} 剥离标记并清理空白后的内容
+   */
+  stripMarkers: function (content) {
+    if (!content) return '';
+    // 移除标记连同其前面的换行符（标记总是以 \n + <!-- 形式写入）
+    var cleaned = content.replace(/\n?<!--\s*sticker:.*?-->/g, '');
+    // 压缩 3 个以上连续换行为双换行（最多保留一个段落间距）
+    cleaned = cleaned.replace(/\n{3,}/g, '\n\n');
+    return cleaned.trim();
+  },
+
+  /**
    * 从标记注释内容中解析字段（字段顺序无关，兼容新旧格式）。
    * @param {string} raw - 注释内部文本，如 "deco_abc align=left w=120 h=120"
    * @returns {object} { decoId, x, y, w, h, align }
@@ -69,9 +87,9 @@ export const StickerRenderer = {
       });
     }
 
-    // 移除所有标记
+    // 移除所有标记（复用 stripMarkers 清理空白）
     regex.lastIndex = 0;
-    var cleanContent = content.replace(regex, '');
+    var cleanContent = this.stripMarkers(content);
 
     return { cleanContent: cleanContent, stickers: stickers };
   },

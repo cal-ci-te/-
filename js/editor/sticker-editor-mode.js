@@ -126,9 +126,7 @@ export const StickerEditorMode = {
     this._articleContainer.id = 'sticker-editor-article';
     this._articleContainer.style.cssText = [
       'max-width:800px', 'margin:40px auto', 'padding:40px 50px',
-      'color:var(--color-text-primary, #d4c9b8)',
-      'font-family:"Courier New", monospace', 'font-size:15px',
-      'line-height:1.9', 'position:relative', 'overflow:visible',
+      'position:relative', 'overflow:visible',
       'min-height:80vh',
     ].join(';');
     this._overlay.appendChild(this._articleContainer);
@@ -354,11 +352,21 @@ export const StickerEditorMode = {
       { type: 'sep' },
       { label: UI.stickerEditor.ctxRemove || '🗑️ 删除贴纸',
         action: function () {
-          delete stickerEl._stickerDragDown; // marker only, listener on element
+          // 1. 移除 DOM 上的事件监听器
+          if (stickerEl._stickerDragDown) {
+            stickerEl.removeEventListener('mousedown', stickerEl._stickerDragDown);
+            delete stickerEl._stickerDragDown;
+          }
+          stickerEl.onmouseenter = null;
+          stickerEl.onmouseleave = null;
+          stickerEl.oncontextmenu = null;
+          // 2. 从数据中移除
           self._stickerData = self._stickerData.filter(function (s) {
             return s.decoId !== stickerData.decoId;
           });
+          // 3. 从 DOM 中完全移除
           if (stickerEl.parentNode) stickerEl.parentNode.removeChild(stickerEl);
+          // 4. 清理右键菜单 + 刷新控制台
           self._removeContextMenu();
           self._refreshConsoleGallery();
         }},
@@ -483,17 +491,11 @@ export const StickerEditorMode = {
       e.stopPropagation();
       collapsed = !collapsed;
       if (collapsed) {
-        panel.style.width = '48px';
-        panel.style.minWidth = '48px';
-        content.style.display = 'none';
-        header.querySelector('h4').style.display = 'none';
-        this.textContent = '◀';
+        panel.classList.add('collapsed');
+        header.querySelector('.toggle-icon').textContent = '◀';
       } else {
-        panel.style.width = '280px';
-        panel.style.minWidth = '';
-        content.style.display = '';
-        header.querySelector('h4').style.display = '';
-        this.textContent = '▶';
+        panel.classList.remove('collapsed');
+        header.querySelector('.toggle-icon').textContent = '▶';
       }
     });
 
@@ -771,7 +773,7 @@ export const StickerEditorMode = {
 
     // 将贴纸标记写入文章内容
     var content = this._article.content || '';
-    content = content.replace(StickerRenderer._MARKER_REGEX, '');
+    content = StickerRenderer.stripMarkers(content);
     this._stickerData.forEach(function (s) {
       content += '\n' + StickerRenderer.createMarker(s.decoId, s);
     });

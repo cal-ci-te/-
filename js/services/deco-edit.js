@@ -428,11 +428,12 @@ export const DecoEdit = {
                 let newLeft = self._dragStartLeft + dx;
                 let newTop = self._dragStartTop + dy;
 
-                const MARGIN = 10;
-                const maxLeft = window.innerWidth - el.offsetWidth - MARGIN;
-                const maxTop = window.innerHeight - el.offsetHeight - MARGIN;
-                newLeft = Math.max(MARGIN, Math.min(newLeft, maxLeft));
-                newTop = Math.max(MARGIN, Math.min(newTop, maxTop));
+                const MARGIN_H = 10;
+                const TOP_MIN = 36;
+                const BOTTOM_MAX = 50000;
+                const maxLeft = window.innerWidth - el.offsetWidth - MARGIN_H;
+                newLeft = Math.max(MARGIN_H, Math.min(newLeft, maxLeft));
+                newTop = Math.max(TOP_MIN, Math.min(newTop, BOTTOM_MAX));
 
                 el.style.left = newLeft + 'px';
                 el.style.top = newTop + 'px';
@@ -494,10 +495,12 @@ export const DecoEdit = {
         const currentLeft = parseFloat(el.style.left) || 0;
         const currentTop = parseFloat(el.style.top) || 0;
 
+        const MARGIN_H = 10;
+        const TOP_MIN = 36;
+        const BOTTOM_MAX = 50000;
         const maxX = Math.max(0, window.innerWidth - width);
-        const maxY = Math.max(0, window.innerHeight - height);
-        const clampedLeft = Math.max(0, Math.min(currentLeft, maxX));
-        const clampedTop = Math.max(0, Math.min(currentTop, maxY));
+        const clampedLeft = Math.max(MARGIN_H, Math.min(currentLeft, maxX));
+        const clampedTop = Math.max(TOP_MIN, Math.min(currentTop, BOTTOM_MAX));
 
         if (clampedLeft !== currentLeft) el.style.left = clampedLeft + 'px';
         if (clampedTop !== currentTop) el.style.top = clampedTop + 'px';
